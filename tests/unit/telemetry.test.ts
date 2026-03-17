@@ -1,28 +1,32 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const {
+  PostHogMock,
   shutdownMock,
   captureMock,
   getSettingMock,
   setSettingMock,
   loggerDebugMock,
+  loggerInfoMock,
   loggerErrorMock,
 } = vi.hoisted(() => ({
-  shutdownMock: vi.fn(),
-  captureMock: vi.fn(),
-  getSettingMock: vi.fn(),
-  setSettingMock: vi.fn(),
-  loggerDebugMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-}));
-
-vi.mock('posthog-node', () => ({
-  PostHog: vi.fn(function PostHogMock() {
+  PostHogMock: vi.fn(function PostHogMock() {
     return {
       capture: captureMock,
       shutdown: shutdownMock,
     };
   }),
+  shutdownMock: vi.fn(),
+  captureMock: vi.fn(),
+  getSettingMock: vi.fn(),
+  setSettingMock: vi.fn(),
+  loggerDebugMock: vi.fn(),
+  loggerInfoMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
+}));
+
+vi.mock('posthog-node', () => ({
+  PostHog: PostHogMock,
 }));
 
 vi.mock('@electron/utils/store', () => ({
@@ -34,7 +38,7 @@ vi.mock('@electron/utils/logger', () => ({
   logger: {
     debug: loggerDebugMock,
     error: loggerErrorMock,
-    info: vi.fn(),
+    info: loggerInfoMock,
     warn: vi.fn(),
   },
 }));
@@ -49,7 +53,7 @@ vi.mock('node-machine-id', () => ({
   machineIdSync: () => 'machine-id-1',
 }));
 
-describe('main telemetry shutdown', () => {
+describe('main telemetry', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -69,24 +73,17 @@ describe('main telemetry shutdown', () => {
     captureMock.mockReturnValue(undefined);
   });
 
-  it('ignores PostHog network timeout errors during shutdown', async () => {
-    shutdownMock.mockRejectedValueOnce(
-      Object.assign(new Error('Network error while fetching PostHog'), {
-        name: 'PostHogFetchNetworkError',
-        cause: Object.assign(new Error('The operation was aborted due to timeout'), {
-          name: 'TimeoutError',
-        }),
-      }),
-    );
-
+  it('short-circuits when remote PostHog telemetry is disabled', async () => {
     const { initTelemetry, shutdownTelemetry } = await import('@electron/utils/telemetry');
     await initTelemetry();
     await shutdownTelemetry();
 
+    expect(PostHogMock).not.toHaveBeenCalled();
+    expect(captureMock).not.toHaveBeenCalled();
+    expect(shutdownMock).not.toHaveBeenCalled();
+    expect(getSettingMock).not.toHaveBeenCalledWith('machineId');
+    expect(setSettingMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).not.toHaveBeenCalled();
-    expect(loggerDebugMock).toHaveBeenCalledWith(
-      'Ignored telemetry shutdown network error:',
-      expect.objectContaining({ name: 'PostHogFetchNetworkError' }),
-    );
+    expect(loggerInfoMock).toHaveBeenCalledWith('Remote telemetry is disabled at build time');
   });
 });

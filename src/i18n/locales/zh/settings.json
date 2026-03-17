@@ -201,7 +201,7 @@
     "devMode": "开发者模式",
     "devModeDesc": "显示开发者工具和快捷方式",
     "telemetry": "匿名使用数据",
-    "telemetryDesc": "允许提供匿名的基础使用数据，用于改进 ClawX"
+    "telemetryDesc": "远端 PostHog 遥测目前暂时停用，保留此设置以便后续恢复。"
   },
   "developer": {
     "title": "开发者",

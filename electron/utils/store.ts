@@ -65,7 +65,7 @@ const defaults: AppSettings = {
   language: 'en',
   startMinimized: false,
   launchAtStartup: false,
-  telemetryEnabled: true,
+  telemetryEnabled: false,
   machineId: '',
   hasReportedInstall: false,
 

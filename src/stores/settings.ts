@@ -74,7 +74,7 @@ const defaultSettings = {
   })(),
   startMinimized: false,
   launchAtStartup: false,
-  telemetryEnabled: true,
+  telemetryEnabled: false,
   gatewayAutoStart: true,
   gatewayPort: 18789,
   proxyEnabled: false,

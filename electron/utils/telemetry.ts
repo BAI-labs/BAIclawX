@@ -4,8 +4,9 @@ import { app } from 'electron';
 import { getSetting, setSetting } from './store';
 import { logger } from './logger';
 
-const POSTHOG_API_KEY = 'phc_aGNegeJQP5FzNiF2rEoKqQbkuCpiiETMttplibXpB0n';
-const POSTHOG_HOST = 'https://us.i.posthog.com';
+const REMOTE_TELEMETRY_ENABLED = false;
+// const POSTHOG_API_KEY = 'phc_aGNegeJQP5FzNiF2rEoKqQbkuCpiiETMttplibXpB0n';
+// const POSTHOG_HOST = 'https://us.i.posthog.com';
 const TELEMETRY_SHUTDOWN_TIMEOUT_MS = 1500;
 
 let posthogClient: PostHog | null = null;
@@ -37,6 +38,11 @@ function isIgnorablePostHogShutdownError(error: unknown): boolean {
  */
 export async function initTelemetry(): Promise<void> {
     try {
+        if (!REMOTE_TELEMETRY_ENABLED) {
+            logger.info('Remote telemetry is disabled at build time');
+            return;
+        }
+
         const telemetryEnabled = await getSetting('telemetryEnabled');
         if (!telemetryEnabled) {
             logger.info('Telemetry is disabled in settings');

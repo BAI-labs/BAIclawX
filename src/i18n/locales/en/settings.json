@@ -201,7 +201,7 @@
     "devMode": "Developer Mode",
     "devModeDesc": "Show developer tools and shortcuts",
     "telemetry": "Anonymous Usage Data",
-    "telemetryDesc": "Allow providing anonymous basic usage data to improve ClawX"
+    "telemetryDesc": "Remote PostHog telemetry is temporarily disabled. Keep this setting for future re-enable."
   },
   "developer": {
     "title": "Developer",

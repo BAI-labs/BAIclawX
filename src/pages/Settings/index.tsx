@@ -627,6 +627,7 @@ export function Settings() {
                 <Switch
                   checked={telemetryEnabled}
                   onCheckedChange={setTelemetryEnabled}
+                  disabled
                 />
               </div>
 
