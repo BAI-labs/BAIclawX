@@ -7,6 +7,7 @@ import {
   signDevicePayload,
 } from '../utils/device-identity';
 import { logger } from '../utils/logger';
+import { brand } from '../shared/brand';
 
 export async function probeGatewayReady(
   port: number,
@@ -143,7 +144,7 @@ export function buildGatewayConnectFrame(options: {
         maxProtocol: 3,
         client: {
           id: clientId,
-          displayName: 'ClawX',
+          displayName: brand.displayName,
           version: '0.1.0',
           platform: options.platform,
           mode: clientMode,

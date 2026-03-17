@@ -12,16 +12,27 @@ import enSkills from './locales/en/skills.json';
 import enCron from './locales/en/cron.json';
 import enSetup from './locales/en/setup.json';
 
-// ZH
-import zhCommon from './locales/zh/common.json';
-import zhSettings from './locales/zh/settings.json';
-import zhDashboard from './locales/zh/dashboard.json';
-import zhChat from './locales/zh/chat.json';
-import zhChannels from './locales/zh/channels.json';
-import zhAgents from './locales/zh/agents.json';
-import zhSkills from './locales/zh/skills.json';
-import zhCron from './locales/zh/cron.json';
-import zhSetup from './locales/zh/setup.json';
+// ZH-CN
+import zhCnCommon from './locales/zh-CN/common.json';
+import zhCnSettings from './locales/zh-CN/settings.json';
+import zhCnDashboard from './locales/zh-CN/dashboard.json';
+import zhCnChat from './locales/zh-CN/chat.json';
+import zhCnChannels from './locales/zh-CN/channels.json';
+import zhCnAgents from './locales/zh-CN/agents.json';
+import zhCnSkills from './locales/zh-CN/skills.json';
+import zhCnCron from './locales/zh-CN/cron.json';
+import zhCnSetup from './locales/zh-CN/setup.json';
+
+// ZH-TW
+import zhTwCommon from './locales/zh-TW/common.json';
+import zhTwSettings from './locales/zh-TW/settings.json';
+import zhTwDashboard from './locales/zh-TW/dashboard.json';
+import zhTwChat from './locales/zh-TW/chat.json';
+import zhTwChannels from './locales/zh-TW/channels.json';
+import zhTwAgents from './locales/zh-TW/agents.json';
+import zhTwSkills from './locales/zh-TW/skills.json';
+import zhTwCron from './locales/zh-TW/cron.json';
+import zhTwSetup from './locales/zh-TW/setup.json';
 
 // JA
 import jaCommon from './locales/ja/common.json';
@@ -36,7 +47,8 @@ import jaSetup from './locales/ja/setup.json';
 
 export const SUPPORTED_LANGUAGES = [
     { code: 'en', label: 'English' },
-    { code: 'zh', label: '中文' },
+    { code: 'zh-TW', label: '繁體中文' },
+    { code: 'zh-CN', label: '简体中文' },
     { code: 'ja', label: '日本語' },
 ] as const;
 
@@ -54,16 +66,38 @@ const resources = {
         cron: enCron,
         setup: enSetup,
     },
+    'zh-CN': {
+        common: zhCnCommon,
+        settings: zhCnSettings,
+        dashboard: zhCnDashboard,
+        chat: zhCnChat,
+        channels: zhCnChannels,
+        agents: zhCnAgents,
+        skills: zhCnSkills,
+        cron: zhCnCron,
+        setup: zhCnSetup,
+    },
+    'zh-TW': {
+        common: zhTwCommon,
+        settings: zhTwSettings,
+        dashboard: zhTwDashboard,
+        chat: zhTwChat,
+        channels: zhTwChannels,
+        agents: zhTwAgents,
+        skills: zhTwSkills,
+        cron: zhTwCron,
+        setup: zhTwSetup,
+    },
     zh: {
-        common: zhCommon,
-        settings: zhSettings,
-        dashboard: zhDashboard,
-        chat: zhChat,
-        channels: zhChannels,
-        agents: zhAgents,
-        skills: zhSkills,
-        cron: zhCron,
-        setup: zhSetup,
+        common: zhCnCommon,
+        settings: zhCnSettings,
+        dashboard: zhCnDashboard,
+        chat: zhCnChat,
+        channels: zhCnChannels,
+        agents: zhCnAgents,
+        skills: zhCnSkills,
+        cron: zhCnCron,
+        setup: zhCnSetup,
     },
     ja: {
         common: jaCommon,

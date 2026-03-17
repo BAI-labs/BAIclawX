@@ -36,6 +36,7 @@ import {
   getProviderIconUrl,
   resolveProviderApiKeyForSave,
   resolveProviderModelForSave,
+  shouldShowProviderBaseUrl,
   shouldShowProviderModelId,
   shouldInvertInDark,
 } from '@/lib/providers';
@@ -52,6 +53,7 @@ import { invokeIpc } from '@/lib/api-client';
 import { useSettingsStore } from '@/stores/settings';
 import { hostApiFetch } from '@/lib/host-api';
 import { subscribeHostEvent } from '@/lib/host-events';
+import { brandHeadingStyle } from '@/lib/brand';
 
 const inputClasses = 'h-[44px] rounded-xl font-mono text-[13px] bg-[#eeece3] dark:bg-muted border-black/10 dark:border-white/10 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 shadow-sm transition-all text-foreground placeholder:text-foreground/40';
 const labelClasses = 'text-[14px] text-foreground/80 font-bold';
@@ -191,7 +193,7 @@ export function ProvidersSettings() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-serif text-foreground font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+        <h2 className="text-3xl font-serif text-foreground font-normal tracking-tight" style={brandHeadingStyle}>
           {t('aiProviders.title', 'AI Providers')}
         </h2>
         <Button onClick={() => setShowAddDialog(true)} className="rounded-full px-5 h-9 shadow-none font-medium text-[13px]">
@@ -321,7 +323,8 @@ function ProviderCard({
   const typeInfo = PROVIDER_TYPE_INFO.find((t) => t.id === account.vendorId);
   const providerDocsUrl = getProviderDocsUrl(typeInfo, i18n.language);
   const showModelIdField = shouldShowProviderModelId(typeInfo, devModeUnlocked);
-  const canEditModelConfig = Boolean(typeInfo?.showBaseUrl || showModelIdField);
+  const showBaseUrlField = shouldShowProviderBaseUrl(typeInfo);
+  const canEditModelConfig = Boolean(showBaseUrlField || showModelIdField);
 
   useEffect(() => {
     if (isEditing) {
@@ -355,7 +358,7 @@ function ProviderCard({
         setValidating(true);
         const result = await onValidateKey(newKey, {
           baseUrl: baseUrl.trim() || undefined,
-          apiProtocol: (account.vendorId === 'custom' || account.vendorId === 'ollama') ? apiProtocol : undefined,
+          apiProtocol: account.vendorId === 'custom' ? apiProtocol : undefined,
         });
         setValidating(false);
         if (!result.valid) {
@@ -367,6 +370,11 @@ function ProviderCard({
       }
 
       {
+        if (typeInfo?.baseUrlMode === 'required' && !baseUrl.trim()) {
+          toast.error(t('aiProviders.toast.baseUrlRequired'));
+          setSaving(false);
+          return;
+        }
         if (showModelIdField && !modelId.trim()) {
           toast.error(t('aiProviders.toast.modelRequired'));
           setSaving(false);
@@ -374,10 +382,10 @@ function ProviderCard({
         }
 
         const updates: Partial<ProviderConfig> = {};
-        if (typeInfo?.showBaseUrl && (baseUrl.trim() || undefined) !== (account.baseUrl || undefined)) {
+        if (showBaseUrlField && (baseUrl.trim() || undefined) !== (account.baseUrl || undefined)) {
           updates.baseUrl = baseUrl.trim() || undefined;
         }
-        if ((account.vendorId === 'custom' || account.vendorId === 'ollama') && apiProtocol !== account.apiProtocol) {
+        if (account.vendorId === 'custom' && apiProtocol !== account.apiProtocol) {
           updates.apiProtocol = apiProtocol;
         }
         if (showModelIdField && (modelId.trim() || undefined) !== (account.model || undefined)) {
@@ -540,7 +548,7 @@ function ProviderCard({
           {canEditModelConfig && (
             <div className="space-y-3">
               <p className={currentSectionLabelClasses}>{t('aiProviders.sections.model')}</p>
-              {typeInfo?.showBaseUrl && (
+              {showBaseUrlField && (
                 <div className="space-y-1.5">
                   <Label className={currentLabelClasses}>{t('aiProviders.dialog.baseUrl')}</Label>
                   <Input
@@ -710,6 +718,7 @@ function ProviderCard({
                       && fallbackModelsEqual(normalizeFallbackModels(fallbackModelsText.split('\n')), account.fallbackModels)
                       && fallbackProviderIdsEqual(fallbackProviderIds, account.fallbackAccountIds)
                     )
+                    || Boolean(typeInfo?.baseUrlMode === 'required' && !baseUrl.trim())
                     || Boolean(showModelIdField && !modelId.trim())
                   }
                 >
@@ -801,6 +810,7 @@ function AddProviderDialog({
   const typeInfo = PROVIDER_TYPE_INFO.find((t) => t.id === selectedType);
   const providerDocsUrl = getProviderDocsUrl(typeInfo, i18n.language);
   const showModelIdField = shouldShowProviderModelId(typeInfo, devModeUnlocked);
+  const showBaseUrlField = shouldShowProviderBaseUrl(typeInfo);
   const isOAuth = typeInfo?.isOAuth ?? false;
   const supportsApiKey = typeInfo?.supportsApiKey ?? false;
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor]));
@@ -963,6 +973,9 @@ function AddProviderDialog({
     }
     return vendor.supportsMultipleAccounts || !existingVendorIds.has(type.id);
   });
+  const sortedAvailableTypes = [...availableTypes].sort(
+    (left, right) => (left.sortOrder ?? Number.MAX_SAFE_INTEGER) - (right.sortOrder ?? Number.MAX_SAFE_INTEGER),
+  );
 
   const handleAdd = async () => {
     if (!selectedType) return;
@@ -987,10 +1000,15 @@ function AddProviderDialog({
         setSaving(false);
         return;
       }
+      if (typeInfo?.baseUrlMode === 'required' && !baseUrl.trim()) {
+        setValidationError(t('aiProviders.toast.baseUrlRequired'));
+        setSaving(false);
+        return;
+      }
       if (requiresKey && apiKey) {
         const result = await onValidateKey(selectedType, apiKey, {
           baseUrl: baseUrl.trim() || undefined,
-          apiProtocol: (selectedType === 'custom' || selectedType === 'ollama') ? apiProtocol : undefined,
+          apiProtocol: selectedType === 'custom' ? apiProtocol : undefined,
         });
         if (!result.valid) {
           setValidationError(result.error || t('aiProviders.toast.invalidKey'));
@@ -1012,7 +1030,7 @@ function AddProviderDialog({
         apiKey.trim(),
         {
           baseUrl: baseUrl.trim() || undefined,
-          apiProtocol: (selectedType === 'custom' || selectedType === 'ollama') ? apiProtocol : undefined,
+          apiProtocol: selectedType === 'custom' ? apiProtocol : undefined,
           model: resolveProviderModelForSave(typeInfo, modelId, devModeUnlocked),
           authMode: useOAuthFlow ? (preferredOAuthMode || 'oauth_device') : selectedType === 'ollama'
             ? 'local'
@@ -1048,7 +1066,7 @@ function AddProviderDialog({
         <CardContent className="overflow-y-auto flex-1 p-6">
           {!selectedType ? (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {availableTypes.map((type) => (
+              {sortedAvailableTypes.map((type) => (
                 <button
                   key={type.id}
                   onClick={() => {
@@ -1192,7 +1210,7 @@ function AddProviderDialog({
                   </div>
                 )}
 
-                {typeInfo?.showBaseUrl && (
+                {showBaseUrlField && (
                   <div className="space-y-2.5">
                     <Label htmlFor="baseUrl" className={labelClasses}>{t('aiProviders.dialog.baseUrl')}</Label>
                     <Input
@@ -1386,7 +1404,7 @@ function AddProviderDialog({
                 <Button
                   onClick={handleAdd}
                   className={cn("rounded-full px-8 h-[42px] text-[13px] font-semibold bg-[#0a84ff] hover:bg-[#007aff] text-white shadow-sm", useOAuthFlow && "hidden")}
-                  disabled={!selectedType || saving || (showModelIdField && modelId.trim().length === 0)}
+                  disabled={!selectedType || saving || (showModelIdField && modelId.trim().length === 0) || (typeInfo?.baseUrlMode === 'required' && baseUrl.trim().length === 0)}
                 >
                   {saving ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />

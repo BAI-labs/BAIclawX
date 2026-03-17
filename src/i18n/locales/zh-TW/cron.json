@@ -1,0 +1,82 @@
+{
+    "title": "排程任務",
+    "subtitle": "透過排程任務自動化 AI 工作流程",
+    "newTask": "新增任務",
+    "refresh": "重新整理",
+    "gatewayWarning": "閘道未執行。沒有可用的閘道時，無法管理排程任務。",
+    "stats": {
+        "total": "任務總數",
+        "active": "執行中",
+        "paused": "已暫停",
+        "failed": "失敗"
+    },
+    "empty": {
+        "title": "暫無排程任務",
+        "description": "建立排程任務來自動化 AI 工作流程。任務可以在指定時間傳送訊息、執行查詢或觸發操作。",
+        "create": "建立第一個任務"
+    },
+    "card": {
+        "runNow": "立即執行",
+        "deleteConfirm": "確定要刪除此任務嗎？",
+        "last": "上次執行",
+        "next": "下次執行"
+    },
+    "dialog": {
+        "createTitle": "建立任務",
+        "editTitle": "編輯任務",
+        "description": "安排自動化的 AI 任務",
+        "taskName": "任務名稱",
+        "taskNamePlaceholder": "例如：早晨簡報",
+        "message": "訊息 / 提示詞",
+        "messagePlaceholder": "AI 應該做什麼？例如：給我今天的新聞與天氣摘要",
+        "schedule": "排程",
+        "cronPlaceholder": "Cron 表達式（例如：0 9 * * *）",
+        "usePresets": "使用預設",
+        "useCustomCron": "使用自訂 Cron",
+        "targetChannel": "目標頻道",
+        "noChannels": "沒有可用的頻道。請先新增頻道。",
+        "discordChannelId": "Discord 頻道 ID",
+        "discordChannelIdPlaceholder": "例如：1438452657525100686",
+        "discordChannelIdDesc": "在 Discord 頻道上按右鍵 → 複製頻道 ID",
+        "enableImmediately": "立即啟用",
+        "enableImmediatelyDesc": "建立後立即開始執行此任務",
+        "saveChanges": "儲存變更"
+    },
+    "presets": {
+        "everyMinute": "每分鐘",
+        "every5Min": "每 5 分鐘",
+        "every15Min": "每 15 分鐘",
+        "everyHour": "每小時",
+        "daily9am": "每天上午 9 點",
+        "daily6pm": "每天下午 6 點",
+        "weeklyMon": "每週（週一上午 9 點）",
+        "monthly1st": "每月（1 號上午 9 點）"
+    },
+    "toast": {
+        "created": "任務已建立",
+        "updated": "任務已更新",
+        "enabled": "任務已啟用",
+        "paused": "任務已暫停",
+        "deleted": "任務已刪除",
+        "triggered": "任務已成功觸發",
+        "failedTrigger": "觸發任務失敗：{{error}}",
+        "failedUpdate": "更新任務失敗",
+        "failedDelete": "刪除任務失敗",
+        "nameRequired": "請輸入任務名稱",
+        "messageRequired": "請輸入訊息",
+        "channelRequired": "請選擇頻道",
+        "discordIdRequired": "請輸入 Discord 頻道 ID",
+        "scheduleRequired": "請選擇或輸入排程"
+    },
+    "schedule": {
+        "everySeconds": "每 {{count}} 秒",
+        "everyMinutes": "每 {{count}} 分鐘",
+        "everyHours": "每 {{count}} 小時",
+        "everyDays": "每 {{count}} 天",
+        "onceAt": "執行一次，時間：{{time}}",
+        "weeklyAt": "每週 {{day}} {{time}}",
+        "monthlyAtDay": "每月 {{day}} 日 {{time}}",
+        "dailyAt": "每天 {{time}}",
+        "unknown": "未知"
+    }
+}

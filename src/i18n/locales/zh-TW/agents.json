@@ -1,0 +1,51 @@
+{
+    "title": "Agents",
+    "subtitle": "新增 Agent 時，BAIclaw 會複製主 Agent 的工作區引導檔與執行階段認證設定；之後也可透過對話方式繼續調整。",
+    "refresh": "重新整理",
+    "addAgent": "新增 Agent",
+    "gatewayWarning": "Gateway 服務未執行。Agent 或頻道變更可能需要一點時間才會生效。",
+    "defaultBadge": "預設",
+    "inherited": "繼承",
+    "none": "無",
+    "modelLine": "Model: {{model}}{{suffix}}",
+    "channelsLine": "頻道：{{channels}}",
+    "deleteAgent": "刪除 Agent",
+    "settings": "設定",
+    "creating": "建立中...",
+    "createDialog": {
+        "title": "新增 Agent",
+        "description": "只要輸入名稱就能建立新的 Agent。BAIclaw 會複製主 Agent 的工作區引導檔與執行階段認證設定。",
+        "nameLabel": "Agent 名稱",
+        "namePlaceholder": "Coding Helper"
+    },
+    "deleteDialog": {
+        "title": "刪除 Agent",
+        "message": "確定要從 BAIclaw 刪除「{{name}}」嗎？這會永久刪除該 Agent，以及由 BAIclaw 管理的工作區、執行階段與會話檔案。"
+    },
+    "settingsDialog": {
+        "title": "{{name}} 設定",
+        "description": "更新 Agent 名稱，並管理哪些頻道歸屬於這個 Agent。",
+        "nameLabel": "Agent 名稱",
+        "agentIdLabel": "Agent ID",
+        "modelLabel": "Model",
+        "channelsTitle": "頻道",
+        "channelsDescription": "每種頻道類型在 BAIclaw 中只保留一份設定。您在這裡儲存已設定的頻道後，歸屬就會切換到目前 Agent。",
+        "addChannel": "新增頻道",
+        "noChannels": "這個 Agent 尚未分配任何頻道。"
+    },
+    "removeChannelDialog": {
+        "title": "移除頻道",
+        "message": "確定要移除 {{name}} 嗎？這會刪除目前的頻道設定。"
+    },
+    "toast": {
+        "agentCreated": "Agent 已建立",
+        "agentCreateFailed": "建立 Agent 失敗：{{error}}",
+        "agentDeleted": "Agent 已刪除",
+        "agentUpdated": "Agent 已更新",
+        "agentUpdateFailed": "更新 Agent 失敗：{{error}}",
+        "channelAssigned": "{{channel}} 已指派給 Agent",
+        "channelAssignFailed": "指派頻道失敗：{{error}}",
+        "channelRemoved": "{{channel}} 已移除",
+        "channelRemoveFailed": "移除頻道失敗：{{error}}"
+    }
+}

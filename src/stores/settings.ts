@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import i18n from '@/i18n';
+import { detectPreferredLanguage, normalizeLanguageCode } from '@/i18n/language';
 import { hostApiFetch } from '@/lib/host-api';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -66,12 +67,7 @@ interface SettingsState {
 
 const defaultSettings = {
   theme: 'system' as Theme,
-  language: (() => {
-    const lang = navigator.language.toLowerCase();
-    if (lang.startsWith('zh')) return 'zh';
-    if (lang.startsWith('ja')) return 'ja';
-    return 'en';
-  })(),
+  language: detectPreferredLanguage(navigator.language),
   startMinimized: false,
   launchAtStartup: false,
   telemetryEnabled: false,
@@ -99,9 +95,16 @@ export const useSettingsStore = create<SettingsState>()(
       init: async () => {
         try {
           const settings = await hostApiFetch<Partial<typeof defaultSettings>>('/api/settings');
-          set((state) => ({ ...state, ...settings }));
-          if (settings.language) {
-            i18n.changeLanguage(settings.language);
+          const normalizedLanguage = normalizeLanguageCode(settings.language);
+          set((state) => ({ ...state, ...settings, language: normalizedLanguage }));
+          if (settings.language && settings.language !== normalizedLanguage) {
+            void hostApiFetch('/api/settings/language', {
+              method: 'PUT',
+              body: JSON.stringify({ value: normalizedLanguage }),
+            }).catch(() => { });
+          }
+          if (normalizedLanguage) {
+            i18n.changeLanguage(normalizedLanguage);
           }
         } catch {
           // Keep renderer-persisted settings as a fallback when the main
@@ -111,11 +114,12 @@ export const useSettingsStore = create<SettingsState>()(
 
       setTheme: (theme) => set({ theme }),
       setLanguage: (language) => {
-        i18n.changeLanguage(language);
-        set({ language });
+        const normalizedLanguage = normalizeLanguageCode(language);
+        i18n.changeLanguage(normalizedLanguage);
+        set({ language: normalizedLanguage });
         void hostApiFetch('/api/settings/language', {
           method: 'PUT',
-          body: JSON.stringify({ value: language }),
+          body: JSON.stringify({ value: normalizedLanguage }),
         }).catch(() => { });
       },
       setStartMinimized: (startMinimized) => set({ startMinimized }),
@@ -162,7 +166,7 @@ export const useSettingsStore = create<SettingsState>()(
       resetSettings: () => set(defaultSettings),
     }),
     {
-      name: 'clawx-settings',
+      name: 'baiclaw-settings',
     }
   )
 );

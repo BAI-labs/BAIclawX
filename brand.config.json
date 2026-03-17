@@ -1,0 +1,25 @@
+{
+  "appId": "app.baiclaw.desktop",
+  "appName": "BAIclaw",
+  "displayName": "BAIclaw",
+  "executableName": "BAIclaw",
+  "tagline": "AI Assistant powered by OpenClaw",
+  "vendor": "BAIclaw",
+  "maintainer": "BAIclaw Team <support@b.ai>",
+  "websiteUrl": "https://b.ai",
+  "docsUrl": "https://b.ai",
+  "githubUrl": "https://github.com",
+  "issuesUrl": "https://github.com/issues",
+  "updateGenericUrl": "https://oss.intelli-spectrum.com/latest",
+  "copyright": "Copyright © 2026 BAIclaw",
+  "openRouterReferrer": "https://b.ai",
+  "openRouterTitle": "BAIclaw",
+  "fonts": {
+    "heading": "\"Noto Sans\", \"SF Pro Display\", \"Segoe UI\", system-ui, sans-serif",
+    "body": "\"SF Pro Text\", \"Segoe UI\", Inter, system-ui, sans-serif",
+    "mono": "\"SFMono-Regular\", Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+  },
+  "about": {
+    "tagline": "A graphical AI assistant built on OpenClaw and ClawX."
+  }
+}

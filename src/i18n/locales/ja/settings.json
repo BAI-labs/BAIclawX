@@ -1,6 +1,6 @@
 {
   "title": "設定",
-  "subtitle": "ClawX の体験をカスタマイズ",
+  "subtitle": "BAIclaw の体験をカスタマイズ",
   "appearance": {
     "title": "通用",
     "description": "外観とスタイルをカスタマイズ",
@@ -10,7 +10,7 @@
     "system": "システム",
     "language": "言語",
     "launchAtStartup": "システム起動時に自動起動",
-    "launchAtStartupDesc": "ログイン時に ClawX を自動的に起動します"
+    "launchAtStartupDesc": "ログイン時に BAIclaw を自動的に起動します"
   },
   "aiProviders": {
     "title": "AI プロバイダー",
@@ -37,7 +37,7 @@
     "notRequired": "不要",
     "empty": {
       "title": "プロバイダーが構成されていません",
-      "desc": "ClawX の使用を開始するには AI プロバイダーを追加してください",
+      "desc": "BAIclaw の使用を開始するには AI プロバイダーを追加してください",
       "cta": "最初のプロバイダーを追加"
     },
     "dialog": {
@@ -93,6 +93,7 @@
       "updated": "プロバイダーが更新されました",
       "failedUpdate": "プロバイダーの更新に失敗しました",
       "invalidKey": "無効な API キー",
+      "baseUrlRequired": "Base URL が必要です",
       "modelRequired": "モデル ID が必要です",
       "minimaxConflict": "MiniMax (Global) と MiniMax (CN) は同時に追加できません。"
     },
@@ -125,7 +126,7 @@
     "appLogs": "アプリケーションログ",
     "openFolder": "フォルダーを開く",
     "autoStart": "ゲートウェイ自動起動",
-    "autoStartDesc": "ClawX 起動時にゲートウェイを自動起動",
+    "autoStartDesc": "BAIclaw 起動時にゲートウェイを自動起動",
     "proxyTitle": "プロキシ",
     "proxyDesc": "Electron と Gateway の通信をローカルプロキシ経由にします。",
     "proxyServer": "プロキシサーバー",
@@ -146,7 +147,7 @@
   },
   "updates": {
     "title": "アップデート",
-    "description": "ClawX を最新に保つ",
+    "description": "BAIclaw を最新に保つ",
     "autoCheck": "自動更新チェック",
     "autoCheckDesc": "起動時に更新を確認",
     "autoDownload": "自動アップデート",
@@ -200,7 +201,7 @@
     "devMode": "開発者モード",
     "devModeDesc": "開発者ツールとショートカットを表示",
     "telemetry": "匿名利用データ",
-    "telemetryDesc": "リモート PostHog テレメトリは一時的に無効化されています。将来の再有効化に備えて設定項目のみ残しています。"
+    "telemetryDesc": "ローカル診断はデバッグ用に利用できますが、エンドユーザー向けの製品テレメトリとしては公開しません。"
   },
   "developer": {
     "title": "開発者",
@@ -262,9 +263,9 @@
   },
   "about": {
     "title": "バージョン情報",
-    "appName": "ClawX",
+    "appName": "BAIclaw",
     "tagline": "グラフィカル AI アシスタント",
-    "basedOn": "OpenClaw ベース",
+    "basedOn": "OpenClaw と ClawX をベースにしています",
     "version": "バージョン {{version}}",
     "docs": "公式サイト",
     "github": "GitHub"

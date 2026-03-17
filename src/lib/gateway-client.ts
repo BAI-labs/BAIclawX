@@ -1,4 +1,5 @@
 import { hostApiFetch } from './host-api';
+import { brand } from './brand';
 
 type GatewayInfo = {
   wsUrl: string;
@@ -149,7 +150,7 @@ class GatewayBrowserClient {
                 maxProtocol: 3,
                 client: {
                   id: 'gateway-client',
-                  displayName: 'ClawX',
+                  displayName: brand.displayName,
                   version: '0.1.0',
                   platform: navigator.platform,
                   mode: 'ui',

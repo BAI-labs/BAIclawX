@@ -4,6 +4,8 @@
  */
 
 import { randomBytes } from 'crypto';
+import { app } from 'electron';
+import { detectPreferredAppLanguage, normalizeAppLanguageCode } from '../shared/language';
 
 // Lazy-load electron-store (ESM module)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,7 +64,7 @@ export interface AppSettings {
 const defaults: AppSettings = {
   // General
   theme: 'system',
-  language: 'en',
+  language: detectPreferredAppLanguage(app.getLocale?.()),
   startMinimized: false,
   launchAtStartup: false,
   telemetryEnabled: false,
@@ -115,7 +117,17 @@ async function getSettingsStore() {
  */
 export async function getSetting<K extends keyof AppSettings>(key: K): Promise<AppSettings[K]> {
   const store = await getSettingsStore();
-  return store.get(key);
+  const value = store.get(key);
+
+  if (key === 'language' && typeof value === 'string') {
+    const normalizedLanguage = normalizeAppLanguageCode(value);
+    if (normalizedLanguage !== value) {
+      store.set(key, normalizedLanguage);
+    }
+    return normalizedLanguage as AppSettings[K];
+  }
+
+  return value;
 }
 
 /**
@@ -126,6 +138,11 @@ export async function setSetting<K extends keyof AppSettings>(
   value: AppSettings[K]
 ): Promise<void> {
   const store = await getSettingsStore();
+  if (key === 'language' && typeof value === 'string') {
+    store.set(key, normalizeAppLanguageCode(value) as AppSettings[K]);
+    return;
+  }
+
   store.set(key, value);
 }
 
@@ -134,7 +151,17 @@ export async function setSetting<K extends keyof AppSettings>(
  */
 export async function getAllSettings(): Promise<AppSettings> {
   const store = await getSettingsStore();
-  return store.store;
+  const settings = store.store as AppSettings;
+  const normalizedLanguage = normalizeAppLanguageCode(settings.language);
+
+  if (normalizedLanguage !== settings.language) {
+    store.set('language', normalizedLanguage);
+  }
+
+  return {
+    ...settings,
+    language: normalizedLanguage,
+  };
 }
 
 /**

@@ -5,6 +5,7 @@ import type { GatewayLaunchContext } from './config-sync';
 import type { GatewayLifecycleState } from './process-policy';
 import { logger } from '../utils/logger';
 import { appendNodeRequireToNodeOptions } from '../utils/paths';
+import { brand } from '../shared/brand';
 
 const GATEWAY_FETCH_PRELOAD_SOURCE = `'use strict';
 (function () {
@@ -32,8 +33,8 @@ const GATEWAY_FETCH_PRELOAD_SOURCE = `'use strict';
       delete flat['HTTP-Referer'];
       delete flat['x-title'];
       delete flat['X-Title'];
-      flat['HTTP-Referer'] = 'https://claw-x.com';
-      flat['X-Title'] = 'ClawX';
+      flat['HTTP-Referer'] = '${brand.openRouterReferrer}';
+      flat['X-Title'] = '${brand.openRouterTitle}';
       init.headers = flat;
     }
     return _f.call(globalThis, input, init);

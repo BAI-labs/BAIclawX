@@ -1,6 +1,6 @@
 import {
-  PROVIDER_DEFINITIONS,
   getProviderDefinition,
+  getProviderUiInfoList,
 } from '../../shared/providers/registry';
 import type {
   ProviderAccount,
@@ -51,7 +51,7 @@ function logLegacyProviderApiUsage(method: string, replacement: string): void {
 
 export class ProviderService {
   async listVendors(): Promise<ProviderDefinition[]> {
-    return PROVIDER_DEFINITIONS;
+    return getProviderUiInfoList() as ProviderDefinition[];
   }
 
   async listAccounts(): Promise<ProviderAccount[]> {

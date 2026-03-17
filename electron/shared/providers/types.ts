@@ -1,4 +1,5 @@
 export const PROVIDER_TYPES = [
+  'ainft',
   'anthropic',
   'openai',
   'google',
@@ -14,6 +15,7 @@ export const PROVIDER_TYPES = [
 ] as const;
 
 export const BUILTIN_PROVIDER_TYPES = [
+  'ainft',
   'anthropic',
   'openai',
   'google',
@@ -71,10 +73,17 @@ export interface ProviderWithKeyInfo extends ProviderConfig {
 export interface ProviderTypeInfo {
   id: ProviderType;
   name: string;
+  displayName?: string;
   icon: string;
   placeholder: string;
   model?: string;
   requiresApiKey: boolean;
+  authMode?: ProviderAuthMode;
+  baseUrlMode?: 'hidden' | 'optional' | 'required';
+  modelSelectionMode?: 'hidden' | 'optional' | 'required';
+  supportsCustomBaseUrl?: boolean;
+  supportsCustomModelId?: boolean;
+  sortOrder?: number;
   defaultBaseUrl?: string;
   showBaseUrl?: boolean;
   showModelId?: boolean;
@@ -84,6 +93,8 @@ export interface ProviderTypeInfo {
   isOAuth?: boolean;
   supportsApiKey?: boolean;
   apiKeyUrl?: string;
+  docsUrl?: string;
+  docsUrlZh?: string;
 }
 
 export interface ProviderModelEntry extends Record<string, unknown> {

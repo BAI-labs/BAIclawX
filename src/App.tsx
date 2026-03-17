@@ -20,6 +20,7 @@ import { Setup } from './pages/Setup';
 import { useSettingsStore } from './stores/settings';
 import { useGatewayStore } from './stores/gateway';
 import { applyGatewayTransportPreference } from './lib/api-client';
+import { normalizeLanguageCode } from './i18n/language';
 
 
 /**
@@ -101,8 +102,9 @@ function App() {
 
   // Sync i18n language with persisted settings on mount
   useEffect(() => {
-    if (language && language !== i18n.language) {
-      i18n.changeLanguage(language);
+    const normalizedLanguage = normalizeLanguageCode(language);
+    if (normalizedLanguage && normalizedLanguage !== i18n.language) {
+      i18n.changeLanguage(normalizedLanguage);
     }
   }, [language]);
 

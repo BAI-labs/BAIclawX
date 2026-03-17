@@ -3,6 +3,7 @@
  * Creates the native application menu for macOS/Windows/Linux
  */
 import { Menu, app, shell, BrowserWindow } from 'electron';
+import { brand } from '../shared/brand';
 
 /**
  * Create application menu
@@ -176,13 +177,13 @@ export function createMenu(): void {
         {
           label: 'Documentation',
           click: async () => {
-            await shell.openExternal('https://claw-x.com');
+            await shell.openExternal(brand.docsUrl);
           },
         },
         {
           label: 'Report Issue',
           click: async () => {
-            await shell.openExternal('https://github.com/ValueCell-ai/ClawX/issues');
+            await shell.openExternal(brand.issuesUrl);
           },
         },
         { type: 'separator' },

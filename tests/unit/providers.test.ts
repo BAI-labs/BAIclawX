@@ -15,6 +15,31 @@ import {
 } from '@electron/utils/provider-registry';
 
 describe('provider metadata', () => {
+  it('includes ainft in the frontend provider registry and keeps it first', () => {
+    expect(PROVIDER_TYPES[0]).toBe('ainft');
+
+    expect(PROVIDER_TYPE_INFO).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'ainft',
+          name: 'AINFT',
+          requiresApiKey: true,
+          showBaseUrl: true,
+          showModelId: true,
+          baseUrlMode: 'required',
+          modelSelectionMode: 'required',
+          sortOrder: 0,
+        }),
+      ]),
+    );
+  });
+
+  it('includes ainft in the backend provider registry', () => {
+    expect(BUILTIN_PROVIDER_TYPES).toContain('ainft');
+    expect(getProviderEnvVar('ainft')).toBe('AINFT_API_KEY');
+    expect(getProviderConfig('ainft')).toBeUndefined();
+  });
+
   it('includes ark in the frontend provider registry', () => {
     expect(PROVIDER_TYPES).toContain('ark');
 
@@ -55,7 +80,7 @@ describe('provider metadata', () => {
 
   it('keeps builtin provider sources in sync', () => {
     expect(BUILTIN_PROVIDER_TYPES).toEqual(
-      expect.arrayContaining(['anthropic', 'openai', 'google', 'openrouter', 'ark', 'moonshot', 'siliconflow', 'minimax-portal', 'minimax-portal-cn', 'qwen-portal', 'ollama'])
+      expect.arrayContaining(['ainft', 'anthropic', 'openai', 'google', 'openrouter', 'ark', 'moonshot', 'siliconflow', 'minimax-portal', 'minimax-portal-cn', 'qwen-portal', 'ollama'])
     );
   });
 
@@ -74,6 +99,7 @@ describe('provider metadata', () => {
   });
 
   it('exposes provider documentation links', () => {
+    const ainft = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'ainft');
     const anthropic = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'anthropic');
     const openrouter = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'openrouter');
     const moonshot = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'moonshot');
@@ -81,20 +107,20 @@ describe('provider metadata', () => {
     const ark = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'ark');
     const custom = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'custom');
 
+    expect(ainft).toMatchObject({
+      docsUrl: 'https://b.ai',
+    });
     expect(anthropic).toMatchObject({
       docsUrl: 'https://platform.claude.com/docs/en/api/overview',
     });
+    expect(getProviderDocsUrl(ainft, 'en')).toBe('https://b.ai');
     expect(getProviderDocsUrl(anthropic, 'en')).toBe('https://platform.claude.com/docs/en/api/overview');
     expect(getProviderDocsUrl(openrouter, 'en')).toBe('https://openrouter.ai/models');
     expect(getProviderDocsUrl(moonshot, 'en')).toBe('https://platform.moonshot.cn/');
     expect(getProviderDocsUrl(siliconflow, 'en')).toBe('https://docs.siliconflow.cn/cn/userguide/introduction');
     expect(getProviderDocsUrl(ark, 'en')).toBe('https://www.volcengine.com/');
-    expect(getProviderDocsUrl(custom, 'en')).toBe(
-      'https://icnnp7d0dymg.feishu.cn/wiki/BmiLwGBcEiloZDkdYnGc8RWnn6d#Ee1ldfvKJoVGvfxc32mcILwenth'
-    );
-    expect(getProviderDocsUrl(custom, 'zh-CN')).toBe(
-      'https://icnnp7d0dymg.feishu.cn/wiki/BmiLwGBcEiloZDkdYnGc8RWnn6d#IWQCdfe5fobGU3xf3UGcgbLynGh'
-    );
+    expect(getProviderDocsUrl(custom, 'en')).toBe('https://b.ai');
+    expect(getProviderDocsUrl(custom, 'zh-CN')).toBe('https://b.ai');
   });
 
   it('exposes OpenRouter and SiliconFlow model overrides by default', () => {

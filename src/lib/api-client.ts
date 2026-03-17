@@ -1,4 +1,5 @@
 import { trackUiEvent } from './telemetry';
+import { brand } from './brand';
 import {
   AppError,
   type AppErrorCode,
@@ -706,7 +707,7 @@ export function createGatewayWsTransportInvoker(options: GatewayWsTransportOptio
         maxProtocol: 3,
         client: {
           id: 'openclaw-control-ui',
-          displayName: 'ClawX UI',
+          displayName: `${brand.displayName} UI`,
           version: '1.0.0',
           platform: window.electron?.platform ?? 'unknown',
           mode: 'webchat',

@@ -1,0 +1,41 @@
+{
+    "gatewayNotRunning": "閘道未執行",
+    "gatewayRequired": "OpenClaw 閘道需要先執行才能使用聊天功能。它會自動啟動，或您也可以從設定中手動啟動。",
+    "welcome": {
+        "title": "BAIclaw 聊天",
+        "subtitle": "我能幫你處理什麼？",
+        "askQuestions": "執行任務",
+        "askQuestionsDesc": "處理以任務為導向的請求",
+        "creativeTasks": "持續執行",
+        "creativeTasksDesc": "持續推進多步驟工作",
+        "brainstorming": "多代理並行"
+    },
+    "noLogs": "（暫無日誌）",
+    "toolbar": {
+        "refresh": "重新整理聊天",
+        "showThinking": "顯示思考過程",
+        "hideThinking": "隱藏思考過程",
+        "currentAgent": "目前對話對象：{{agent}}"
+    },
+    "composer": {
+        "attachFiles": "新增檔案",
+        "pickAgent": "選擇 Agent",
+        "clearTarget": "清除目標 Agent",
+        "targetChip": "@{{agent}}",
+        "agentPickerTitle": "將下一則訊息直接傳送給其他 Agent",
+        "gatewayDisconnectedPlaceholder": "閘道尚未連線...",
+        "send": "送出",
+        "stop": "停止",
+        "gatewayConnected": "已連線",
+        "gatewayStatus": "gateway {{state}} | port: {{port}} {{pid}}",
+        "retryFailedAttachments": "重試失敗的附件"
+    },
+    "historyBuckets": {
+        "today": "今天",
+        "yesterday": "昨天",
+        "withinWeek": "一週內",
+        "withinTwoWeeks": "兩週內",
+        "withinMonth": "一個月內",
+        "older": "一個月前"
+    }
+}

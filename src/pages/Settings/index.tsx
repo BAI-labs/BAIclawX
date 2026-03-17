@@ -40,6 +40,7 @@ import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LANGUAGES } from '@/i18n';
 import { hostApiFetch } from '@/lib/host-api';
 import { cn } from '@/lib/utils';
+import { brand, getBrandExternalUrl } from '@/lib/brand';
 type ControlUiInfo = {
   url: string;
   token: string;
@@ -454,7 +455,7 @@ export function Settings() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between mb-12 shrink-0 gap-4">
           <div>
-            <h1 className="text-5xl md:text-6xl font-serif text-foreground mb-3 font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+            <h1 className="text-5xl md:text-6xl font-serif text-foreground mb-3 font-normal tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               {t('title')}
             </h1>
             <p className="text-[17px] text-foreground/70 font-medium">
@@ -468,7 +469,7 @@ export function Settings() {
 
           {/* Appearance */}
           <div>
-            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               {t('appearance.title')}
             </h2>
             <div className="space-y-6">
@@ -535,7 +536,7 @@ export function Settings() {
 
           {/* Gateway */}
           <div>
-            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               {t('gateway.title')}
             </h2>
             <div className="space-y-6">
@@ -617,19 +618,21 @@ export function Settings() {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-[15px] font-medium text-foreground">{t('advanced.telemetry')}</Label>
-                  <p className="text-[13px] text-muted-foreground mt-1">
-                    {t('advanced.telemetryDesc')}
-                  </p>
+              {devModeUnlocked && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-[15px] font-medium text-foreground">{t('advanced.telemetry')}</Label>
+                    <p className="text-[13px] text-muted-foreground mt-1">
+                      {t('advanced.telemetryDesc')}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={telemetryEnabled}
+                    onCheckedChange={setTelemetryEnabled}
+                    disabled
+                  />
                 </div>
-                <Switch
-                  checked={telemetryEnabled}
-                  onCheckedChange={setTelemetryEnabled}
-                  disabled
-                />
-              </div>
+              )}
 
             </div>
           </div>
@@ -640,7 +643,7 @@ export function Settings() {
             <>
               <Separator className="bg-black/5 dark:bg-white/5" />
               <div>
-                <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+                <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
                   {t('developer.title')}
                 </h2>
                 <div className="space-y-8">
@@ -1009,7 +1012,7 @@ export function Settings() {
 
           {/* Updates */}
           <div>
-            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               {t('updates.title')}
             </h2>
             <div className="space-y-6">
@@ -1050,12 +1053,12 @@ export function Settings() {
 
           {/* About */}
           <div>
-            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif' }}>
+            <h2 className="text-3xl font-serif text-foreground mb-6 font-normal tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               {t('about.title')}
             </h2>
             <div className="space-y-3 text-[14px] text-muted-foreground">
               <p>
-                <strong className="text-foreground font-semibold">{t('about.appName')}</strong> - {t('about.tagline')}
+                <strong className="text-foreground font-semibold">{brand.displayName}</strong> - {t('about.tagline')}
               </p>
               <p>{t('about.basedOn')}</p>
               <p>{t('about.version', { version: currentVersion })}</p>
@@ -1063,14 +1066,14 @@ export function Settings() {
                 <Button
                   variant="link"
                   className="h-auto p-0 text-[14px] text-blue-500 hover:text-blue-600 font-medium"
-                  onClick={() => window.electron.openExternal('https://claw-x.com')}
+                  onClick={() => window.electron.openExternal(getBrandExternalUrl('docs'))}
                 >
                   {t('about.docs')}
                 </Button>
                 <Button
                   variant="link"
                   className="h-auto p-0 text-[14px] text-blue-500 hover:text-blue-600 font-medium"
-                  onClick={() => window.electron.openExternal('https://github.com/ValueCell-ai/ClawX')}
+                  onClick={() => window.electron.openExternal(getBrandExternalUrl('github'))}
                 >
                   {t('about.github')}
                 </Button>
