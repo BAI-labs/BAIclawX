@@ -1133,7 +1133,7 @@ function registerGatewayHandlers(
   ipcMain.handle('gateway:httpProxy', async (_, request: GatewayHttpProxyRequest) => {
     try {
       const status = gatewayManager.getStatus();
-      const port = status.port || 18789;
+      const port = status.port || 19789;
       const path = request?.path && request.path.startsWith('/') ? request.path : '/';
       const method = (request?.method || 'GET').toUpperCase();
       const timeoutMs =
@@ -1283,7 +1283,7 @@ function registerGatewayHandlers(
     try {
       const status = gatewayManager.getStatus();
       const token = await getSetting('gatewayToken');
-      const port = status.port || 18789;
+      const port = status.port || 19789;
       const url = buildOpenClawControlUiUrl(port, token);
       return { success: true, url, port, token };
     } catch (error) {
