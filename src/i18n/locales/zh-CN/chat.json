@@ -1,6 +1,13 @@
 {
     "gatewayNotRunning": "网关未运行",
     "gatewayRequired": "OpenClaw 网关需要运行才能使用聊天。它将自动启动，或者您可以从设置中启动。",
+    "providerGate": {
+        "missingTitle": "请先设置 AINFT 再开始聊天",
+        "missingDescription": "新增 AINFT 账号并设为默认模型供应商后，才能使用聊天功能。",
+        "defaultRequiredTitle": "请先将默认供应商切换为 AINFT",
+        "defaultRequiredDescription": "目前 BAIclaw 聊天仅支持 AINFT。请前往模型页面，将某个 AINFT 账号设为默认供应商。",
+        "openModels": "打开模型页面"
+    },
     "welcome": {
         "title": "BAIclaw 聊天",
         "subtitle": "我能为你做些什么？",

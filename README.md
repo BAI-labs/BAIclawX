@@ -41,7 +41,7 @@
 
 Whether you're automating workflows, managing AI-powered channels, or scheduling intelligent tasks, BAIclaw provides the interface you need to harness AI agents effectively.
 
-BAIclaw comes pre-configured with best-practice model providers and natively supports Windows as well as multi-language settings. Of course, you can also fine-tune advanced configurations via **Settings → Advanced → Developer Mode**.
+BAIclaw comes pre-configured for AINFT-based model access and natively supports Windows as well as multi-language settings. Of course, you can also fine-tune advanced configurations via **Settings → Advanced → Developer Mode**.
 
 ---
 ## Screenshot
@@ -81,7 +81,7 @@ Building AI agents shouldn't require mastering the command line. BAIclaw was des
 | Complex CLI setup | One-click installation with guided setup wizard |
 | Configuration files | Visual settings with real-time validation |
 | Process management | Automatic gateway lifecycle management |
-| Multiple AI providers | Unified provider configuration panel |
+| AINFT model access | Unified AINFT account configuration panel |
 | Skill/plugin installation | Built-in skill marketplace and management |
 
 ### OpenClaw Inside
@@ -118,8 +118,8 @@ Environment variables for bundled search skills:
 - `BOCHA_API_KEY` for `bocha-skill`
 - `find-skills` and `self-improving-agent` do not require API keys
 
-### 🔐 Secure Provider Integration
-Connect to multiple AI providers (OpenAI, Anthropic, and more) with credentials stored securely in your system's native keychain. OpenAI supports both API key and browser OAuth (Codex subscription) sign-in.
+### 🔐 Secure AINFT Integration
+Configure one or more AINFT accounts with credentials stored securely in your system's native keychain. Each account can use its own Base URL override and model selection, while chat stays pinned to an AINFT default account.
 
 ### 🌙 Adaptive Theming
 Light mode, dark mode, or system-synchronized themes. BAIclaw adapts to your preferences automatically.
@@ -161,7 +161,7 @@ pnpm dev
 When you launch BAIclaw for the first time, the **Setup Wizard** will guide you through:
 
 1. **Language & Region** – Configure your preferred locale
-2. **AI Provider** – Add providers with API keys or OAuth (for providers that support browser/device login)
+2. **AINFT Provider** – Add one or more AINFT accounts with API keys, choose a model from the live `/models` list, and set the default chat provider
 3. **Skill Bundles** – Select pre-configured skills for common use cases
 4. **Verification** – Test your configuration before entering the main interface
 

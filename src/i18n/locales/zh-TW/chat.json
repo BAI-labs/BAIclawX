@@ -1,6 +1,13 @@
 {
     "gatewayNotRunning": "閘道未執行",
     "gatewayRequired": "OpenClaw 閘道需要先執行才能使用聊天功能。它會自動啟動，或您也可以從設定中手動啟動。",
+    "providerGate": {
+        "missingTitle": "請先設定 AINFT 再開始聊天",
+        "missingDescription": "新增 AINFT 帳號並設為預設模型供應商後，才能使用聊天功能。",
+        "defaultRequiredTitle": "請先將預設供應商切換為 AINFT",
+        "defaultRequiredDescription": "目前 BAIclaw 聊天僅支援 AINFT。請前往模型頁，將某個 AINFT 帳號設為預設供應商。",
+        "openModels": "前往模型頁"
+    },
     "welcome": {
         "title": "BAIclaw 聊天",
         "subtitle": "我能幫你處理什麼？",

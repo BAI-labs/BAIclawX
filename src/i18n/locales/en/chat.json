@@ -1,6 +1,13 @@
 {
     "gatewayNotRunning": "Gateway Not Running",
     "gatewayRequired": "The OpenClaw Gateway needs to be running to use chat. It will start automatically, or you can start it from Settings.",
+    "providerGate": {
+        "missingTitle": "Set up AINFT before chatting",
+        "missingDescription": "Chat is available after you add an AINFT account and choose a default model provider.",
+        "defaultRequiredTitle": "Switch the default provider to AINFT",
+        "defaultRequiredDescription": "BAIclaw chat only runs with AINFT right now. Open Models and set an AINFT account as the default provider.",
+        "openModels": "Open Models"
+    },
     "welcome": {
         "title": "BAIclaw Chat",
         "subtitle": "What can I do for you?",

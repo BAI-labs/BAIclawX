@@ -22,6 +22,44 @@ import { getProviderService } from '../../services/providers/provider-service';
 import { providerAccountToConfig } from '../../services/providers/provider-store';
 import type { ProviderAccount } from '../../shared/providers/types';
 import { logger } from '../../utils/logger';
+import { proxyAwareFetch } from '../../utils/proxy-fetch';
+
+function normalizeBaseUrl(baseUrl: string): string {
+  return baseUrl.trim().replace(/\/+$/, '');
+}
+
+function normalizeDiscoveredModels(payload: unknown): Array<{ id: string; displayName: string }> {
+  const data = payload && typeof payload === 'object' && 'data' in (payload as Record<string, unknown>)
+    ? (payload as { data?: unknown }).data
+    : [];
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') {
+        return null;
+      }
+
+      const id = typeof (entry as { id?: unknown }).id === 'string'
+        ? (entry as { id: string }).id.trim()
+        : '';
+      const displayNameValue = (entry as { name?: unknown; display_name?: unknown }).name
+        ?? (entry as { display_name?: unknown }).display_name;
+      const displayName = typeof displayNameValue === 'string' && displayNameValue.trim()
+        ? displayNameValue.trim()
+        : id;
+
+      if (!id) {
+        return null;
+      }
+
+      return { id, displayName };
+    })
+    .filter((entry): entry is { id: string; displayName: string } => Boolean(entry));
+}
 
 const legacyProviderRoutesWarned = new Set<string>();
 
@@ -58,6 +96,55 @@ export async function handleProviderRoutes(
       sendJson(res, 200, { success: true, account });
     } catch (error) {
       sendJson(res, 500, { success: false, error: String(error) });
+    }
+    return true;
+  }
+
+  if (url.pathname === '/api/provider-models/discover' && req.method === 'POST') {
+    try {
+      const body = await parseJsonBody<{ providerId: string; apiKey: string; baseUrl?: string }>(req);
+      const provider = await providerService.getLegacyProvider(body.providerId);
+      const providerType = provider?.type || body.providerId;
+      const providerConfig = getProviderConfig(providerType);
+
+      if (providerType !== 'ainft' && providerConfig?.api !== 'openai-completions' && providerConfig?.api !== 'openai-responses') {
+        sendJson(res, 400, { models: [], error: `Model discovery is not supported for provider "${providerType}"` });
+        return true;
+      }
+
+      const apiKey = body.apiKey?.trim();
+      const baseUrl = normalizeBaseUrl(body.baseUrl || provider?.baseUrl || providerConfig?.baseUrl || '');
+
+      if (!apiKey) {
+        sendJson(res, 400, { models: [], error: 'API key is required for model discovery' });
+        return true;
+      }
+
+      if (!baseUrl) {
+        sendJson(res, 400, { models: [], error: 'Base URL is required for model discovery' });
+        return true;
+      }
+
+      const response = await proxyAwareFetch(`${baseUrl}/models`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+      });
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const errorMessage = typeof (payload as { error?: { message?: unknown }; message?: unknown }).error?.message === 'string'
+          ? (payload as { error: { message: string } }).error.message
+          : (typeof (payload as { message?: unknown }).message === 'string'
+            ? (payload as { message: string }).message
+            : `Model discovery failed with status ${response.status}`);
+        sendJson(res, response.status, { models: [], error: errorMessage });
+        return true;
+      }
+
+      sendJson(res, 200, { models: normalizeDiscoveredModels(payload) });
+    } catch (error) {
+      sendJson(res, 500, { models: [], error: String(error) });
     }
     return true;
   }

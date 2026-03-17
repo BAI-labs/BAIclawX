@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { useGatewayStore } from '@/stores/gateway';
 import { useSettingsStore } from '@/stores/settings';
@@ -105,6 +106,8 @@ import {
   shouldInvertInDark,
   shouldShowProviderModelId,
 } from '@/lib/providers';
+import { fetchAinftModels, pickPreferredAinftModelId, type AinftModelOption } from '@/lib/ainft-models';
+import { filterVisibleProviderTypeInfo } from '@/lib/provider-policy';
 import {
   buildProviderAccountId,
   fetchProviderSnapshot,
@@ -114,7 +117,7 @@ import {
 import clawxIcon from '@/assets/logo.svg';
 
 // Use the shared provider registry for setup providers
-const providers = SETUP_PROVIDERS;
+const providers = filterVisibleProviderTypeInfo(SETUP_PROVIDERS);
 
 function getProtocolBaseUrlPlaceholder(
   apiProtocol: ProviderAccount['apiProtocol'],
@@ -724,6 +727,9 @@ function ProviderContent({
   const [baseUrl, setBaseUrl] = useState('');
   const [modelId, setModelId] = useState('');
   const [apiProtocol, setApiProtocol] = useState<ProviderAccount['apiProtocol']>('openai-completions');
+  const [modelOptions, setModelOptions] = useState<AinftModelOption[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
   const [providerMenuOpen, setProviderMenuOpen] = useState(false);
   const providerMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -875,6 +881,13 @@ function ProviderContent({
     }
   };
 
+  useEffect(() => {
+    if (selectedProvider || providers.length !== 1) {
+      return;
+    }
+    onSelectProvider(providers[0].id);
+  }, [onSelectProvider, selectedProvider, providers]);
+
   // On mount, try to restore previously configured provider
   useEffect(() => {
     let cancelled = false;
@@ -900,6 +913,10 @@ function ProviderContent({
           )).apiKey;
           onApiKeyChange(storedKey || '');
         } else if (!cancelled) {
+          if (providers.length === 1) {
+            onSelectProvider(providers[0].id);
+            setBaseUrl(providers[0].defaultBaseUrl || '');
+          }
           onConfiguredChange(false);
           onApiKeyChange('');
         }
@@ -943,6 +960,7 @@ function ProviderContent({
           setBaseUrl(savedProvider?.baseUrl || info?.defaultBaseUrl || '');
           setModelId(savedProvider?.model || info?.defaultModelId || '');
           setApiProtocol(savedProvider?.apiProtocol || 'openai-completions');
+          setModelsError(null);
         }
       } catch (error) {
         if (!cancelled) {
@@ -976,6 +994,45 @@ function ProviderContent({
     };
   }, [providerMenuOpen]);
 
+  useEffect(() => {
+    if (selectedProvider !== 'ainft') {
+      setModelOptions([]);
+      setModelsError(null);
+      setModelsLoading(false);
+      return;
+    }
+    setModelOptions([]);
+    setModelsError(null);
+    setModelsLoading(false);
+  }, [selectedProvider]);
+
+  const handleRefreshAinftModels = async () => {
+    const trimmedApiKey = apiKey.trim();
+    const trimmedBaseUrl = baseUrl.trim();
+    if (!trimmedApiKey || !trimmedBaseUrl) {
+      setModelsError(t('provider.ainftModelsMissingConfig'));
+      return;
+    }
+
+    setModelsLoading(true);
+    setModelsError(null);
+    try {
+      const models = await fetchAinftModels({
+        apiKey: trimmedApiKey,
+        baseUrl: trimmedBaseUrl,
+      });
+      setModelOptions(models);
+      if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
+        setModelId(pickPreferredAinftModelId(models) || '');
+      }
+    } catch (error) {
+      setModelOptions([]);
+      setModelsError(String(error));
+    } finally {
+      setModelsLoading(false);
+    }
+  };
+
   const selectedProviderData = providers.find((p) => p.id === selectedProvider);
   const providerDocsUrl = getProviderDocsUrl(selectedProviderData, i18n.language);
   const selectedProviderIconUrl = selectedProviderData
@@ -987,6 +1044,8 @@ function ProviderContent({
   const isOAuth = selectedProviderData?.isOAuth ?? false;
   const supportsApiKey = selectedProviderData?.supportsApiKey ?? false;
   const useOAuthFlow = isOAuth && (!supportsApiKey || authMode === 'oauth');
+  const canDiscoverAinftModels = selectedProvider === 'ainft' && !!apiKey.trim() && !!baseUrl.trim();
+  const usesAinftModelSelect = selectedProvider === 'ainft' && modelOptions.length > 0;
 
   const handleValidateAndSave = async () => {
     if (!selectedProvider) return;
@@ -1134,6 +1193,8 @@ function ProviderContent({
     onConfiguredChange(false);
     onApiKeyChange('');
     setKeyValid(null);
+    setModelOptions([]);
+    setModelsError(null);
     setProviderMenuOpen(false);
     setAuthMode('oauth');
   };
@@ -1264,21 +1325,58 @@ function ProviderContent({
           {/* Model ID field (for siliconflow etc.) */}
           {showModelIdField && (
             <div className="space-y-2">
-              <Label htmlFor="modelId">{t('provider.modelId')}</Label>
-              <Input
-                id="modelId"
-                type="text"
-                placeholder={selectedProviderData?.modelIdPlaceholder || 'e.g. deepseek-ai/DeepSeek-V3'}
-                value={modelId}
-                onChange={(e) => {
-                  setModelId(e.target.value);
-                  onConfiguredChange(false);
-                }}
-                autoComplete="off"
-                className="bg-background border-input"
-              />
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="modelId">{t('provider.modelId')}</Label>
+                {selectedProvider === 'ainft' && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => { void handleRefreshAinftModels(); }}
+                    disabled={modelsLoading || !canDiscoverAinftModels}
+                    className="h-7 rounded-full px-3 text-[12px]"
+                  >
+                    <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
+                    {t('provider.refreshModels')}
+                  </Button>
+                )}
+              </div>
+              {usesAinftModelSelect ? (
+                <Select
+                  id="modelId"
+                  value={modelId}
+                  onChange={(e) => {
+                    setModelId(e.target.value);
+                    onConfiguredChange(false);
+                  }}
+                  className="bg-background border-input"
+                >
+                  {modelOptions.map((model) => (
+                    <option key={model.id} value={model.id}>
+                      {model.displayName}
+                    </option>
+                  ))}
+                </Select>
+              ) : (
+                <Input
+                  id="modelId"
+                  type="text"
+                  placeholder={selectedProviderData?.modelIdPlaceholder || 'e.g. deepseek-ai/DeepSeek-V3'}
+                  value={modelId}
+                  onChange={(e) => {
+                    setModelId(e.target.value);
+                    onConfiguredChange(false);
+                  }}
+                  autoComplete="off"
+                  className="bg-background border-input"
+                />
+              )}
               <p className="text-xs text-muted-foreground">
-                {t('provider.modelIdDesc')}
+                {selectedProvider === 'ainft'
+                  ? (modelsError
+                    ? t('provider.ainftModelsFailed', { error: modelsError })
+                    : (modelsLoading ? t('provider.ainftModelsLoading') : t('provider.ainftModelsHint')))
+                  : t('provider.modelIdDesc')}
               </p>
             </div>
           )}

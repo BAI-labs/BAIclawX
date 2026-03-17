@@ -17,12 +17,14 @@ import {
   Copy,
   XCircle,
   ChevronDown,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Select } from '@/components/ui/select';
 import {
   useProviderStore,
   type ProviderAccount,
@@ -54,6 +56,13 @@ import { useSettingsStore } from '@/stores/settings';
 import { hostApiFetch } from '@/lib/host-api';
 import { subscribeHostEvent } from '@/lib/host-events';
 import { brandHeadingStyle } from '@/lib/brand';
+import { fetchAinftModels, pickPreferredAinftModelId, type AinftModelOption } from '@/lib/ainft-models';
+import {
+  filterVisibleProviderAccounts,
+  filterVisibleProviderStatuses,
+  filterVisibleProviderTypes,
+  filterVisibleProviderVendors,
+} from '@/lib/provider-policy';
 
 const inputClasses = 'h-[44px] rounded-xl font-mono text-[13px] bg-[#eeece3] dark:bg-muted border-black/10 dark:border-white/10 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:border-blue-500 shadow-sm transition-all text-foreground placeholder:text-foreground/40';
 const labelClasses = 'text-[14px] text-foreground/80 font-bold';
@@ -85,6 +94,13 @@ function fallbackModelsEqual(a?: string[], b?: string[]): boolean {
   const left = normalizeFallbackModels(a);
   const right = normalizeFallbackModels(b);
   return left.length === right.length && left.every((model, index) => model === right[index]);
+}
+
+function shouldUseAinftModelSelect(
+  vendorId: ProviderType | string | null | undefined,
+  models: AinftModelOption[],
+): boolean {
+  return vendorId === 'ainft' && models.length > 0;
 }
 
 function getAuthModeLabel(
@@ -124,11 +140,14 @@ export function ProvidersSettings() {
 
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProvider, setEditingProvider] = useState<string | null>(null);
-  const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor]));
-  const existingVendorIds = new Set(accounts.map((account) => account.vendorId));
+  const visibleAccounts = useMemo(() => filterVisibleProviderAccounts(accounts), [accounts]);
+  const visibleStatuses = useMemo(() => filterVisibleProviderStatuses(statuses), [statuses]);
+  const visibleVendors = useMemo(() => filterVisibleProviderVendors(vendors), [vendors]);
+  const vendorMap = new Map(visibleVendors.map((vendor) => [vendor.id, vendor]));
+  const existingVendorIds = new Set(visibleAccounts.map((account) => account.vendorId));
   const displayProviders = useMemo(
-    () => buildProviderListItems(accounts, statuses, vendors, defaultAccountId),
-    [accounts, statuses, vendors, defaultAccountId],
+    () => buildProviderListItems(visibleAccounts, visibleStatuses, visibleVendors, defaultAccountId),
+    [visibleAccounts, visibleStatuses, visibleVendors, defaultAccountId],
   );
 
   // Fetch providers on mount
@@ -260,7 +279,7 @@ export function ProvidersSettings() {
       {showAddDialog && (
         <AddProviderDialog
           existingVendorIds={existingVendorIds}
-          vendors={vendors}
+          vendors={visibleVendors}
           onClose={() => setShowAddDialog(false)}
           onAdd={handleAddProvider}
           onValidateKey={(type, key, options) => validateAccountApiKey(type, key, options)}
@@ -319,12 +338,18 @@ function ProviderCard({
   const [showFallback, setShowFallback] = useState(false);
   const [validating, setValidating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [storedApiKey, setStoredApiKey] = useState<string>('');
+  const [modelOptions, setModelOptions] = useState<AinftModelOption[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
 
   const typeInfo = PROVIDER_TYPE_INFO.find((t) => t.id === account.vendorId);
   const providerDocsUrl = getProviderDocsUrl(typeInfo, i18n.language);
   const showModelIdField = shouldShowProviderModelId(typeInfo, devModeUnlocked);
   const showBaseUrlField = shouldShowProviderBaseUrl(typeInfo);
   const canEditModelConfig = Boolean(showBaseUrlField || showModelIdField);
+  const canDiscoverAinftModels = account.vendorId === 'ainft' && !!baseUrl.trim();
+  const usesAinftModelSelect = shouldUseAinftModelSelect(account.vendorId, modelOptions);
 
   useEffect(() => {
     if (isEditing) {
@@ -335,10 +360,80 @@ function ProviderCard({
       setModelId(account.model || '');
       setFallbackModelsText(normalizeFallbackModels(account.fallbackModels).join('\n'));
       setFallbackProviderIds(normalizeFallbackProviderIds(account.fallbackAccountIds));
+      setModelsError(null);
     }
   }, [isEditing, account.baseUrl, account.fallbackModels, account.fallbackAccountIds, account.model, account.apiProtocol]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!isEditing || account.vendorId !== 'ainft') {
+      setStoredApiKey('');
+      setModelOptions([]);
+      setModelsLoading(false);
+      setModelsError(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setModelOptions([]);
+    setModelsLoading(false);
+    setModelsError(null);
+
+    void hostApiFetch<{ apiKey: string | null }>(`/api/providers/${encodeURIComponent(account.id)}/api-key`)
+      .then((result) => {
+        if (cancelled) return;
+        setStoredApiKey(result.apiKey || '');
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setStoredApiKey('');
+        setModelsError(String(error));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [account.id, account.vendorId, isEditing]);
+
+  useEffect(() => {
+    if (!isEditing || account.vendorId !== 'ainft') {
+      return;
+    }
+    setModelOptions([]);
+    setModelsLoading(false);
+    setModelsError(null);
+  }, [account.vendorId, isEditing]);
+
   const fallbackOptions = allProviders.filter((candidate) => candidate.account.id !== account.id);
+
+  const handleRefreshAinftModels = async () => {
+    const effectiveApiKey = newKey.trim() || storedApiKey.trim();
+    const effectiveBaseUrl = baseUrl.trim();
+    if (!effectiveApiKey || !effectiveBaseUrl) {
+      setModelsError(t('aiProviders.dialog.ainftModelsMissingConfig'));
+      return;
+    }
+
+    setModelsLoading(true);
+    setModelsError(null);
+    try {
+      const models = await fetchAinftModels({
+        apiKey: effectiveApiKey,
+        baseUrl: effectiveBaseUrl,
+      });
+      setModelOptions(models);
+      if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
+        setModelId(pickPreferredAinftModelId(models) || '');
+      }
+    } catch (error) {
+      setModelOptions([]);
+      setModelsError(String(error));
+    } finally {
+      setModelsLoading(false);
+    }
+  };
 
   const toggleFallbackProvider = (providerId: string) => {
     setFallbackProviderIds((current) => (
@@ -561,13 +656,51 @@ function ProviderCard({
               )}
               {showModelIdField && (
                 <div className="space-y-1.5 pt-2">
-                  <Label className={currentLabelClasses}>{t('aiProviders.dialog.modelId')}</Label>
-                  <Input
-                    value={modelId}
-                    onChange={(e) => setModelId(e.target.value)}
-                    placeholder={typeInfo?.modelIdPlaceholder || 'provider/model-id'}
-                    className={currentInputClasses}
-                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <Label className={currentLabelClasses}>{t('aiProviders.dialog.modelId')}</Label>
+                    {account.vendorId === 'ainft' && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => { void handleRefreshAinftModels(); }}
+                        disabled={modelsLoading || !canDiscoverAinftModels}
+                        className="h-7 rounded-full px-3 text-[12px]"
+                      >
+                        <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
+                        {t('aiProviders.dialog.refreshModels')}
+                      </Button>
+                    )}
+                  </div>
+                  {usesAinftModelSelect ? (
+                    <Select
+                      value={modelId}
+                      onChange={(e) => setModelId(e.target.value)}
+                      className={currentInputClasses}
+                    >
+                      {modelOptions.map((model) => (
+                        <option key={model.id} value={model.id}>
+                          {model.displayName}
+                        </option>
+                      ))}
+                    </Select>
+                  ) : (
+                    <Input
+                      value={modelId}
+                      onChange={(e) => setModelId(e.target.value)}
+                      placeholder={typeInfo?.modelIdPlaceholder || 'provider/model-id'}
+                      className={currentInputClasses}
+                    />
+                  )}
+                  {account.vendorId === 'ainft' && (
+                    <p className="text-[12px] text-muted-foreground">
+                      {modelsError
+                        ? t('aiProviders.dialog.ainftModelsFailed', { error: modelsError })
+                        : (modelsLoading
+                          ? t('aiProviders.dialog.ainftModelsLoading')
+                          : t('aiProviders.dialog.ainftModelsHint'))}
+                    </p>
+                  )}
                 </div>
               )}
               {account.vendorId === 'custom' && (
@@ -788,6 +921,9 @@ function AddProviderDialog({
   const [showKey, setShowKey] = useState(false);
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [modelOptions, setModelOptions] = useState<AinftModelOption[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
 
   // OAuth Flow State
   const [oauthFlowing, setOauthFlowing] = useState(false);
@@ -815,6 +951,8 @@ function AddProviderDialog({
   const supportsApiKey = typeInfo?.supportsApiKey ?? false;
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor]));
   const selectedVendor = selectedType ? vendorMap.get(selectedType) : undefined;
+  const canDiscoverAinftModels = selectedType === 'ainft' && !!apiKey.trim() && !!baseUrl.trim();
+  const usesAinftModelSelect = shouldUseAinftModelSelect(selectedType, modelOptions);
   const preferredOAuthMode = selectedVendor?.supportedAuthModes.includes('oauth_browser')
     ? 'oauth_browser'
     : (selectedVendor?.supportedAuthModes.includes('oauth_device')
@@ -829,6 +967,55 @@ function AddProviderDialog({
     }
     setAuthMode(selectedVendor.defaultAuthMode === 'api_key' ? 'apikey' : 'oauth');
   }, [selectedVendor, isOAuth, supportsApiKey]);
+
+  useEffect(() => {
+    if (selectedType !== 'ainft') {
+      setModelOptions([]);
+      setModelsError(null);
+      setModelsLoading(false);
+      return;
+    }
+
+    const trimmedApiKey = apiKey.trim();
+    const trimmedBaseUrl = baseUrl.trim();
+    if (!trimmedApiKey || !trimmedBaseUrl) {
+      setModelOptions([]);
+      setModelsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      setModelsLoading(true);
+      setModelsError(null);
+      void fetchAinftModels({
+        apiKey: trimmedApiKey,
+        baseUrl: trimmedBaseUrl,
+      })
+        .then((models) => {
+          if (cancelled) return;
+          setModelOptions(models);
+          if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
+            setModelId(pickPreferredAinftModelId(models) || '');
+          }
+        })
+        .catch((error) => {
+          if (cancelled) return;
+          setModelOptions([]);
+          setModelsError(String(error));
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setModelsLoading(false);
+          }
+        });
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [apiKey, baseUrl, modelId, selectedType]);
 
   // Keep refs to the latest values so event handlers see the current dialog state.
   const latestRef = React.useRef({ selectedType, typeInfo, onAdd, onClose, t });
@@ -966,7 +1153,34 @@ function AddProviderDialog({
     }
   };
 
-  const availableTypes = PROVIDER_TYPE_INFO.filter((type) => {
+  const handleRefreshAinftModels = async () => {
+    const trimmedApiKey = apiKey.trim();
+    const trimmedBaseUrl = baseUrl.trim();
+    if (!trimmedApiKey || !trimmedBaseUrl) {
+      setModelsError(t('aiProviders.dialog.ainftModelsMissingConfig'));
+      return;
+    }
+
+    setModelsLoading(true);
+    setModelsError(null);
+    try {
+      const models = await fetchAinftModels({
+        apiKey: trimmedApiKey,
+        baseUrl: trimmedBaseUrl,
+      });
+      setModelOptions(models);
+      if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
+        setModelId(pickPreferredAinftModelId(models) || '');
+      }
+    } catch (error) {
+      setModelOptions([]);
+      setModelsError(String(error));
+    } finally {
+      setModelsLoading(false);
+    }
+  };
+
+  const availableTypes = filterVisibleProviderTypes(PROVIDER_TYPE_INFO).filter((type) => {
     const vendor = vendorMap.get(type.id);
     if (!vendor) {
       return !existingVendorIds.has(type.id) || type.id === 'custom';
@@ -1074,6 +1288,8 @@ function AddProviderDialog({
                     setName(type.id === 'custom' ? t('aiProviders.custom') : type.name);
                     setBaseUrl(type.defaultBaseUrl || '');
                     setModelId(type.defaultModelId || '');
+                    setModelOptions([]);
+                    setModelsError(null);
                   }}
                   className="p-4 rounded-2xl border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-center group"
                 >
@@ -1106,6 +1322,8 @@ function AddProviderDialog({
                       setValidationError(null);
                       setBaseUrl('');
                       setModelId('');
+                      setModelOptions([]);
+                      setModelsError(null);
                     }}
                     className="text-[13px] text-blue-500 hover:text-blue-600 font-medium"
                   >
@@ -1129,7 +1347,8 @@ function AddProviderDialog({
               </div>
 
               <div className="space-y-6 bg-transparent p-0">
-                <div className="space-y-2.5">
+                {selectedType !== 'ainft' && (
+                  <div className="space-y-2.5">
                   <Label htmlFor="name" className={labelClasses}>{t('aiProviders.dialog.displayName')}</Label>
                   <Input
                     id="name"
@@ -1138,7 +1357,8 @@ function AddProviderDialog({
                     onChange={(e) => setName(e.target.value)}
                     className={inputClasses}
                   />
-                </div>
+                  </div>
+                )}
 
                 {/* Auth mode toggle for providers supporting both */}
                 {isOAuth && supportsApiKey && (
@@ -1225,17 +1445,59 @@ function AddProviderDialog({
 
                 {showModelIdField && (
                   <div className="space-y-2.5">
-                    <Label htmlFor="modelId" className={labelClasses}>{t('aiProviders.dialog.modelId')}</Label>
-                    <Input
-                      id="modelId"
-                      placeholder={typeInfo?.modelIdPlaceholder || 'provider/model-id'}
-                      value={modelId}
-                      onChange={(e) => {
-                        setModelId(e.target.value);
-                        setValidationError(null);
-                      }}
-                      className={inputClasses}
-                    />
+                    <div className="flex items-center justify-between gap-3">
+                      <Label htmlFor="modelId" className={labelClasses}>{t('aiProviders.dialog.modelId')}</Label>
+                      {selectedType === 'ainft' && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => { void handleRefreshAinftModels(); }}
+                          disabled={modelsLoading || !canDiscoverAinftModels}
+                          className="h-7 rounded-full px-3 text-[12px]"
+                        >
+                          <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
+                          {t('aiProviders.dialog.refreshModels')}
+                        </Button>
+                      )}
+                    </div>
+                    {usesAinftModelSelect ? (
+                      <Select
+                        id="modelId"
+                        value={modelId}
+                        onChange={(e) => {
+                          setModelId(e.target.value);
+                          setValidationError(null);
+                        }}
+                        className={inputClasses}
+                      >
+                        {modelOptions.map((model) => (
+                          <option key={model.id} value={model.id}>
+                            {model.displayName}
+                          </option>
+                        ))}
+                      </Select>
+                    ) : (
+                      <Input
+                        id="modelId"
+                        placeholder={typeInfo?.modelIdPlaceholder || 'provider/model-id'}
+                        value={modelId}
+                        onChange={(e) => {
+                          setModelId(e.target.value);
+                          setValidationError(null);
+                        }}
+                        className={inputClasses}
+                      />
+                    )}
+                    {selectedType === 'ainft' && (
+                      <p className="text-[12px] text-muted-foreground">
+                        {modelsError
+                          ? t('aiProviders.dialog.ainftModelsFailed', { error: modelsError })
+                          : (modelsLoading
+                            ? t('aiProviders.dialog.ainftModelsLoading')
+                            : t('aiProviders.dialog.ainftModelsHint'))}
+                      </p>
+                    )}
                   </div>
                 )}
                 {selectedType === 'custom' && (

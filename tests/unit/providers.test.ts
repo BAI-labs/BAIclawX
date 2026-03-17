@@ -37,7 +37,11 @@ describe('provider metadata', () => {
   it('includes ainft in the backend provider registry', () => {
     expect(BUILTIN_PROVIDER_TYPES).toContain('ainft');
     expect(getProviderEnvVar('ainft')).toBe('AINFT_API_KEY');
-    expect(getProviderConfig('ainft')).toBeUndefined();
+    expect(getProviderConfig('ainft')).toEqual({
+      baseUrl: 'https://api.bankofai.io/v1',
+      api: 'openai-completions',
+      apiKeyEnv: 'AINFT_API_KEY',
+    });
   });
 
   it('includes ark in the frontend provider registry', () => {

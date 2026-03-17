@@ -67,6 +67,11 @@
         "baseUrl": "基礎 URL",
         "modelId": "模型 ID",
         "modelIdDesc": "供應商的模型識別碼（例如 deepseek-ai/DeepSeek-V3）",
+        "refreshModels": "重新整理",
+        "ainftModelsHint": "AINFT 可依目前的 Base URL 與 API Key 載入可用模型清單。",
+        "ainftModelsLoading": "正在載入 AINFT 可用模型...",
+        "ainftModelsMissingConfig": "請先輸入 Base URL 與 API Key，再載入模型清單。",
+        "ainftModelsFailed": "載入 AINFT 模型失敗：{{error}}",
         "protocol": "協定",
         "protocols": {
             "openaiCompletions": "OpenAI Completions",

@@ -5,10 +5,12 @@
  * are in the toolbar; messages render with markdown + streaming.
  */
 import { useEffect, useState } from 'react';
-import { AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useChatStore, type RawMessage } from '@/stores/chat';
 import { useGatewayStore } from '@/stores/gateway';
 import { useAgentsStore } from '@/stores/agents';
+import { useProviderStore } from '@/stores/providers';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
@@ -18,11 +20,17 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { useStickToBottomInstant } from '@/hooks/use-stick-to-bottom-instant';
 import { useMinLoading } from '@/hooks/use-min-loading';
+import { Button } from '@/components/ui/button';
+import { getChatProviderGate } from '@/lib/provider-policy';
 
 export function Chat() {
   const { t } = useTranslation('chat');
+  const navigate = useNavigate();
   const gatewayStatus = useGatewayStore((s) => s.status);
   const isGatewayRunning = gatewayStatus.state === 'running';
+  const providerAccounts = useProviderStore((s) => s.accounts);
+  const defaultAccountId = useProviderStore((s) => s.defaultAccountId);
+  const refreshProviderSnapshot = useProviderStore((s) => s.refreshProviderSnapshot);
 
   const messages = useChatStore((s) => s.messages);
   const currentSessionKey = useChatStore((s) => s.currentSessionKey);
@@ -41,6 +49,7 @@ export function Chat() {
   const cleanupEmptySession = useChatStore((s) => s.cleanupEmptySession);
 
   const [streamingTimestamp, setStreamingTimestamp] = useState<number>(0);
+  const [providerGateReady, setProviderGateReady] = useState(false);
   const minLoading = useMinLoading(loading && messages.length > 0);
   const { contentRef, scrollRef } = useStickToBottomInstant(currentSessionKey);
 
@@ -60,6 +69,18 @@ export function Chat() {
   useEffect(() => {
     void fetchAgents();
   }, [fetchAgents]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void refreshProviderSnapshot().finally(() => {
+      if (!cancelled) {
+        setProviderGateReady(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshProviderSnapshot]);
 
   // Update timestamp when sending starts
   useEffect(() => {
@@ -89,6 +110,8 @@ export function Chat() {
   const hasAnyStreamContent = hasStreamText || hasStreamThinking || hasStreamTools || hasStreamImages || hasStreamToolStatus;
 
   const isEmpty = messages.length === 0 && !sending;
+  const providerGate = getChatProviderGate(providerAccounts, defaultAccountId);
+  const chatBlocked = providerGateReady && providerGate.blocked;
 
   return (
     <div className={cn("relative flex flex-col -m-6 transition-colors duration-500 dark:bg-background")} style={{ height: 'calc(100vh - 2.5rem)' }}>
@@ -100,7 +123,18 @@ export function Chat() {
       {/* Messages Area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4">
         <div ref={contentRef} className="max-w-4xl mx-auto space-y-4">
-          {isEmpty ? (
+          {chatBlocked ? (
+            <ChatProviderGate
+              title={providerGate.reason === 'default_not_allowed'
+                ? t('providerGate.defaultRequiredTitle')
+                : t('providerGate.missingTitle')}
+              description={providerGate.reason === 'default_not_allowed'
+                ? t('providerGate.defaultRequiredDescription')
+                : t('providerGate.missingDescription')}
+              cta={t('providerGate.openModels')}
+              onOpenModels={() => navigate('/models')}
+            />
+          ) : isEmpty ? (
             <WelcomeScreen />
           ) : (
             <>
@@ -169,7 +203,7 @@ export function Chat() {
       <ChatInput
         onSend={sendMessage}
         onStop={abortRun}
-        disabled={!isGatewayRunning}
+        disabled={!isGatewayRunning || chatBlocked}
         sending={sending}
         isEmpty={isEmpty}
       />
@@ -212,6 +246,36 @@ function WelcomeScreen() {
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ChatProviderGate({
+  title,
+  description,
+  cta,
+  onOpenModels,
+}: {
+  title: string;
+  description: string;
+  cta: string;
+  onOpenModels: () => void;
+}) {
+  return (
+    <div className="flex h-[60vh] flex-col items-center justify-center text-center">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-black/5 dark:bg-white/5">
+        <AlertCircle className="h-6 w-6 text-foreground/70" />
+      </div>
+      <h1 className="mb-3 text-3xl font-normal tracking-tight text-foreground" style={{ fontFamily: 'var(--font-heading)' }}>
+        {title}
+      </h1>
+      <p className="mb-6 max-w-md text-[15px] text-foreground/70">
+        {description}
+      </p>
+      <Button onClick={onOpenModels} className="rounded-full px-6">
+        {cta}
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </Button>
     </div>
   );
 }

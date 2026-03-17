@@ -1,6 +1,13 @@
 {
     "gatewayNotRunning": "ゲートウェイが停止中",
     "gatewayRequired": "チャットを利用するには OpenClaw ゲートウェイが実行されている必要があります。自動的に起動するか、設定から起動できます。",
+    "providerGate": {
+        "missingTitle": "チャットの前に AINFT を設定してください",
+        "missingDescription": "AINFT アカウントを追加し、既定のモデルプロバイダーに設定するとチャットを利用できます。",
+        "defaultRequiredTitle": "既定のプロバイダーを AINFT に切り替えてください",
+        "defaultRequiredDescription": "現在の BAIclaw チャットは AINFT のみ対応しています。Models を開き、AINFT アカウントを既定のプロバイダーに設定してください。",
+        "openModels": "Models を開く"
+    },
     "welcome": {
         "title": "BAIclaw チャット",
         "subtitle": "お手伝いできることはありますか？",
