@@ -30,7 +30,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> | 简体中文 | <a href="README.ja-JP.md">日本語</a>
+  <a href="README.md">English</a> | 简体中文 | <a href="README.zh-TW.md">繁體中文</a>
 </p>
 
 ---
@@ -119,7 +119,7 @@ Skills 页面可展示来自多个 OpenClaw 来源的技能（托管目录、wor
 - `BOCHA_API_KEY`：用于 `bocha-skill`
 
 ### 🔐 安全的 AINFT 集成
-可配置一个或多个 AINFT 账号，凭证安全存储在系统原生密钥链中。每个账号都可以单独覆盖 Base URL 与模型选择，而聊天会固定使用默认的 AINFT 账号。
+可配置一个或多个 AINFT 账号，凭证安全存储在系统原生密钥链中。新增账号时只需要填写 API Key；进入聊天后即可通过输入框旁的模型选择器拉取 AINFT 可用模型并直接切换。
 
 ### 🌙 自适应主题
 支持浅色模式、深色模式或跟随系统主题。BAIclaw 自动适应你的偏好设置。
@@ -161,7 +161,7 @@ pnpm dev
 首次启动 BAIclaw 时，**设置向导** 将引导你完成以下步骤：
 
 1. **语言与区域** – 配置你的首选语言和地区
-2. **AINFT 供应商** – 使用 API Key 添加一个或多个 AINFT 账号，从实时 `/models` 列表中选择模型，并设置默认聊天供应商
+2. **AINFT 供应商** – 使用 API Key 添加一个或多个 AINFT 账号，并设置默认聊天供应商
 3. **技能包** – 选择适用于常见场景的预配置技能
 4. **验证** – 在进入主界面前测试你的配置
 

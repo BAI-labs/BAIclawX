@@ -34,22 +34,10 @@ import zhTwSkills from './locales/zh-TW/skills.json';
 import zhTwCron from './locales/zh-TW/cron.json';
 import zhTwSetup from './locales/zh-TW/setup.json';
 
-// JA
-import jaCommon from './locales/ja/common.json';
-import jaSettings from './locales/ja/settings.json';
-import jaDashboard from './locales/ja/dashboard.json';
-import jaChat from './locales/ja/chat.json';
-import jaChannels from './locales/ja/channels.json';
-import jaAgents from './locales/ja/agents.json';
-import jaSkills from './locales/ja/skills.json';
-import jaCron from './locales/ja/cron.json';
-import jaSetup from './locales/ja/setup.json';
-
 export const SUPPORTED_LANGUAGES = [
     { code: 'en', label: 'English' },
     { code: 'zh-TW', label: '繁體中文' },
     { code: 'zh-CN', label: '简体中文' },
-    { code: 'ja', label: '日本語' },
 ] as const;
 
 export type LanguageCode = (typeof SUPPORTED_LANGUAGES)[number]['code'];
@@ -98,17 +86,6 @@ const resources = {
         skills: zhCnSkills,
         cron: zhCnCron,
         setup: zhCnSetup,
-    },
-    ja: {
-        common: jaCommon,
-        settings: jaSettings,
-        dashboard: jaDashboard,
-        chat: jaChat,
-        channels: jaChannels,
-        agents: jaAgents,
-        skills: jaSkills,
-        cron: jaCron,
-        setup: jaSetup,
     },
 };
 

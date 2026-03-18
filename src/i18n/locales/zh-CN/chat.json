@@ -27,6 +27,13 @@
     "composer": {
         "attachFiles": "添加文件",
         "pickAgent": "选择 Agent",
+        "pickModel": "选择模型：{{model}}",
+        "modelPickerTitle": "选择模型",
+        "modelPickerLoading": "正在加载 AINFT 可用模型...",
+        "modelPickerEmpty": "当前没有可选模型。",
+        "modelPickerMissingConfig": "找不到可用的 AINFT API Key 或 Base URL。",
+        "modelPickerError": "加载模型失败：{{error}}",
+        "refreshModels": "刷新模型",
         "clearTarget": "清除目标 Agent",
         "targetChip": "@{{agent}}",
         "agentPickerTitle": "将下一条消息直接发送给其他 Agent",

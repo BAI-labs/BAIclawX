@@ -7,7 +7,7 @@
  * are sent with the message (no base64 over WebSocket).
  */
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { SendHorizontal, Square, X, Paperclip, FileText, Film, Music, FileArchive, File, Loader2, AtSign } from 'lucide-react';
+import { SendHorizontal, Square, X, Paperclip, FileText, Film, Music, FileArchive, File, Loader2, AtSign, Box, RefreshCw, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { hostApiFetch } from '@/lib/host-api';
@@ -16,8 +16,11 @@ import { cn } from '@/lib/utils';
 import { useGatewayStore } from '@/stores/gateway';
 import { useAgentsStore } from '@/stores/agents';
 import { useChatStore } from '@/stores/chat';
+import { useProviderStore } from '@/stores/providers';
 import type { AgentSummary } from '@/types/agent';
 import { useTranslation } from 'react-i18next';
+import { fetchAinftModels, type AinftModelOption } from '@/lib/ainft-models';
+import { getProviderTypeInfo } from '@/lib/providers';
 
 // ── Types ────────────────────────────────────────────────────────
 
@@ -90,12 +93,23 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
   const [targetAgentId, setTargetAgentId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const [modelOptions, setModelOptions] = useState<AinftModelOption[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [modelsError, setModelsError] = useState<string | null>(null);
+  const [ainftApiKey, setAinftApiKey] = useState<string | null>(null);
+  const [switchingModelId, setSwitchingModelId] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const modelPickerRef = useRef<HTMLDivElement>(null);
   const isComposingRef = useRef(false);
   const gatewayStatus = useGatewayStore((s) => s.status);
   const agents = useAgentsStore((s) => s.agents);
   const currentAgentId = useChatStore((s) => s.currentAgentId);
+  const providerAccounts = useProviderStore((s) => s.accounts);
+  const defaultAccountId = useProviderStore((s) => s.defaultAccountId);
+  const getAccountApiKey = useProviderStore((s) => s.getAccountApiKey);
+  const updateAccount = useProviderStore((s) => s.updateAccount);
   const currentAgentName = useMemo(
     () => agents.find((agent) => agent.id === currentAgentId)?.name ?? currentAgentId,
     [agents, currentAgentId],
@@ -109,6 +123,23 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     [agents, targetAgentId],
   );
   const showAgentPicker = mentionableAgents.length > 0;
+  const ainftProviderInfo = useMemo(() => getProviderTypeInfo('ainft'), []);
+  const activeAinftAccount = useMemo(() => {
+    const defaultAccount = providerAccounts.find((account) => account.id === defaultAccountId) ?? null;
+    if (defaultAccount?.vendorId === 'ainft') {
+      return defaultAccount;
+    }
+
+    return providerAccounts.find((account) => account.vendorId === 'ainft' && account.isDefault) ?? null;
+  }, [providerAccounts, defaultAccountId]);
+  const activeAinftBaseUrl = activeAinftAccount?.baseUrl?.trim()
+    || ainftProviderInfo?.defaultBaseUrl
+    || 'https://api.bankofai.io/v1';
+  const selectedModelId = activeAinftAccount?.model?.trim()
+    || ainftProviderInfo?.defaultModelId
+    || 'gpt-5.2';
+  const selectedModelLabel = modelOptions.find((model) => model.id === selectedModelId)?.displayName || selectedModelId;
+  const canPickModel = Boolean(activeAinftAccount) && !disabled;
 
   // Auto-resize textarea
   useEffect(() => {
@@ -139,17 +170,91 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
   }, [agents, currentAgentId, targetAgentId]);
 
   useEffect(() => {
-    if (!pickerOpen) return;
+    if (!pickerOpen && !modelPickerOpen) return;
     const handlePointerDown = (event: MouseEvent) => {
       if (!pickerRef.current?.contains(event.target as Node)) {
         setPickerOpen(false);
+      }
+      if (!modelPickerRef.current?.contains(event.target as Node)) {
+        setModelPickerOpen(false);
       }
     };
     document.addEventListener('mousedown', handlePointerDown);
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
     };
-  }, [pickerOpen]);
+  }, [pickerOpen, modelPickerOpen]);
+
+  useEffect(() => {
+    if (!activeAinftAccount) {
+      setAinftApiKey(null);
+      setModelOptions([]);
+      setModelsError(null);
+      setModelPickerOpen(false);
+      return;
+    }
+
+    let cancelled = false;
+    void getAccountApiKey(activeAinftAccount.id).then((apiKey) => {
+      if (!cancelled) {
+        setAinftApiKey(apiKey);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeAinftAccount, getAccountApiKey]);
+
+  const loadAinftModels = useCallback(async () => {
+    if (!activeAinftAccount || !ainftApiKey?.trim() || !activeAinftBaseUrl.trim()) {
+      setModelOptions([]);
+      setModelsError(t('composer.modelPickerMissingConfig'));
+      return;
+    }
+
+    setModelsLoading(true);
+    setModelsError(null);
+
+    try {
+      const models = await fetchAinftModels({
+        apiKey: ainftApiKey,
+        baseUrl: activeAinftBaseUrl,
+      });
+
+      setModelOptions(models);
+      if (models.length === 0) {
+        setModelsError(t('composer.modelPickerEmpty'));
+      }
+    } catch (error) {
+      setModelsError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setModelsLoading(false);
+    }
+  }, [activeAinftAccount, ainftApiKey, activeAinftBaseUrl, t]);
+
+  useEffect(() => {
+    if (modelPickerOpen && activeAinftAccount && !modelsLoading && modelOptions.length === 0 && !modelsError) {
+      void loadAinftModels();
+    }
+  }, [activeAinftAccount, loadAinftModels, modelOptions.length, modelPickerOpen, modelsError, modelsLoading]);
+
+  const handleModelSelect = useCallback(async (modelId: string) => {
+    if (!activeAinftAccount || modelId === selectedModelId) {
+      setModelPickerOpen(false);
+      return;
+    }
+
+    setSwitchingModelId(modelId);
+    try {
+      await updateAccount(activeAinftAccount.id, {
+        model: modelId,
+      });
+      setModelPickerOpen(false);
+    } finally {
+      setSwitchingModelId(null);
+    }
+  }, [activeAinftAccount, selectedModelId, updateAccount]);
 
   // ── File staging via native dialog ─────────────────────────────
 
@@ -310,6 +415,7 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     onSend(textToSend, attachmentsToSend, targetAgentId);
     setTargetAgentId(null);
     setPickerOpen(false);
+    setModelPickerOpen(false);
   }, [input, attachments, canSend, onSend, targetAgentId]);
 
   const handleStop = useCallback(() => {
@@ -434,6 +540,7 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
               title={t('composer.attachFiles')}
             >
               <Paperclip className="h-4 w-4" />
+
             </Button>
 
             {showAgentPicker && (
@@ -474,6 +581,96 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
                 )}
               </div>
             )}
+
+            <div ref={modelPickerRef} className="relative shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  'h-10 w-10 rounded-full text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground transition-colors',
+                  modelPickerOpen && 'bg-primary/10 text-primary hover:bg-primary/20',
+                )}
+                onClick={() => {
+                  if (!canPickModel) return;
+                  setPickerOpen(false);
+                  setModelPickerOpen((open) => !open);
+                }}
+                disabled={!canPickModel || switchingModelId !== null || modelsLoading}
+                title={t('composer.pickModel', { model: selectedModelLabel })}
+              >
+                {modelsLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Box className="h-4 w-4" />
+                )}
+              </Button>
+              {modelPickerOpen && (
+                <div className="absolute left-0 bottom-full z-20 mb-2 w-72 overflow-hidden rounded-2xl border border-black/10 bg-white p-1.5 shadow-xl dark:border-white/10 dark:bg-card">
+                  <div className="flex items-center justify-between gap-2 px-3 py-2">
+                    <div>
+                      <div className="text-[11px] font-medium text-muted-foreground/80">
+                        {t('composer.modelPickerTitle')}
+                      </div>
+                      <div className="mt-1 text-xs font-medium text-foreground/80">
+                        {selectedModelLabel}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 rounded-full px-2 text-muted-foreground"
+                      onClick={() => void loadAinftModels()}
+                      disabled={modelsLoading || switchingModelId !== null}
+                      title={t('composer.refreshModels')}
+                    >
+                      <RefreshCw className={cn('h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
+                    </Button>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto px-1 pb-1">
+                    {modelsLoading ? (
+                      <div className="px-3 py-3 text-sm text-muted-foreground">
+                        {t('composer.modelPickerLoading')}
+                      </div>
+                    ) : modelsError ? (
+                      <div className="px-3 py-3 text-sm text-destructive">
+                        {t('composer.modelPickerError', { error: modelsError })}
+                      </div>
+                    ) : modelOptions.length === 0 ? (
+                      <div className="px-3 py-3 text-sm text-muted-foreground">
+                        {t('composer.modelPickerEmpty')}
+                      </div>
+                    ) : (
+                      modelOptions.map((model) => {
+                        const selected = model.id === selectedModelId;
+                        const switching = model.id === switchingModelId;
+                        return (
+                          <button
+                            key={model.id}
+                            type="button"
+                            onClick={() => void handleModelSelect(model.id)}
+                            disabled={switchingModelId !== null}
+                            className={cn(
+                              'flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors',
+                              selected ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-black/5 dark:hover:bg-white/5',
+                            )}
+                          >
+                            <div className="min-w-0">
+                              <div className="truncate font-medium">{model.displayName}</div>
+                              <div className="truncate text-xs text-muted-foreground">{model.id}</div>
+                            </div>
+                            {switching ? (
+                              <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                            ) : selected ? (
+                              <Check className="h-4 w-4 shrink-0" />
+                            ) : null}
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Textarea */}
             <div className="flex-1 relative">

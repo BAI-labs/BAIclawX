@@ -27,6 +27,13 @@
     "composer": {
         "attachFiles": "ファイルを添付",
         "pickAgent": "Agent を選択",
+        "pickModel": "モデルを選択: {{model}}",
+        "modelPickerTitle": "モデルを選択",
+        "modelPickerLoading": "AINFT の利用可能モデルを読み込み中...",
+        "modelPickerEmpty": "現在選択可能なモデルがありません。",
+        "modelPickerMissingConfig": "利用可能な AINFT API キーまたは Base URL が見つかりません。",
+        "modelPickerError": "モデルの読み込みに失敗しました: {{error}}",
+        "refreshModels": "モデルを更新",
         "clearTarget": "送信先 Agent をクリア",
         "targetChip": "@{{agent}}",
         "agentPickerTitle": "次のメッセージを別の Agent に直接送信します",

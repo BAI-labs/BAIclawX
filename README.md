@@ -30,7 +30,7 @@
 </p>
 
 <p align="center">
-  English | <a href="README.zh-CN.md">简体中文</a> | <a href="README.ja-JP.md">日本語</a>
+  English | <a href="README.zh-CN.md">简体中文</a> | <a href="README.zh-TW.md">繁體中文</a>
 </p>
 
 ---
@@ -119,7 +119,7 @@ Environment variables for bundled search skills:
 - `find-skills` and `self-improving-agent` do not require API keys
 
 ### 🔐 Secure AINFT Integration
-Configure one or more AINFT accounts with credentials stored securely in your system's native keychain. Each account can use its own Base URL override and model selection, while chat stays pinned to an AINFT default account.
+Configure one or more AINFT accounts with credentials stored securely in your system's native keychain. Account creation only requires an API key; chat can then load the available AINFT models and switch between them directly from the composer with the model picker.
 
 ### 🌙 Adaptive Theming
 Light mode, dark mode, or system-synchronized themes. BAIclaw adapts to your preferences automatically.
@@ -161,7 +161,7 @@ pnpm dev
 When you launch BAIclaw for the first time, the **Setup Wizard** will guide you through:
 
 1. **Language & Region** – Configure your preferred locale
-2. **AINFT Provider** – Add one or more AINFT accounts with API keys, choose a model from the live `/models` list, and set the default chat provider
+2. **AINFT Provider** – Add one or more AINFT accounts with an API key and set the default chat provider
 3. **Skill Bundles** – Select pre-configured skills for common use cases
 4. **Verification** – Test your configuration before entering the main interface
 

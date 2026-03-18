@@ -35,10 +35,6 @@ export function normalizeLanguageCode(locale: string | null | undefined): Langua
     return normalizeChineseLanguage(compact);
   }
 
-  if (compact.startsWith('ja')) {
-    return 'ja';
-  }
-
   return 'en';
 }
 
@@ -53,10 +49,6 @@ export function detectPreferredLanguage(locale: string | null | undefined): Lang
 
   if (compact.startsWith('zh')) {
     return normalizeChineseLanguage(compact);
-  }
-
-  if (compact.startsWith('ja')) {
-    return 'ja';
   }
 
   return 'en';

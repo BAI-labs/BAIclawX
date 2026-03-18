@@ -19,4 +19,11 @@ describe('language normalization', () => {
   it('prefers zh-TW for generic Chinese system locales', () => {
     expect(detectPreferredLanguage('zh')).toBe('zh-TW');
   });
+
+  it('falls back Japanese locales to English', () => {
+    expect(normalizeLanguageCode('ja')).toBe('en');
+    expect(normalizeLanguageCode('ja-JP')).toBe('en');
+    expect(detectPreferredLanguage('ja')).toBe('en');
+    expect(detectPreferredLanguage('ja-JP')).toBe('en');
+  });
 });

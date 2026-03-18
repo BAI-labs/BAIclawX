@@ -27,6 +27,13 @@
     "composer": {
         "attachFiles": "Attach files",
         "pickAgent": "Choose agent",
+        "pickModel": "Choose model: {{model}}",
+        "modelPickerTitle": "Choose model",
+        "modelPickerLoading": "Loading available AINFT models...",
+        "modelPickerEmpty": "No models are currently available.",
+        "modelPickerMissingConfig": "No usable AINFT API key or Base URL was found.",
+        "modelPickerError": "Failed to load models: {{error}}",
+        "refreshModels": "Refresh models",
         "clearTarget": "Clear target agent",
         "targetChip": "@{{agent}}",
         "agentPickerTitle": "Route the next message to another agent",
