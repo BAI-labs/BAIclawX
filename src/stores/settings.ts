@@ -96,7 +96,12 @@ export const useSettingsStore = create<SettingsState>()(
         try {
           const settings = await hostApiFetch<Partial<typeof defaultSettings>>('/api/settings');
           const normalizedLanguage = normalizeLanguageCode(settings.language);
-          set((state) => ({ ...state, ...settings, language: normalizedLanguage }));
+          set((state) => ({
+            ...state,
+            ...settings,
+            language: normalizedLanguage,
+            devModeUnlocked: false,
+          }));
           if (settings.language && settings.language !== normalizedLanguage) {
             void hostApiFetch('/api/settings/language', {
               method: 'PUT',
@@ -161,9 +166,9 @@ export const useSettingsStore = create<SettingsState>()(
       setAutoCheckUpdate: (autoCheckUpdate) => set({ autoCheckUpdate }),
       setAutoDownloadUpdate: (autoDownloadUpdate) => set({ autoDownloadUpdate }),
       setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
-      setDevModeUnlocked: (devModeUnlocked) => set({ devModeUnlocked }),
+      setDevModeUnlocked: () => set({ devModeUnlocked: false }),
       markSetupComplete: () => set({ setupComplete: true }),
-      resetSettings: () => set(defaultSettings),
+      resetSettings: () => set({ ...defaultSettings, devModeUnlocked: false }),
     }),
     {
       name: 'baiclaw-settings',

@@ -75,7 +75,6 @@ export function Settings() {
     autoDownloadUpdate,
     setAutoDownloadUpdate,
     devModeUnlocked,
-    setDevModeUnlocked,
     telemetryEnabled,
     setTelemetryEnabled,
   } = useSettingsStore();
@@ -601,20 +600,6 @@ export function Settings() {
                 <Switch
                   checked={gatewayAutoStart}
                   onCheckedChange={setGatewayAutoStart}
-                />
-              </div>
-
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-[15px] font-medium text-foreground">{t('advanced.devMode')}</Label>
-                  <p className="text-[13px] text-muted-foreground mt-1">
-                    {t('advanced.devModeDesc')}
-                  </p>
-                </div>
-                <Switch
-                  checked={devModeUnlocked}
-                  onCheckedChange={setDevModeUnlocked}
                 />
               </div>
 

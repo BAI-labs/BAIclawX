@@ -117,6 +117,10 @@ async function getSettingsStore() {
  */
 export async function getSetting<K extends keyof AppSettings>(key: K): Promise<AppSettings[K]> {
   const store = await getSettingsStore();
+  if (key === 'devModeUnlocked') {
+    store.set('devModeUnlocked', false);
+    return false as AppSettings[K];
+  }
   const value = store.get(key);
 
   if (key === 'language' && typeof value === 'string') {
@@ -138,6 +142,10 @@ export async function setSetting<K extends keyof AppSettings>(
   value: AppSettings[K]
 ): Promise<void> {
   const store = await getSettingsStore();
+  if (key === 'devModeUnlocked') {
+    store.set('devModeUnlocked', false as AppSettings[K]);
+    return;
+  }
   if (key === 'language' && typeof value === 'string') {
     store.set(key, normalizeAppLanguageCode(value) as AppSettings[K]);
     return;
@@ -157,10 +165,14 @@ export async function getAllSettings(): Promise<AppSettings> {
   if (normalizedLanguage !== settings.language) {
     store.set('language', normalizedLanguage);
   }
+  if (settings.devModeUnlocked) {
+    store.set('devModeUnlocked', false);
+  }
 
   return {
     ...settings,
     language: normalizedLanguage,
+    devModeUnlocked: false,
   };
 }
 
