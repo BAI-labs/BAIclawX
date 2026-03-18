@@ -7,52 +7,50 @@
 @layer base {
   :root {
     --font-heading: "Noto Sans", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
-    --font-body: "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif;
-    --font-mono-brand: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    /* #f1ede1 */
-    --background: 45 36.4% 91.4%;
-    --foreground: 222.2 84% 4.9%;
+    --font-body: "Noto Sans","SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif;
+    --font-mono-brand: "Noto Sans","SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.92%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 3.92%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 0 0% 3.92%;
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 95.69%;
+    --secondary: 0 0% 94.51%;
+    --secondary-foreground: 0 0% 3.92%;
+    --muted: 0 0% 94.51%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 94.51%;
+    --accent-foreground: 0 0% 3.92%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --border: 0 0% 90%;
+    --input: 0 0% 94.51%;
+    --ring: 0 0% 0%;
     --radius: 0.5rem;
   }
 
-  /* Neutral deep-gray dark palette */
   .dark {
-    --background: 240 4% 11%;
-    --foreground: 210 20% 96%;
-    --card: 240 3% 14%;
-    --card-foreground: 210 20% 96%;
-    --popover: 240 3% 14%;
-    --popover-foreground: 210 20% 96%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 3% 18%;
-    --secondary-foreground: 210 20% 96%;
-    --muted: 240 3% 18%;
-    --muted-foreground: 220 8% 72%;
-    --accent: 240 3% 22%;
-    --accent-foreground: 210 20% 96%;
+    --background: 0 0% 3.92%;
+    --foreground: 0 0% 98.04%;
+    --card: 0 0% 3.92%;
+    --card-foreground: 0 0% 98.04%;
+    --popover: 0 0% 3.92%;
+    --popover-foreground: 0 0% 98.04%;
+    --primary: 0 0% 89.8%;
+    --primary-foreground: 0 0% 3.92%;
+    --secondary: 0 0% 9.02%;
+    --secondary-foreground: 0 0% 98.04%;
+    --muted: 0 0% 9.02%;
+    --muted-foreground: 0 0% 63.14%;
+    --accent: 0 0% 9.02%;
+    --accent-foreground: 0 0% 98.04%;
     --destructive: 0 65% 42%;
-    --destructive-foreground: 210 20% 96%;
-    --border: 240 3% 24%;
-    --input: 240 3% 18%;
-    --ring: 217.2 91.2% 59.8%;
+    --destructive-foreground: 0 0% 98.04%;
+    --border: 0 0% 16%;
+    --input: 0 0% 9.02%;
+    --ring: 0 0% 89.8%;
   }
 }
 
