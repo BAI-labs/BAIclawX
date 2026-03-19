@@ -9,8 +9,11 @@
  */
 import { app } from 'electron';
 import { join } from 'path';
-import { existsSync, mkdirSync, appendFileSync } from 'fs';
+import { existsSync, mkdirSync, appendFileSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { appendFile, readFile, readdir, stat } from 'fs/promises';
+
+const LOG_FILE_PREFIX = 'bankofai';
+const LOG_SESSION_LABEL = 'bankofai';
 
 /**
  * Log levels
@@ -54,6 +57,38 @@ let flushing = false;
 
 const FLUSH_INTERVAL_MS = 500;
 const FLUSH_SIZE_THRESHOLD = 20;
+const LEGACY_LOG_FILE_PREFIX = 'clawx';
+
+function migrateLegacyLogFiles(targetDir: string): void {
+  const entries = readdirSync(targetDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith('.log')) continue;
+
+    const currentPath = join(targetDir, entry.name);
+    const nextName = entry.name.startsWith(`${LEGACY_LOG_FILE_PREFIX}-`)
+      ? `${LOG_FILE_PREFIX}-${entry.name.slice(LEGACY_LOG_FILE_PREFIX.length + 1)}`
+      : entry.name;
+    const nextPath = join(targetDir, nextName);
+
+    if (nextPath !== currentPath && !existsSync(nextPath)) {
+      renameSync(currentPath, nextPath);
+    }
+
+    const content = readFileSync(nextPath, 'utf8');
+    const migrated = content
+      .replaceAll('[clawx-validate]', '[bankofai-validate]')
+      .replaceAll('ClawX Session Start', 'bankofai Session Start')
+      .replaceAll('=== ClawX Application Starting ===', '=== bankofai Application Starting ===')
+      .replaceAll('ClawX-only', 'bankofai-only')
+      .replaceAll('ClawX context', 'bankofai context')
+      .replaceAll('ClawX', 'bankofai');
+
+    if (migrated !== content) {
+      writeFileSync(nextPath, migrated);
+    }
+  }
+}
 
 async function flushBuffer(): Promise<void> {
   if (flushing || writeBuffer.length === 0 || !logFilePath) return;
@@ -101,11 +136,13 @@ export function initLogger(): void {
       mkdirSync(logDir, { recursive: true });
     }
 
+    migrateLegacyLogFiles(logDir);
+
     const timestamp = new Date().toISOString().split('T')[0];
-    logFilePath = join(logDir, `clawx-${timestamp}.log`);
+    logFilePath = join(logDir, `${LOG_FILE_PREFIX}-${timestamp}.log`);
 
     // Write a separator for new session (sync is OK — happens once at startup)
-    const sessionHeader = `\n${'='.repeat(80)}\n[${new Date().toISOString()}] === ClawX Session Start (v${app.getVersion()}) ===\n${'='.repeat(80)}\n`;
+    const sessionHeader = `\n${'='.repeat(80)}\n[${new Date().toISOString()}] === ${LOG_SESSION_LABEL} Session Start (v${app.getVersion()}) ===\n${'='.repeat(80)}\n`;
     appendFileSync(logFilePath, sessionHeader);
   } catch (error) {
     console.error('Failed to initialize logger:', error);

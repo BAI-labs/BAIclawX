@@ -5,8 +5,8 @@ import { getClawXProviderStore } from './store-instance';
 const PROVIDER_STORE_SCHEMA_VERSION = 1;
 const LEGACY_BANKOFAI_MODEL_ID = 'chatgpt-4o-latest';
 const CURRENT_BANKOFAI_MODEL_ID = 'gpt-5.2';
-const LEGACY_PROVIDER_ID = ['a', 'inft'].join('');
-const CANONICAL_PROVIDER_ID = 'bankofai';
+export const LEGACY_PROVIDER_ID = ['a', 'inft'].join('');
+export const CANONICAL_PROVIDER_ID = 'bankofai';
 
 function normalizeBankOfAiModelId(model?: string): string | undefined {
   if (!model) {
@@ -28,7 +28,7 @@ function normalizeProviderAccount(account: ProviderAccount): ProviderAccount {
   };
 }
 
-function normalizeProviderConfig(config: ProviderConfig): ProviderConfig {
+export function normalizeProviderConfig(config: ProviderConfig): ProviderConfig {
   return {
     ...config,
     type: normalizeProviderType(config.type),

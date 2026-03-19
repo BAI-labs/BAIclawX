@@ -1,6 +1,7 @@
 import type { ProviderConfig } from '../../shared/providers/types';
 import {
   getDefaultProviderAccountId,
+  normalizeProviderConfig,
   providerConfigToAccount,
   saveProviderAccount,
 } from './provider-store';
@@ -19,13 +20,18 @@ export async function ensureProviderStoreMigrated(): Promise<void> {
   const legacyProviders = (store.get('providers') ?? {}) as Record<string, ProviderConfig>;
   const defaultProviderId = (store.get('defaultProvider') ?? null) as string | null;
   const existingDefaultAccountId = await getDefaultProviderAccountId();
+  const normalizedProviders: Record<string, ProviderConfig> = {};
 
   for (const provider of Object.values(legacyProviders)) {
-    const account = providerConfigToAccount(provider, {
-      isDefault: provider.id === defaultProviderId,
+    const normalizedProvider = normalizeProviderConfig(provider);
+    normalizedProviders[normalizedProvider.id] = normalizedProvider;
+    const account = providerConfigToAccount(normalizedProvider, {
+      isDefault: normalizedProvider.id === defaultProviderId,
     });
     await saveProviderAccount(account);
   }
+
+  store.set('providers', normalizedProviders);
 
   if (!existingDefaultAccountId && defaultProviderId) {
     store.set('defaultProviderAccountId', defaultProviderId);

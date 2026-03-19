@@ -11,6 +11,7 @@ import {
   deleteProviderAccount,
   getProviderAccount,
   listProviderAccounts,
+  normalizeProviderConfig,
   providerAccountToConfig,
   providerConfigToAccount,
   saveProviderAccount,
@@ -141,12 +142,13 @@ export async function saveProvider(config: ProviderConfig): Promise<void> {
   await ensureProviderStoreMigrated();
   const s = await getClawXProviderStore();
   const providers = s.get('providers') as Record<string, ProviderConfig>;
-  providers[config.id] = config;
+  const normalizedConfig = normalizeProviderConfig(config);
+  providers[normalizedConfig.id] = normalizedConfig;
   s.set('providers', providers);
 
   const defaultProviderId = (s.get('defaultProvider') ?? null) as string | null;
   await saveProviderAccount(
-    providerConfigToAccount(config, { isDefault: defaultProviderId === config.id }),
+    providerConfigToAccount(normalizedConfig, { isDefault: defaultProviderId === normalizedConfig.id }),
   );
 }
 
@@ -158,7 +160,7 @@ export async function getProvider(providerId: string): Promise<ProviderConfig | 
   const s = await getClawXProviderStore();
   const providers = s.get('providers') as Record<string, ProviderConfig>;
   if (providers[providerId]) {
-    return providers[providerId];
+    return normalizeProviderConfig(providers[providerId]);
   }
 
   const account = await getProviderAccount(providerId);
@@ -174,7 +176,7 @@ export async function getAllProviders(): Promise<ProviderConfig[]> {
   const providers = s.get('providers') as Record<string, ProviderConfig>;
   const legacyProviders = Object.values(providers);
   if (legacyProviders.length > 0) {
-    return legacyProviders;
+    return legacyProviders.map(normalizeProviderConfig);
   }
 
   const accounts = await listProviderAccounts();
