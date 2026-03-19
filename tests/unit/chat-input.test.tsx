@@ -10,7 +10,7 @@ const { agentsState, chatState, gatewayState } = vi.hoisted(() => ({
     currentAgentId: 'main',
   },
   gatewayState: {
-    status: { state: 'running', port: 18789 },
+    status: { state: 'running', port: 19789 },
   },
 }));
 
@@ -73,7 +73,7 @@ describe('ChatInput agent targeting', () => {
   beforeEach(() => {
     agentsState.agents = [];
     chatState.currentAgentId = 'main';
-    gatewayState.status = { state: 'running', port: 18789 };
+    gatewayState.status = { state: 'running', port: 19789 };
   });
 
   it('hides the @agent picker when only one agent is configured', () => {

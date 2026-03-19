@@ -18,7 +18,7 @@ describe('gateway store event wiring', () => {
   });
 
   it('subscribes to host events through subscribeHostEvent on init', async () => {
-    hostApiFetchMock.mockResolvedValueOnce({ state: 'running', port: 18789 });
+    hostApiFetchMock.mockResolvedValueOnce({ state: 'running', port: 19789 });
 
     const handlers = new Map<string, (payload: unknown) => void>();
     subscribeHostEventMock.mockImplementation((eventName: string, handler: (payload: unknown) => void) => {
@@ -35,7 +35,7 @@ describe('gateway store event wiring', () => {
     expect(subscribeHostEventMock).toHaveBeenCalledWith('gateway:chat-message', expect.any(Function));
     expect(subscribeHostEventMock).toHaveBeenCalledWith('gateway:channel-status', expect.any(Function));
 
-    handlers.get('gateway:status')?.({ state: 'stopped', port: 18789 });
+    handlers.get('gateway:status')?.({ state: 'stopped', port: 19789 });
     expect(useGatewayStore.getState().status.state).toBe('stopped');
   });
 });

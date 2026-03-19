@@ -137,12 +137,12 @@ describe('prepareWinSpawn', () => {
     setPlatform('win32');
     const result = prepareWinSpawn(
       'node',
-      ['C:\\Users\\John Doe\\script.js', '--port', '18789'],
+      ['C:\\Users\\John Doe\\script.js', '--port', '19789'],
       true,
     );
     expect(result.shell).toBe(true);
     expect(result.command).toBe('node');
-    expect(result.args).toEqual(['"C:\\Users\\John Doe\\script.js"', '--port', '18789']);
+    expect(result.args).toEqual(['"C:\\Users\\John Doe\\script.js"', '--port', '19789']);
   });
 
   it('auto-detects shell need based on absolute path on Windows', () => {
