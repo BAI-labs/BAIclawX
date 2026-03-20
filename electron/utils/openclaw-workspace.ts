@@ -11,8 +11,8 @@ import { homedir } from 'os';
 import { logger } from './logger';
 import { getResourcesDir } from './paths';
 
-const CLAWX_BEGIN = '<!-- clawx:begin -->';
-const CLAWX_END = '<!-- clawx:end -->';
+const CLAWX_BEGIN = '<!-- BAIclaw:begin -->';
+const CLAWX_END = '<!-- BAIclaw:end -->';
 
 // ── Helpers ──────────────────────────────────────────────────────
 

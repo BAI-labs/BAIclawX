@@ -275,6 +275,25 @@ export function ProvidersSettings() {
         </div>
       )}
 
+      <div className="space-y-2">
+        <div className="flex items-center justify-start">
+          <div className='text-[17px] text-foreground/70 font-medium'>
+          {t('settings:aiProviders.dialog.customViewPoints1')}
+          {` `}
+          <a
+            href={'https://chat.bankofai.io/usage'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
+          >
+            https://chat.bankofai.io/usage
+          </a>
+          {` `}
+          {t('settings:aiProviders.dialog.customViewPoints2')}
+          </div>
+        </div>
+      </div>
+
       {/* Add Provider Dialog */}
       {showAddDialog && (
         <AddProviderDialog
@@ -635,7 +654,7 @@ function ProviderCard({
                 rel="noopener noreferrer"
                 className="text-[12px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
               >
-                {t('aiProviders.dialog.customDoc')}
+                {t('aiProviders.dialog.customDoc2')}
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>
@@ -1346,7 +1365,7 @@ function AddProviderDialog({
                         rel="noopener noreferrer"
                         className="text-[13px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
                       >
-                        {t('aiProviders.dialog.customDoc')}
+                        {t('aiProviders.dialog.customDoc2')}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </>

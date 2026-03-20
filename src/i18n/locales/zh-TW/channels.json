@@ -61,7 +61,7 @@
     "meta": {
         "telegram": {
             "description": "使用 @BotFather 提供的機器人令牌連線 Telegram",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/TjiGwxsMWi7hpDkDAQBc0ydMnEf#PL8ndvsEwoYVWIx1T4mcB1EvnSb",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/Telegram/",
             "fields": {
                 "botToken": {
                     "label": "機器人令牌",
@@ -83,7 +83,7 @@
         },
         "discord": {
             "description": "使用開發者门户提供的機器人令牌連線 Discord",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/BkOywJYCAiYRN9k4KTTceKPMnxg#C9zjdBRT1oqZ4VxF8q7ceRxQnLk",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/Discord/",
             "fields": {
                 "token": {
                     "label": "機器人令牌",
@@ -111,7 +111,7 @@
         },
         "whatsapp": {
             "description": "透過掃描QR Code連線 WhatsApp（無需手機號碼）",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/ES7fwUfH8iGl8FkHYfFcyWB3n4d#doxcnsDDFbeEzqgjN6HSlyonLvc",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/WhatsApp/",
             "instructions": [
                 "在手机上開啟 WhatsApp",
                 "前往 設定 > 已关联裝置 >包含連線裝置",
@@ -121,7 +121,7 @@
         },
         "dingtalk": {
             "description": "透過 OpenClaw 渠道插件連線钉钉（Stream 模式）",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/Y5eNwiSiZidkLskrwtJc1rUln0b#doxcnr8KfaA2mNPeQUeHO83eDPh",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/DingTalk/",
             "fields": {
                 "clientId": {
                     "label": "Client ID (AppKey)",
@@ -168,7 +168,7 @@
         },
         "feishu": {
             "description": "透過飞书官方推出的 OpenClaw 插件連線飞书/Lark 機器人",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/GKn8wOvHnibpPNkNkPzcAvGlnzK#Py88dTltfoJc1jxAhIBcW3Pkn7b",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/Feishu/",
             "fields": {
                 "appId": {
                     "label": "應用 ID (App ID)",
@@ -189,7 +189,7 @@
         },
         "wecom": {
             "description": "透過插件連線企业微信機器人",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/JTGnwoV0RixKPtkr4w7c7gpAnDc",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/WeCom/",
             "fields": {
                 "botId": {
                     "label": "機器人 Bot ID",
@@ -320,7 +320,7 @@
         },
         "qqbot": {
             "description": "透過 @sliverp/qqbot 插件連線 QQ 機器人",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/KPIJwlyiGiupMrkiS9ice39Zn2c",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/QQ%20Bot/",
             "fields": {
                 "appId": {
                     "label": "App ID",
