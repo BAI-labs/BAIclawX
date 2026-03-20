@@ -19,7 +19,7 @@ import { useChatStore } from '@/stores/chat';
 import { useProviderStore } from '@/stores/providers';
 import type { AgentSummary } from '@/types/agent';
 import { useTranslation } from 'react-i18next';
-import { fetchBankOfAiModels, type BankOfAiModelOption } from '@/lib/bankofai-models';
+import { fetchBankOfAiModels, pickPreferredBankOfAiModelId, type BankOfAiModelOption } from '@/lib/bankofai-models';
 import { getProviderTypeInfo } from '@/lib/providers';
 
 // ── Types ────────────────────────────────────────────────────────
@@ -223,6 +223,12 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
       });
 
       setModelOptions(models);
+      const preferredModelId = pickPreferredBankOfAiModelId(models);
+      if (preferredModelId && !models.some((model) => model.id === selectedModelId)) {
+        await updateAccount(activeBankOfAiAccount.id, {
+          model: preferredModelId,
+        });
+      }
       if (models.length === 0) {
         setModelsError(t('composer.modelPickerEmpty'));
       }
@@ -231,7 +237,15 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     } finally {
       setModelsLoading(false);
     }
-  }, [activeBankOfAiAccount, bankOfAiApiKey, activeBankOfAiBaseUrl, t]);
+  }, [activeBankOfAiAccount, bankOfAiApiKey, activeBankOfAiBaseUrl, selectedModelId, t, updateAccount]);
+
+  useEffect(() => {
+    if (!activeBankOfAiAccount || !bankOfAiApiKey?.trim() || !activeBankOfAiBaseUrl.trim()) {
+      return;
+    }
+
+    void loadBankOfAiModels();
+  }, [activeBankOfAiAccount, bankOfAiApiKey, activeBankOfAiBaseUrl, loadBankOfAiModels]);
 
   useEffect(() => {
     if (modelPickerOpen && activeBankOfAiAccount && !modelsLoading && modelOptions.length === 0 && !modelsError) {

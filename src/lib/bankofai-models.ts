@@ -5,6 +5,30 @@ export interface BankOfAiModelOption {
   displayName: string;
 }
 
+function normalizeModelText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9.]+/g, '');
+}
+
+function isTemporarilyHiddenBankOfAiModel(model: BankOfAiModelOption): boolean {
+  const id = normalizeModelText(model.id);
+  const displayName = normalizeModelText(model.displayName);
+  const text = `${id} ${displayName}`;
+
+  return text.includes('kimi') || text.includes('minimax') || text.includes('glm');
+}
+
+function isClaudeHaiku45Model(model: BankOfAiModelOption): boolean {
+  const id = normalizeModelText(model.id);
+  const displayName = normalizeModelText(model.displayName);
+  const text = `${id} ${displayName}`;
+
+  if (!text.includes('claude') || !text.includes('haiku')) {
+    return false;
+  }
+
+  return text.includes('4.5') || text.includes('45');
+}
+
 export async function fetchBankOfAiModels(input: {
   apiKey: string;
   baseUrl: string;
@@ -24,21 +48,25 @@ export async function fetchBankOfAiModels(input: {
     }),
   });
 
-  return Array.isArray(response.models) ? response.models : [];
+  if (!Array.isArray(response.models)) {
+    return [];
+  }
+
+  return response.models.filter((model) => !isTemporarilyHiddenBankOfAiModel(model));
 }
 
-function getChatGptPriority(modelId: string): number {
-  const id = modelId.toLowerCase();
+function getChatGptPriority(model: BankOfAiModelOption): number {
+  if (isClaudeHaiku45Model(model)) return 0;
 
-  if (id === 'minimax-m2.5' || id.includes('minimax-m2.5')) return 0;
-  if (id.includes('minimax') && id.includes('m2.5')) return 1;
-  if (id.includes('chatgpt') && id.includes('latest')) return 2;
-  if (id.includes('gpt-5')) return 3;
-  if (id.includes('chatgpt')) return 4;
-  if (id.includes('gpt-4.1')) return 5;
-  if (id.includes('gpt-4o')) return 6;
-  if (id.includes('gpt-4')) return 7;
-  if (id.includes('gpt-3.5')) return 8;
+  const id = model.id.toLowerCase();
+
+  if (id.includes('chatgpt') && id.includes('latest')) return 1;
+  if (id.includes('gpt-5')) return 2;
+  if (id.includes('chatgpt')) return 3;
+  if (id.includes('gpt-4.1')) return 4;
+  if (id.includes('gpt-4o')) return 5;
+  if (id.includes('gpt-4')) return 6;
+  if (id.includes('gpt-3.5')) return 7;
   return Number.MAX_SAFE_INTEGER;
 }
 
@@ -51,7 +79,7 @@ export function pickPreferredBankOfAiModelId(models: BankOfAiModelOption[]): str
     .map((model, index) => ({
       model,
       index,
-      priority: getChatGptPriority(model.id),
+      priority: getChatGptPriority(model),
     }))
     .sort((left, right) => {
       if (left.priority !== right.priority) {
