@@ -1224,7 +1224,7 @@ function ProviderContent({
               rel="noopener noreferrer"
               className="text-[13px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
             >
-              {t('settings:aiProviders.dialog.customDoc')}
+              {t('settings:aiProviders.dialog.customDoc2')}
               <ExternalLink className="h-3 w-3" />
             </a>
           )}

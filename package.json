@@ -1,6 +1,6 @@
 {
     "name": "baiclaw",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "pnpm": {
         "onlyBuiltDependencies": [
             "@discordjs/opus",

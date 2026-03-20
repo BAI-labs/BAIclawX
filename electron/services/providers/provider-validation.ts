@@ -1,5 +1,6 @@
 import { proxyAwareFetch } from '../../utils/proxy-fetch';
 import { getProviderConfig } from '../../utils/provider-registry';
+import i18n from 'i18next';
 
 type ValidationProfile =
   | 'openai-completions'
@@ -140,7 +141,7 @@ function classifyAuthResponse(
 ): { valid: boolean; error?: string } {
   if (status >= 200 && status < 300) return { valid: true };
   if (status === 429) return { valid: true };
-  if (status === 401 || status === 403) return { valid: false, error: 'Invalid API key' };
+  if (status === 401 || status === 403) return { valid: false, error: i18n.t('toast.invalidKey') };
 
   const obj = data as { error?: { message?: string }; message?: string } | null;
   const msg = obj?.error?.message || obj?.message || `API error: ${status}`;
@@ -194,7 +195,7 @@ async function performResponsesProbe(
     const data = await response.json().catch(() => ({}));
 
     if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: 'Invalid API key' };
+      return { valid: false, error: i18n.t('toast.invalidKey') };
     }
     if (
       (response.status >= 200 && response.status < 300) ||
@@ -232,7 +233,7 @@ async function performChatCompletionsProbe(
     const data = await response.json().catch(() => ({}));
 
     if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: 'Invalid API key' };
+      return { valid: false, error: i18n.t('toast.invalidKey') };
     }
     if (
       (response.status >= 200 && response.status < 300) ||
@@ -270,7 +271,7 @@ async function performAnthropicMessagesProbe(
     const data = await response.json().catch(() => ({}));
 
     if (response.status === 401 || response.status === 403) {
-      return { valid: false, error: 'Invalid API key' };
+      return { valid: false, error: i18n.t('toast.invalidKey') };
     }
     if (
       (response.status >= 200 && response.status < 300) ||

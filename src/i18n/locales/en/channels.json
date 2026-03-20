@@ -188,7 +188,7 @@
         },
         "wecom": {
             "description": "Connect WeCom Bot via plugin",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/JTGnwoV0RixKPtkr4w7c7gpAnDc",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/WeCom/",
             "fields": {
                 "botId": {
                     "label": "Bot ID",
@@ -319,7 +319,7 @@
         },
         "qqbot": {
             "description": "Connect QQ Bot via @sliverp/qqbot plugin",
-            "docsUrl": "https://icnnp7d0dymg.feishu.cn/wiki/KPIJwlyiGiupMrkiS9ice39Zn2c",
+            "docsUrl": "https://docs-test.b.ai/BAIclaw/How%20to%20Add%20Channels/QQ%20Bot/",
             "fields": {
                 "appId": {
                     "label": "App ID",

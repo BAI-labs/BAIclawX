@@ -69,6 +69,9 @@
       "add": "Add Provider",
       "save": "Save",
       "customDoc": "How to get API Key?",
+      "customDoc2": "How to get API Key?",
+      "customViewPoints1": "Log in to",
+      "customViewPoints2": "to check your credit usage.",
       "validate": "Validate"
     },
     "card": {
