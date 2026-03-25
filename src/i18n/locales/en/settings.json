@@ -162,6 +162,11 @@
       "editKey": "Edit API key",
       "delete": "Delete provider"
     },
+    "agentWalletBound": {
+      "title": "AgentWallet is linked",
+      "message": "This API key is already linked to an AgentWallet. To change it, delete the AgentWallet in Settings → Web3 first.",
+      "gotIt": "Got it"
+    },
     "protocols": {
       "openai": "OpenAI Compatible",
       "openaiCompletions": "OpenAI Completions",

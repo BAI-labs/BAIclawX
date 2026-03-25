@@ -162,6 +162,11 @@
       "editKey": "編輯 API 金鑰",
       "delete": "刪除供應商"
     },
+    "agentWalletBound": {
+      "title": "已綁定 AgentWallet",
+      "message": "目前的 API Key 已綁定 AgentWallet；若要修改，請先到設定中刪除 AgentWallet",
+      "gotIt": "知道了"
+    },
     "protocols": {
       "openai": "OpenAI 相容",
       "openaiCompletions": "OpenAI Completions",

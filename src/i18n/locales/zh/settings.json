@@ -157,6 +157,11 @@
       "editKey": "编辑 API 密钥",
       "delete": "删除提供商"
     },
+    "agentWalletBound": {
+      "title": "已绑定 AgentWallet",
+      "message": "当前 API-Key 已绑定 AgentWallet，如要修改请先在设置中删除 AgentWallet",
+      "gotIt": "知道了"
+    },
     "protocols": {
       "openai": "OpenAI 兼容",
       "openaiCompletions": "OpenAI Completions",

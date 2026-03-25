@@ -140,6 +140,7 @@ export function ProvidersSettings() {
 
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProvider, setEditingProvider] = useState<string | null>(null);
+  const [agentWalletBoundModalOpen, setAgentWalletBoundModalOpen] = useState(false);
   const visibleAccounts = useMemo(() => filterVisibleProviderAccounts(accounts), [accounts]);
   const visibleStatuses = useMemo(() => filterVisibleProviderStatuses(statuses), [statuses]);
   const visibleVendors = useMemo(() => filterVisibleProviderVendors(vendors), [vendors]);
@@ -193,6 +194,15 @@ export function ProvidersSettings() {
 
   const handleDeleteProvider = async (providerId: string) => {
     try {
+      const data = await hostApiFetch<{ wallets?: { id: string }[] }>('/api/agent-wallets');
+      if (data.wallets && data.wallets.length > 0) {
+        setAgentWalletBoundModalOpen(true);
+        return;
+      }
+    } catch {
+      // If the wallet API fails, allow editing so the Models page stays usable.
+    }
+    try {
       await removeAccount(providerId);
       toast.success(t('aiProviders.toast.deleted'));
     } catch (error) {
@@ -207,6 +217,24 @@ export function ProvidersSettings() {
     } catch (error) {
       toast.error(`${t('aiProviders.toast.failedDefault')}: ${error}`);
     }
+  };
+
+  const handleRequestEdit = async (accountId: string, vendorId: string) => {
+    // if (vendorId !== 'bankofai') {
+    //   setEditingProvider(accountId);
+    //   return;
+    // }
+    console.log(vendorId)
+    try {
+      const data = await hostApiFetch<{ wallets?: { id: string }[] }>('/api/agent-wallets');
+      if (data.wallets && data.wallets.length > 0) {
+        setAgentWalletBoundModalOpen(true);
+        return;
+      }
+    } catch {
+      // If the wallet API fails, allow editing so the Models page stays usable.
+    }
+    setEditingProvider(accountId);
   };
 
   return (
@@ -246,7 +274,7 @@ export function ProvidersSettings() {
               allProviders={displayProviders}
               isDefault={item.account.id === defaultAccountId}
               isEditing={editingProvider === item.account.id}
-              onEdit={() => setEditingProvider(item.account.id)}
+              onEdit={() => void handleRequestEdit(item.account.id, item.account.vendorId)}
               onCancelEdit={() => setEditingProvider(null)}
               onDelete={() => handleDeleteProvider(item.account.id)}
               onSetDefault={() => handleSetDefault(item.account.id)}
@@ -305,6 +333,44 @@ export function ProvidersSettings() {
           devModeUnlocked={devModeUnlocked}
         />
       )}
+
+      {agentWalletBoundModalOpen ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="agent-wallet-bound-title"
+        >
+          <div className="w-full max-w-[420px] rounded-3xl bg-white dark:bg-card shadow-xl border border-black/[0.06] dark:border-white/10 p-6">
+            <h2
+              id="agent-wallet-bound-title"
+              className="text-[17px] font-bold text-foreground tracking-tight"
+            >
+              {t('aiProviders.agentWalletBound.title')}
+            </h2>
+            <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
+              {t('aiProviders.agentWalletBound.message')}
+            </p>
+            <div className="mt-8 flex justify-between gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                className="flex-1 rounded-full h-11 font-medium bg-black/[0.06] dark:bg-white/10 text-foreground hover:bg-black/[0.1] dark:hover:bg-white/15 border-0 shadow-none"
+                onClick={() => setAgentWalletBoundModalOpen(false)}
+              >
+                {t('common:actions.cancel')}
+              </Button>
+              <Button
+                type="button"
+                className="flex-1 rounded-full h-11 font-medium bg-[#0a84ff] hover:bg-[#007aff] text-white shadow-sm border-0"
+                onClick={() => setAgentWalletBoundModalOpen(false)}
+              >
+                {t('aiProviders.agentWalletBound.gotIt')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

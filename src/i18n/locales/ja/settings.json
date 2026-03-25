@@ -162,6 +162,11 @@
       "editKey": "API キーを編集",
       "delete": "プロバイダーを削除"
     },
+    "agentWalletBound": {
+      "title": "AgentWallet が紐付け済みです",
+      "message": "この API キーには既に AgentWallet が紐付いています。変更するには、設定の Web3 で AgentWallet を削除してください。",
+      "gotIt": "了解しました"
+    },
     "protocols": {
       "openai": "OpenAI 互換",
       "openaiCompletions": "OpenAI Completions",
