@@ -65,6 +65,12 @@ export async function handleAgentWalletRoutes(
         return true;
       }
       unlockAgentWalletVault(masterPassword);
+      setAgentWalletBaiclawRuntimePassword(masterPassword);
+      try {
+        await ctx.gatewayManager.restart();
+      } catch (err) {
+        logger.warn('Gateway restart after vault unlock failed:', err);
+      }
       sendJson(res, 200, { success: true });
     } catch (error) {
       const message = String((error as Error)?.message ?? error);

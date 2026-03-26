@@ -14,6 +14,7 @@ import {
 } from '@bankofai/agent-wallet';
 import { fetchBankOfAiLinkedTronAddress } from './bankofai-tron-verify';
 import { getApiKey } from '../../utils/secure-storage';
+import { logger } from '../../utils/logger';
 import { getProviderAccount } from '../providers/provider-store';
 
 const KV_PWD_FILE = 'kv-password.bin';
@@ -39,6 +40,41 @@ export function setAgentWalletBaiclawRuntimePassword(password: string): void {
 
 export function clearAgentWalletBaiclawRuntimePassword(): void {
   delete process.env[AGENT_WALLET_BAICLAW_PASSWORD_ENV];
+}
+
+function hasAgentWalletTopologyOnDisk(): boolean {
+  if (!fs.existsSync(walletsConfigPath())) return false;
+  try {
+    const raw = JSON.parse(fs.readFileSync(walletsConfigPath(), 'utf8')) as { wallets?: Record<string, unknown> };
+    const w = raw?.wallets;
+    if (!w || typeof w !== 'object') return false;
+    return Object.keys(w).length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Call from Electron main on startup (before Gateway spawn): if `wallets_config.json`
+ * lists at least one wallet and the master password can be resolved (kv-password / plain /
+ * runtime_secrets / existing env), set `process.env.AGENT_WALLET_BAICLAW_PASSWORD` so
+ * child processes inherit it without opening the wizard.
+ */
+export function bootstrapAgentWalletBaiclawRuntimePassword(): void {
+  if (!hasAgentWalletTopologyOnDisk()) {
+    return;
+  }
+  try {
+    const password = readKvPassword();
+    setAgentWalletBaiclawRuntimePassword(password);
+    logger.debug('[agent-wallet] AGENT_WALLET_BAICLAW_PASSWORD set from vault bootstrap');
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (msg === VAULT_PASSWORD_REQUIRED || msg === 'Agent wallet vault is not initialized') {
+      return;
+    }
+    logger.warn('[agent-wallet] bootstrap AGENT_WALLET_BAICLAW_PASSWORD failed:', e);
+  }
 }
 
 /**

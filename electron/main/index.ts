@@ -29,6 +29,7 @@ import { deviceOAuthManager } from '../utils/device-oauth';
 import { browserOAuthManager } from '../utils/browser-oauth';
 import { whatsAppLoginManager } from '../utils/whatsapp-login';
 import { syncAllProviderAuthToRuntime } from '../services/providers/provider-runtime-sync';
+import { bootstrapAgentWalletBaiclawRuntimePassword } from '../services/agent-wallet/agent-wallet-service';
 
 // Disable GPU hardware acceleration globally for maximum stability across
 // all GPU configurations (no GPU, integrated, discrete).
@@ -164,6 +165,8 @@ async function initialize(): Promise<void> {
   // Apply persisted proxy settings before creating windows or network requests.
   await applyProxySettings();
   await syncLaunchAtStartupSettingFromStore();
+
+  bootstrapAgentWalletBaiclawRuntimePassword();
 
   // Set application menu
   createMenu();
