@@ -23,7 +23,7 @@
     "vaultUnlockSuccess": "钱包已解锁",
     "vaultUnlockFailed": "解锁失败",
     "vaultUnlockPasswordRequired": "请输入主密码",
-    "storagePathHint": "钱包目录：{{path}}。命令行需指向同一目录（例如 agent-wallet list -d \"{{path}}\"）或设置环境变量 AGENT_WALLET_DIR。文件夹名为 .agent-wallet（两个字母 l）。",
+    "storagePathHint": "钱包目录：{{path}}。命令行需指向同一目录（例如 agent-wallet list -d \"{{path}}\"）或设置环境变量 AGENT_WALLET_DIR。文件夹名为 .agent-wallet。",
     "vaultTopologyIncompleteBanner": "保管库已初始化（master.json、kv-password），但 wallets_config.json 里没有钱包项，CLI 会显示 “No wallets configured”，且缺少 secret_default_secure.json，说明私钥导入未完成。请再次点击 **创建钱包**，使用**相同主密码**完成注册。",
     "createWallet": "创建钱包",
     "deleteWallet": "删除钱包",
