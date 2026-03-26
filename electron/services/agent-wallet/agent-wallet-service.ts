@@ -419,6 +419,18 @@ async function resolveWalletAddress(
 export async function listAgentWallets(): Promise<AgentWalletListResult> {
   if (!fs.existsSync(walletsConfigPath())) {
     return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
+  } else {
+    if (!hasAgentWalletTopologyOnDisk()) {
+      const root = getWalletRoot();
+      try {
+        fs.rmSync(root, { recursive: true, force: true });
+        clearAgentWalletBaiclawRuntimePassword();
+      } catch (err) {
+        console.error('[agent-wallet] Failed to remove wallet directory:', err);
+        throw err;
+      }
+      return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
+    }
   }
 
   const topologyIncomplete = getVaultTopologyIncomplete();
