@@ -15,6 +15,7 @@ import { trackUiEvent } from '@/lib/telemetry';
 import { useProviderStore } from '@/stores/providers';
 import { hasConfiguredCredentials, pickPreferredAccount } from '@/lib/provider-accounts';
 import { CreateAgentWalletWizard } from './CreateAgentWalletWizard';
+import { useGatewayStore } from '@/stores/gateway';
 
 type AgentWalletRow = {
   id: string;
@@ -31,6 +32,7 @@ export function Web3Settings() {
   const defaultAccountId = useProviderStore((s) => s.defaultAccountId);
   const providersLoading = useProviderStore((s) => s.loading);
   const refreshProviderSnapshot = useProviderStore((s) => s.refreshProviderSnapshot);
+  const { restart: restartGateway } = useGatewayStore();
 
   const [wallets, setWallets] = useState<AgentWalletRow[]>([]);
   const [vaultUnlockRequired, setVaultUnlockRequired] = useState(false);
@@ -156,6 +158,7 @@ export function Web3Settings() {
       trackUiEvent('settings.agent_wallet_deleted');
       setDeleteTarget(null);
       await refreshWallets();
+      restartGateway();
     } catch (error) {
       toast.error(`${t('web3.deleteFailed')}: ${toUserMessage(error)}`);
     }
