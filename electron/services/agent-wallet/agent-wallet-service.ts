@@ -488,13 +488,13 @@ export async function createAgentWalletFromTronImport(
     throw new Error('VALIDATION_NO_API_KEY');
   }
 
-  const validation = await validateTronPrivateKeyForBankOfAi(input.privateKeyHex, apiKey);
-  if (!validation.ok) {
-    throw new Error(`VALIDATION_${validation.errorCode ?? 'FORMAT'}`);
-  }
-  if (!validation.derivedAddress) {
-    throw new Error('VALIDATION_FORMAT');
-  }
+  // const validation = await validateTronPrivateKeyForBankOfAi(input.privateKeyHex, apiKey);
+  // if (!validation.ok) {
+  //   throw new Error(`VALIDATION_${validation.errorCode ?? 'FORMAT'}`);
+  // }
+  // if (!validation.derivedAddress) {
+  //   throw new Error('VALIDATION_FORMAT');
+  // }
 
   const walletRoot = getWalletRoot();
   const hasPwdFile =
