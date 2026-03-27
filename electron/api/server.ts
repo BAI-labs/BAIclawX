@@ -31,6 +31,7 @@ const routeHandlers: RouteHandler[] = [
   handleProviderRoutes,
   handleAgentRoutes,
   handleChannelRoutes,
+  handleAgentWalletRoutes,
   handleSkillRoutes,
   handleFileRoutes,
   handleSessionRoutes,
