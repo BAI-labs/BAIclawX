@@ -2,7 +2,7 @@
  * AgentWallet storage using @bankofai/agent-wallet (TRON, local_secure + encrypted secrets).
  */
 import { app, safeStorage } from 'electron';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -41,10 +41,14 @@ export function clearAgentWalletBaiclawRuntimePassword(): void {
   delete process.env[AGENT_WALLET_BAICLAW_PASSWORD_ENV];
 }
 
-function hasAgentWalletTopologyOnDisk(): boolean {
-  if (!fs.existsSync(walletsConfigPath())) return false;
+async function hasAgentWalletTopologyOnDisk(): Promise<boolean> {
   try {
-    const raw = JSON.parse(fs.readFileSync(walletsConfigPath(), 'utf8')) as { wallets?: Record<string, unknown> };
+    await fs.access(walletsConfigPath());
+  } catch {
+    return false;
+  }
+  try {
+    const raw = JSON.parse(await fs.readFile(walletsConfigPath(), 'utf8')) as { wallets?: Record<string, unknown> };
     const w = raw?.wallets;
     if (!w || typeof w !== 'object') return false;
     return Object.keys(w).length > 0;
@@ -59,12 +63,12 @@ function hasAgentWalletTopologyOnDisk(): boolean {
  * runtime_secrets / existing env), set `process.env.AGENT_WALLET_BAICLAW_PASSWORD` so
  * child processes inherit it without opening the wizard.
  */
-export function bootstrapAgentWalletBaiclawRuntimePassword(): void {
-  if (!hasAgentWalletTopologyOnDisk()) {
+export async function bootstrapAgentWalletBaiclawRuntimePassword(): Promise<void> {
+  if (!(await hasAgentWalletTopologyOnDisk())) {
     return;
   }
   try {
-    const password = readKvPassword();
+    const password = await readKvPassword();
     setAgentWalletBaiclawRuntimePassword(password);
     logger.debug('[agent-wallet] AGENT_WALLET_BAICLAW_PASSWORD set from vault bootstrap');
   } catch (e) {
@@ -118,9 +122,9 @@ function masterJsonPath(): string {
 }
 
 /** True when `wallets_config.json` parses and `wallets` has no entries (matches empty `agent-wallet list`). */
-function isTopologyEmptyOnDisk(): boolean {
+async function isTopologyEmptyOnDisk(): Promise<boolean> {
   try {
-    const raw = JSON.parse(fs.readFileSync(walletsConfigPath(), 'utf8')) as { wallets?: Record<string, unknown> };
+    const raw = JSON.parse(await fs.readFile(walletsConfigPath(), 'utf8')) as { wallets?: Record<string, unknown> };
     const w = raw?.wallets;
     if (!w || typeof w !== 'object') return true;
     return Object.keys(w).length === 0;
@@ -133,21 +137,26 @@ function isTopologyEmptyOnDisk(): boolean {
  * Vault files exist but topology never registered — same state as CLI "No wallets configured."
  * with only kv-password / master / empty wallets_config (no `secret_<id>.json`).
  */
-function getVaultTopologyIncomplete(): boolean {
-  if (!fs.existsSync(walletsConfigPath()) || !fs.existsSync(masterJsonPath())) {
+async function getVaultTopologyIncomplete(): Promise<boolean> {
+  try {
+    await fs.access(walletsConfigPath());
+    await fs.access(masterJsonPath());
+  } catch {
     return false;
   }
-  return isTopologyEmptyOnDisk();
+  return await isTopologyEmptyOnDisk();
 }
 
-function verifyWalletPersistedOnDisk(walletRoot: string, walletId: string): void {
+async function verifyWalletPersistedOnDisk(walletRoot: string, walletId: string): Promise<void> {
   const secretPath = path.join(walletRoot, `secret_${walletId}.json`);
-  if (!fs.existsSync(secretPath)) {
+  try {
+    await fs.access(secretPath);
+  } catch {
     throw new Error('WALLET_PERSIST_FAILED');
   }
   let raw: unknown;
   try {
-    raw = JSON.parse(fs.readFileSync(path.join(walletRoot, WALLETS_CONFIG_FILENAME), 'utf8'));
+    raw = JSON.parse(await fs.readFile(path.join(walletRoot, WALLETS_CONFIG_FILENAME), 'utf8'));
   } catch {
     throw new Error('WALLET_PERSIST_FAILED');
   }
@@ -157,35 +166,43 @@ function verifyWalletPersistedOnDisk(walletRoot: string, walletId: string): void
   }
 }
 
-function ensureWalletDir(): void {
-  fs.mkdirSync(getWalletRoot(), { recursive: true });
+async function ensureWalletDir(): Promise<void> {
+  await fs.mkdir(getWalletRoot(), { recursive: true });
 }
 
 const VAULT_PASSWORD_REQUIRED = 'VAULT_PASSWORD_REQUIRED';
 
-function readKvPassword(): string {
-  ensureWalletDir();
+async function readKvPassword(): Promise<string> {
+  await ensureWalletDir();
   const root = getWalletRoot();
   const encPath = path.join(root, KV_PWD_FILE);
   const plainPath = path.join(root, KV_PWD_PLAIN_FILE);
 
-  if (fs.existsSync(encPath)) {
+  try {
+    await fs.access(encPath);
     if (!safeStorage.isEncryptionAvailable()) {
       throw new Error(
         'OS secure storage is unavailable but an encrypted wallet password file exists. '
         + 'Enable keychain/secret service or remove kv-password.bin under your agent wallet dir after backup.',
       );
     }
-    const buf = fs.readFileSync(encPath);
+    const buf = await fs.readFile(encPath);
     return safeStorage.decryptString(buf);
+  } catch {
+    // encPath doesn't exist or error accessing it
   }
 
-  if (fs.existsSync(plainPath)) {
-    return fs.readFileSync(plainPath, 'utf8').trim();
+  try {
+    await fs.access(plainPath);
+    return (await fs.readFile(plainPath, 'utf8')).trim();
+  } catch {
+    // plainPath doesn't exist or error accessing it
   }
 
   const masterPath = path.join(root, 'master.json');
-  if (!fs.existsSync(masterPath)) {
+  try {
+    await fs.access(masterPath);
+  } catch {
     throw new Error('Agent wallet vault is not initialized');
   }
 
@@ -215,24 +232,27 @@ function readKvPassword(): string {
 /**
  * Persist the user-chosen master password (first-time vault setup from the wizard).
  */
-export function persistUserMasterPassword(password: string): void {
-  ensureWalletDir();
+export async function persistUserMasterPassword(password: string): Promise<void> {
+  await ensureWalletDir();
   const root = getWalletRoot();
   const encPath = path.join(root, KV_PWD_FILE);
   const plainPath = path.join(root, KV_PWD_PLAIN_FILE);
-  if (fs.existsSync(plainPath)) {
+  try {
+    await fs.access(plainPath);
     try {
-      fs.unlinkSync(plainPath);
+      await fs.unlink(plainPath);
     } catch {
       // ignore
     }
+  } catch {
+    // plainPath doesn't exist
   }
   if (safeStorage.isEncryptionAvailable()) {
-    fs.writeFileSync(encPath, safeStorage.encryptString(password));
+    await fs.writeFile(encPath, safeStorage.encryptString(password));
   } else {
-    fs.writeFileSync(plainPath, password, 'utf8');
+    await fs.writeFile(plainPath, password, 'utf8');
     try {
-      fs.chmodSync(plainPath, 0o600);
+      await fs.chmod(plainPath, 0o600);
     } catch {
       // ignore
     }
@@ -260,42 +280,47 @@ function getProviderWithPassword(password: string): ConfigWalletProvider {
   });
 }
 
-function getProvider(): ConfigWalletProvider {
-  return getProviderWithPassword(readKvPassword());
+async function getProvider(): Promise<ConfigWalletProvider> {
+  return getProviderWithPassword(await readKvPassword());
 }
 
-function ensureKvInitializedWithPassword(password: string): void {
-  ensureWalletDir();
+async function ensureKvInitializedWithPassword(password: string): Promise<void> {
+  await ensureWalletDir();
   const root = getWalletRoot();
   const masterPath = path.join(root, 'master.json');
   const kv = new SecureKVStore(root, password);
-  if (!fs.existsSync(masterPath)) {
-    kv.initMaster();
-  } else {
+  try {
+    await fs.access(masterPath);
     kv.verifyPassword();
+  } catch {
+    kv.initMaster();
   }
 }
 
-function ensureKvInitialized(): void {
-  ensureKvInitializedWithPassword(readKvPassword());
+async function ensureKvInitialized(): Promise<void> {
+  await ensureKvInitializedWithPassword(await readKvPassword());
 }
 
 /**
  * Unlock a CLI-created vault for the GUI: verifies the master password against SecureKVStore
  * and persists it for this app (OS keychain / plain fallback) like the creation wizard.
  */
-export function unlockAgentWalletVault(masterPassword: string): void {
+export async function unlockAgentWalletVault(masterPassword: string): Promise<void> {
   const root = getWalletRoot();
-  if (!fs.existsSync(walletsConfigPath())) {
+  try {
+    await fs.access(walletsConfigPath());
+  } catch {
     throw new Error('NO_WALLET_CONFIG');
   }
   const masterPath = path.join(root, 'master.json');
-  if (!fs.existsSync(masterPath)) {
+  try {
+    await fs.access(masterPath);
+  } catch {
     throw new Error('NO_MASTER_VAULT');
   }
   const kv = new SecureKVStore(root, masterPassword);
   kv.verifyPassword();
-  persistUserMasterPassword(masterPassword);
+  await persistUserMasterPassword(masterPassword);
 }
 
 type WalletMeta = Record<string, { label?: string }>;
@@ -304,9 +329,9 @@ function metaPath(): string {
   return path.join(getWalletRoot(), WALLET_META_FILE);
 }
 
-function loadWalletMeta(): WalletMeta {
+async function loadWalletMeta(): Promise<WalletMeta> {
   try {
-    const raw = fs.readFileSync(metaPath(), 'utf8');
+    const raw = await fs.readFile(metaPath(), 'utf8');
     const parsed = JSON.parse(raw) as WalletMeta;
     return parsed && typeof parsed === 'object' ? parsed : {};
   } catch {
@@ -314,9 +339,10 @@ function loadWalletMeta(): WalletMeta {
   }
 }
 
-function saveWalletMeta(meta: WalletMeta): void {
-  ensureWalletDir();
-  fs.writeFileSync(metaPath(), `${JSON.stringify(meta, null, 2)}\n`, 'utf8');
+async function saveWalletMeta(meta: WalletMeta): Promise<void> {
+  await ensureWalletDir();
+  await fs.writeFile(metaPath(), `${JSON.stringify(meta, null, 2)}
+`, 'utf8');
 }
 
 export function decodeTronPrivateKeyHex(raw: string): Uint8Array {
@@ -412,29 +438,39 @@ async function resolveWalletAddress(
 }
 
 export async function listAgentWallets(): Promise<AgentWalletListResult> {
-  if (!fs.existsSync(walletsConfigPath())) {
+  try {
+    await fs.access(walletsConfigPath());
+  } catch {
     return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
-  } else {
-    const root = getWalletRoot();
-    const hasPwdFile = fs.existsSync(path.join(root, KV_PWD_FILE));
-    console.log('111111111', root, hasPwdFile, hasAgentWalletTopologyOnDisk())
-    if (!(hasAgentWalletTopologyOnDisk() && hasPwdFile)) {
-      try {
-        fs.rmSync(root, { recursive: true, force: true });
-        clearAgentWalletBaiclawRuntimePassword();
-      } catch (err) {
-        console.error('[agent-wallet] Failed to remove wallet directory:', err);
-        throw err;
-      }
-      return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
-    }
   }
 
-  const topologyIncomplete = getVaultTopologyIncomplete();
+  const root = getWalletRoot();
+  let hasPwdFile = false;
+  try {
+    await fs.access(path.join(root, KV_PWD_FILE));
+    hasPwdFile = true;
+  } catch {
+    hasPwdFile = false;
+  }
+
+  const hasTopology = await hasAgentWalletTopologyOnDisk();
+  // console.log('111111111', root, hasPwdFile, hasTopology)
+  if (!(hasTopology && hasPwdFile)) {
+    try {
+      await fs.rm(root, { recursive: true, force: true });
+      clearAgentWalletBaiclawRuntimePassword();
+    } catch (err) {
+      console.error('[agent-wallet] Failed to remove wallet directory:', err);
+      throw err;
+    }
+    return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
+  }
+
+  const topologyIncomplete = await getVaultTopologyIncomplete();
 
   let password: string;
   try {
-    password = readKvPassword();
+    password = await readKvPassword();
   } catch (e) {
     if (e instanceof Error && e.message === VAULT_PASSWORD_REQUIRED) {
       return {
@@ -446,9 +482,9 @@ export async function listAgentWallets(): Promise<AgentWalletListResult> {
     throw e;
   }
 
-  ensureKvInitializedWithPassword(password);
+  await ensureKvInitializedWithPassword(password);
   const provider = getProviderWithPassword(password);
-  const meta = loadWalletMeta();
+  const meta = await loadWalletMeta();
   const rows = provider.listWallets();
   const out: AgentWalletListItem[] = [];
 
@@ -500,12 +536,21 @@ export async function createAgentWalletFromTronImport(
   // }
 
   const walletRoot = getWalletRoot();
-  const hasPwdFile =
-    fs.existsSync(path.join(walletRoot, KV_PWD_FILE))
-    || fs.existsSync(path.join(walletRoot, KV_PWD_PLAIN_FILE));
+  let hasPwdFile = false;
+  try {
+    await fs.access(path.join(walletRoot, KV_PWD_FILE));
+    hasPwdFile = true;
+  } catch {
+    try {
+      await fs.access(path.join(walletRoot, KV_PWD_PLAIN_FILE));
+      hasPwdFile = true;
+    } catch {
+      hasPwdFile = false;
+    }
+  }
 
   if (!hasPwdFile) {
-    persistUserMasterPassword(input.masterPassword);
+    await persistUserMasterPassword(input.masterPassword);
   } else {
     try {
       const kvCheck = new SecureKVStore(walletRoot, input.masterPassword);
@@ -515,9 +560,9 @@ export async function createAgentWalletFromTronImport(
     }
   }
 
-  ensureKvInitialized();
+  await ensureKvInitialized();
 
-  const provider = getProvider();
+  const provider = await getProvider();
   if (provider.listWallets().length > 0) {
     throw new Error('WALLET_ALREADY_EXISTS');
   }
@@ -530,7 +575,8 @@ export async function createAgentWalletFromTronImport(
    * If the app exits before `addWallet`, disk stays empty and matches "list shows nothing".
    * `addWallet` → `persist()` already creates the directory and writes the full topology.
    */
-  if (fs.existsSync(secretPath)) {
+  try {
+    await fs.access(secretPath);
     provider.addWallet(
       walletId,
       { type: 'local_secure', params: { secret_ref: walletId } },
@@ -538,16 +584,18 @@ export async function createAgentWalletFromTronImport(
     );
     const repaired = await provider.getWallet(walletId, TRON_NETWORK);
     const address = await repaired.getAddress();
-    verifyWalletPersistedOnDisk(walletRoot, walletId);
+    await verifyWalletPersistedOnDisk(walletRoot, walletId);
     return {
       id: walletId,
       address,
       network: TRON_NETWORK,
       isActive: provider.getActiveId() === walletId,
     };
+  } catch {
+    // secretPath doesn't exist, continue with creation
   }
 
-  const password = readKvPassword();
+  const password = await readKvPassword();
   const kv = new SecureKVStore(walletRoot, password);
   const pkBytes = decodeTronPrivateKeyHex(input.privateKeyHex);
   kv.saveSecret(walletId, pkBytes);
@@ -561,7 +609,7 @@ export async function createAgentWalletFromTronImport(
   const wallet = await provider.getWallet(walletId, TRON_NETWORK);
   const address = await wallet.getAddress();
 
-  verifyWalletPersistedOnDisk(walletRoot, walletId);
+  await verifyWalletPersistedOnDisk(walletRoot, walletId);
 
   return {
     id: walletId,
@@ -572,17 +620,19 @@ export async function createAgentWalletFromTronImport(
 }
 
 export async function deleteAgentWallet(walletId: string): Promise<void> {
-  if (!fs.existsSync(walletsConfigPath())) {
+  try {
+    await fs.access(walletsConfigPath());
+  } catch {
     return;
   }
-  ensureKvInitialized();
-  const provider = getProvider();
+  await ensureKvInitialized();
+  const provider = await getProvider();
   provider.removeWallet(walletId);
 
   if (provider.listWallets().length === 0) {
     const root = getWalletRoot();
     try {
-      fs.rmSync(root, { recursive: true, force: true });
+      await fs.rm(root, { recursive: true, force: true });
       clearAgentWalletBaiclawRuntimePassword();
     } catch (err) {
       console.error('[agent-wallet] Failed to remove wallet directory:', err);
@@ -591,9 +641,9 @@ export async function deleteAgentWallet(walletId: string): Promise<void> {
     return;
   }
 
-  const meta = loadWalletMeta();
+  const meta = await loadWalletMeta();
   if (meta[walletId]) {
     delete meta[walletId];
-    saveWalletMeta(meta);
+    await saveWalletMeta(meta);
   }
 }
