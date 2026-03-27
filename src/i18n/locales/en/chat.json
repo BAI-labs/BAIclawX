@@ -42,6 +42,7 @@
         "stop": "Stop",
         "gatewayConnected": "connected",
         "gatewayStatus": "gateway {{state}} | port: {{port}} {{pid}}",
+        "currentModel": "Current Model:",
         "retryFailedAttachments": "Retry failed attachments"
     },
     "historyBuckets": {
