@@ -59,7 +59,7 @@
       "bindingSkippedToast": "暫時無法線上驗證與 BANK OF AI 的綁定，已通過本機格式檢查。",
       "step0": {
         "subtitle": "Agent Wallet 是專為 AI 代理打造的本機安全 Web3 錢包",
-        "body": "你可匯入與 BANK OF AI API Key 關聯帳戶的錢包私鑰，以使用充值、轉帳、兌換、流動性與 x402 等能力（依產品實際提供為準）。",
+        "body": "BAIclaw 支援您匯入目前使用的 BANK OF AI API-Key 關聯的錢包私鑰來建立 Agent Wallet\n透過設定 Agent Wallet，BAIclaw 可實現自我充值、轉帳、換幣、管理流動性池，以及存取 x402 協議付費資源等 web3 技能。",
         "learnMore": "了解更多關於 Agent Wallet",
         "learnMoreUrl": "https://docs.bankofai.io/zh-Hans/Agent-Wallet/Intro/"
       },

@@ -59,7 +59,7 @@
       "bindingSkippedToast": "BANK OF AI とのオンライン検証はできませんでした。形式チェックのみ通過しています。",
       "step0": {
         "subtitle": "Agent Wallet は AI エージェント向けのローカル安全な Web3 ウォレットです",
-        "body": "BANK OF AI の API キーに紐づくウォレットの秘密鍵をインポートできます。チャージ、送金、スワップ、流動性、x402 などの機能に利用できます（提供状況は製品によります）。",
+        "body": "BAIclaw は、現在使用している BANK OF AI API-Key に関連付けられたウォレットの秘密鍵をインポートして Agent Wallet を作成することをサポートしています\nAgent Wallet を設定することで、BAIclaw は自己充電、送金、トークン交換、流動性プール管理、x402 プロトコルの有料リソースへのアクセスなど、様々な web3 スキルを実現できます。",
         "learnMore": "Agent Wallet の詳細",
         "learnMoreUrl": "https://docs.bankofai.io/Agent-Wallet/Intro/"
       },

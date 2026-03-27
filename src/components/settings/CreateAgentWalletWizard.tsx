@@ -223,7 +223,7 @@ export function CreateAgentWalletWizard({
           {step === 0 && (
             <div className="space-y-3 text-[14px] leading-relaxed text-foreground/90">
               <p className="font-medium text-foreground">{t('web3.wizard.step0.subtitle')}</p>
-              <p className="text-muted-foreground whitespace-pre-line">{t('web3.wizard.step0.body')}</p>
+              <p className="text-muted-foreground whitespace-pre-line pt-6">{t('web3.wizard.step0.body')}</p>
               <button
                 type="button"
                 className="text-[13px] text-[#0a84ff] hover:underline text-left"
@@ -237,7 +237,7 @@ export function CreateAgentWalletWizard({
           )}
 
           {step === 1 && (
-            <div className="space-y-3">
+            <div className="space-y-3 pt-6">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <Label className="text-[13px] font-medium">{t('web3.wizard.step1.label')}</Label>
                 <button
