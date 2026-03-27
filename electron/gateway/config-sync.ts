@@ -14,6 +14,7 @@ import { buildProxyEnv, resolveProxySettings } from '../utils/proxy';
 import { syncProxyConfigToOpenClaw } from '../utils/openclaw-proxy';
 import { logger } from '../utils/logger';
 import { prependPathEntry } from '../utils/env-path';
+import { loadAgentWalletRuntimeEnv } from '../utils/agent-wallet';
 
 export interface GatewayLaunchContext {
   appSettings: Awaited<ReturnType<typeof getAllSettings>>;
@@ -349,6 +350,7 @@ export async function prepareGatewayLaunchContext(port: number): Promise<Gateway
   const binPathExists = existsSync(binPath);
 
   const { providerEnv, loadedProviderKeyCount } = await loadProviderEnv();
+  const agentWalletEnv = await loadAgentWalletRuntimeEnv();
   const { skipChannels, channelStartupSummary } = await resolveChannelStartupPolicy();
   const uvEnv = await getUvMirrorEnv();
   const proxyEnv = buildProxyEnv(appSettings);
@@ -365,6 +367,7 @@ export async function prepareGatewayLaunchContext(port: number): Promise<Gateway
   const forkEnv: Record<string, string | undefined> = {
     ...baseEnvPatched,
     ...providerEnv,
+    ...agentWalletEnv,
     ...uvEnv,
     ...proxyEnv,
     OPENCLAW_GATEWAY_TOKEN: appSettings.gatewayToken,
