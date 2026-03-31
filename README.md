@@ -4,7 +4,6 @@
 
 BAIclaw is a personal AI agent desktop application built on [OpenClaw](https://openclaw.ai/) and [ClawX](https://github.com/ValueCell-ai/ClawX). It wraps the power of the OpenClaw agent runtime in a graphical interface — no command line, no config files, just a ready-to-use AI assistant.
 
-![BAIclaw](docs/BAIclaw/assets/BAIclaw.png)
 
 ## ✨ Features
 
@@ -66,28 +65,6 @@ A locally secured Web3 wallet designed for AI agents. Once configured, your agen
 4. **Start Chatting** — Open the Chat page and talk to your agent
 
 > ⚠️ If you have previously installed OpenClaw or ClawX, we recommend uninstalling and removing the config directory (`~/.openclaw`) to avoid conflicts.
-
-
-
-### Documentation Structure
-
-```
-docs/
-├── BAIclaw/
-│   ├── BAIclaw-Introduction.md        # Product overview & architecture
-│   ├── Agent-Wallet.md                # Web3 wallet setup & usage
-│   ├── how-to-add-channels/           # Channel integration guides
-│   │   ├── Telegram.md
-│   │   ├── Discord.md
-│   │   ├── WhatsApp.md
-│   │   ├── Feishu.md
-│   │   ├── DingTalk.md
-│   │   ├── WeCom.md
-│   │   └── QQ-Bot.md
-│   └── operation-guide/               # Step-by-step operation guides
-│       ├── Get-API-Key.md
-│       └── Get-Wallet-Secret.md
-```
 
 
 ## 🔗 Related Projects
