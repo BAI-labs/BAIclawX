@@ -126,9 +126,9 @@ export async function repairClawXOnlyBootstrapFiles(): Promise<void> {
       if (before === '' && after === '') {
         try {
           await unlink(filePath);
-          logger.info(`Removed bankofai-only bootstrap file for re-seeding: ${file} (${workspaceDir})`);
+          logger.info(`Removed bai-only bootstrap file for re-seeding: ${file} (${workspaceDir})`);
         } catch {
-          logger.warn(`Failed to remove bankofai-only bootstrap file: ${filePath}`);
+          logger.warn(`Failed to remove bai-only bootstrap file: ${filePath}`);
         }
       }
     }
@@ -145,7 +145,7 @@ export async function repairClawXOnlyBootstrapFiles(): Promise<void> {
 async function mergeClawXContextOnce(): Promise<number> {
   const contextDir = join(getResourcesDir(), 'context');
   if (!(await fileExists(contextDir))) {
-    logger.debug('bankofai context directory not found, skipping context merge');
+    logger.debug('bai context directory not found, skipping context merge');
     return 0;
   }
 
@@ -178,7 +178,7 @@ async function mergeClawXContextOnce(): Promise<number> {
       const merged = mergeClawXSection(existing, section);
       if (merged !== existing) {
         await writeFile(targetPath, merged, 'utf-8');
-        logger.info(`Merged bankofai context into ${targetName} (${workspaceDir})`);
+        logger.info(`Merged bai context into ${targetName} (${workspaceDir})`);
       }
     }
   }
@@ -201,11 +201,11 @@ export async function ensureClawXContext(): Promise<void> {
     await new Promise((r) => setTimeout(r, RETRY_INTERVAL_MS));
     skipped = await mergeClawXContextOnce();
     if (skipped === 0) {
-      logger.info(`bankofai context merge completed after ${attempt} retry(ies)`);
+      logger.info(`bai context merge completed after ${attempt} retry(ies)`);
       return;
     }
-    logger.debug(`bankofai context merge: ${skipped} file(s) still missing (retry ${attempt}/${MAX_RETRIES})`);
+    logger.debug(`bai context merge: ${skipped} file(s) still missing (retry ${attempt}/${MAX_RETRIES})`);
   }
 
-  logger.warn(`bankofai context merge: ${skipped} file(s) still missing after ${MAX_RETRIES} retries`);
+  logger.warn(`bai context merge: ${skipped} file(s) still missing after ${MAX_RETRIES} retries`);
 }

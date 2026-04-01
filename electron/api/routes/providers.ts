@@ -107,7 +107,7 @@ export async function handleProviderRoutes(
       const providerType = provider?.type || body.providerId;
       const providerConfig = getProviderConfig(providerType);
 
-      if (providerType !== 'bankofai' && providerConfig?.api !== 'openai-completions' && providerConfig?.api !== 'openai-responses') {
+      if (providerType !== 'bai' && providerConfig?.api !== 'openai-completions' && providerConfig?.api !== 'openai-responses') {
         sendJson(res, 400, { models: [], error: `Model discovery is not supported for provider "${providerType}"` });
         return true;
       }

@@ -1,6 +1,6 @@
 import { hostApiFetch } from './host-api';
 
-export interface BankOfAiModelOption {
+export interface BaiModelOption {
   id: string;
   displayName: string;
 }
@@ -9,7 +9,7 @@ function normalizeModelText(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9.]+/g, '');
 }
 
-function isTemporarilyHiddenBankOfAiModel(model: BankOfAiModelOption): boolean {
+function isTemporarilyHiddenBaiModel(model: BaiModelOption): boolean {
   const id = normalizeModelText(model.id);
   const displayName = normalizeModelText(model.displayName);
   const text = `${id} ${displayName}`;
@@ -17,7 +17,7 @@ function isTemporarilyHiddenBankOfAiModel(model: BankOfAiModelOption): boolean {
   return text.includes('kimi') || text.includes('minimax') || text.includes('glm');
 }
 
-function isClaudeHaiku45Model(model: BankOfAiModelOption): boolean {
+function isClaudeHaiku45Model(model: BaiModelOption): boolean {
   const id = normalizeModelText(model.id);
   const displayName = normalizeModelText(model.displayName);
   const text = `${id} ${displayName}`;
@@ -29,20 +29,20 @@ function isClaudeHaiku45Model(model: BankOfAiModelOption): boolean {
   return text.includes('4.5') || text.includes('45');
 }
 
-export async function fetchBankOfAiModels(input: {
+export async function fetchBaiModels(input: {
   apiKey: string;
   baseUrl: string;
-}): Promise<BankOfAiModelOption[]> {
+}): Promise<BaiModelOption[]> {
   const apiKey = input.apiKey.trim();
   const baseUrl = input.baseUrl.trim();
   if (!apiKey || !baseUrl) {
     return [];
   }
 
-  const response = await hostApiFetch<{ models?: BankOfAiModelOption[] }>('/api/provider-models/discover', {
+  const response = await hostApiFetch<{ models?: BaiModelOption[] }>('/api/provider-models/discover', {
     method: 'POST',
     body: JSON.stringify({
-      providerId: 'bankofai',
+      providerId: 'bai',
       apiKey,
       baseUrl,
     }),
@@ -52,10 +52,10 @@ export async function fetchBankOfAiModels(input: {
     return [];
   }
 
-  return response.models.filter((model) => !isTemporarilyHiddenBankOfAiModel(model));
+  return response.models.filter((model) => !isTemporarilyHiddenBaiModel(model));
 }
 
-function getChatGptPriority(model: BankOfAiModelOption): number {
+function getChatGptPriority(model: BaiModelOption): number {
   if (isClaudeHaiku45Model(model)) return 0;
 
   const id = model.id.toLowerCase();
@@ -70,7 +70,7 @@ function getChatGptPriority(model: BankOfAiModelOption): number {
   return Number.MAX_SAFE_INTEGER;
 }
 
-export function pickPreferredBankOfAiModelId(models: BankOfAiModelOption[]): string | undefined {
+export function pickPreferredBaiModelId(models: BaiModelOption[]): string | undefined {
   if (models.length === 0) {
     return undefined;
   }
@@ -95,17 +95,17 @@ export function pickPreferredBankOfAiModelId(models: BankOfAiModelOption[]): str
   return models[0]?.id;
 }
 
-export async function resolvePreferredBankOfAiModelId(input: {
+export async function resolvePreferredBaiModelId(input: {
   apiKey: string;
   baseUrl: string;
   fallbackModelId?: string;
 }): Promise<string | undefined> {
   try {
-    const models = await fetchBankOfAiModels({
+    const models = await fetchBaiModels({
       apiKey: input.apiKey,
       baseUrl: input.baseUrl,
     });
-    return pickPreferredBankOfAiModelId(models) || input.fallbackModelId;
+    return pickPreferredBaiModelId(models) || input.fallbackModelId;
   } catch {
     return input.fallbackModelId;
   }

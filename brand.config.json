@@ -7,10 +7,9 @@
   "vendor": "BAIclaw",
   "maintainer": "BAIclaw Team <support@b.ai>",
   "websiteUrl": "https://b.ai",
-  "docsUrl": "https://docs-test.b.ai/BAIclaw/Get%20API%20Key/",
-  "githubUrl": "https://github.com",
-  "issuesUrl": "https://github.com/issues",
-  "updateGenericUrl": "https://oss.intelli-spectrum.com/latest",
+  "docsUrl": "https://docs.b.ai/BAIclaw",
+  "githubUrl": "https://github.com/BAI-labs/BAIclawX",
+  "issuesUrl": "https://github.com/BAI-labs/BAIclawX/issues",
   "copyright": "Copyright © 2026 BAIclaw",
   "openRouterReferrer": "https://b.ai",
   "openRouterTitle": "BAIclaw",
@@ -20,6 +19,6 @@
     "mono": "\"SFMono-Regular\", Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
   },
   "about": {
-    "tagline": "A graphical AI assistant built on OpenClaw and ClawX."
+    "tagline": "A graphical AI assistant built on OpenClaw."
   }
 }

@@ -12,8 +12,8 @@ import { join } from 'path';
 import { existsSync, mkdirSync, appendFileSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { appendFile, readFile, readdir, stat } from 'fs/promises';
 
-const LOG_FILE_PREFIX = 'bankofai';
-const LOG_SESSION_LABEL = 'bankofai';
+const LOG_FILE_PREFIX = 'bai';
+const LOG_SESSION_LABEL = 'bai';
 
 /**
  * Log levels
@@ -77,12 +77,12 @@ function migrateLegacyLogFiles(targetDir: string): void {
 
     const content = readFileSync(nextPath, 'utf8');
     const migrated = content
-      .replaceAll('[clawx-validate]', '[bankofai-validate]')
-      .replaceAll('ClawX Session Start', 'bankofai Session Start')
-      .replaceAll('=== ClawX Application Starting ===', '=== bankofai Application Starting ===')
-      .replaceAll('ClawX-only', 'bankofai-only')
-      .replaceAll('ClawX context', 'bankofai context')
-      .replaceAll('ClawX', 'bankofai');
+      .replaceAll('[clawx-validate]', '[bai-validate]')
+      .replaceAll('ClawX Session Start', 'bai Session Start')
+      .replaceAll('=== ClawX Application Starting ===', '=== bai Application Starting ===')
+      .replaceAll('ClawX-only', 'bai-only')
+      .replaceAll('ClawX context', 'bai context')
+      .replaceAll('ClawX', 'bai');
 
     if (migrated !== content) {
       writeFileSync(nextPath, migrated);

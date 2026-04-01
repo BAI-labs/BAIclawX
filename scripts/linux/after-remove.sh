@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Post-removal script for ClawX on Linux
+# Post-removal script for BAIclaw on Linux
 
 set -e
 
 # Remove symbolic links
-rm -f /usr/local/bin/clawx 2>/dev/null || true
+rm -f /usr/local/bin/baiclaw 2>/dev/null || true
 rm -f /usr/local/bin/openclaw 2>/dev/null || true
 
 # Update desktop database
@@ -24,4 +24,4 @@ if [ -f "$APPARMOR_PROFILE_TARGET" ]; then
     rm -f "$APPARMOR_PROFILE_TARGET"
 fi
 
-echo "ClawX has been removed."
+echo "BAIclaw has been removed."

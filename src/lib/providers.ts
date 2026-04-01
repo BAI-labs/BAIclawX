@@ -2,7 +2,7 @@ import { providerIcons } from '@/assets/providers';
 import { brand } from './brand';
 
 export const PROVIDER_TYPES = [
-  'bankofai',
+  'bai',
   'anthropic',
   'openai',
   'google',
@@ -19,7 +19,7 @@ export const PROVIDER_TYPES = [
 export type ProviderType = (typeof PROVIDER_TYPES)[number];
 
 export const BUILTIN_PROVIDER_TYPES = [
-  'bankofai',
+  'bai',
   'anthropic',
   'openai',
   'google',
@@ -125,12 +125,12 @@ export interface ProviderAccount {
 
 export const PROVIDER_TYPE_INFO: ProviderTypeInfo[] = [
   {
-    id: 'bankofai',
-    name: 'BANK OF AI',
-    displayName: 'BANK OF AI',
+    id: 'bai',
+    name: 'BAI',
+    displayName: 'BAI',
     icon: '🧠',
-    placeholder: 'sk-bankofai-...',
-    model: 'BANK OF AI',
+    placeholder: 'sk-...',
+    model: 'BAI',
     requiresApiKey: true,
     authMode: 'api_key',
     baseUrlMode: 'hidden',
@@ -140,7 +140,7 @@ export const PROVIDER_TYPE_INFO: ProviderTypeInfo[] = [
     defaultBaseUrl: 'https://api.b.ai/v1',
     showBaseUrl: false,
     showModelId: false,
-    modelIdPlaceholder: 'bankofai-chat',
+    modelIdPlaceholder: 'bai-chat',
     defaultModelId: 'MiniMax-M2.5',
     docsUrl: 'https://docs.b.ai/BAIclaw/operation-guide/Get-API-Key/',
     sortOrder: 0,

@@ -708,7 +708,7 @@ export function createGatewayWsTransportInvoker(options: GatewayWsTransportOptio
         client: {
           id: 'openclaw-control-ui',
           displayName: `${brand.displayName} UI`,
-          version: '1.0.0',
+          version: '0.9.0',
           platform: window.electron?.platform ?? 'unknown',
           mode: 'webchat',
         },

@@ -8,12 +8,12 @@ import { brand } from '../brand';
 
 export const PROVIDER_DEFINITIONS: ProviderDefinition[] = [
   {
-    id: 'bankofai',
-    name: 'BANK OF AI',
-    displayName: 'BANK OF AI',
+    id: 'bai',
+    name: 'BAI',
+    displayName: 'BAI',
     icon: '🧠',
-    placeholder: 'sk-bankofai-...',
-    model: 'BANK OF AI',
+    placeholder: 'sk-bai-...',
+    model: 'BAI',
     requiresApiKey: true,
     docsUrl: brand.docsUrl,
     authMode: 'api_key',
@@ -24,9 +24,9 @@ export const PROVIDER_DEFINITIONS: ProviderDefinition[] = [
     defaultBaseUrl: 'https://api.b.ai/v1',
     showBaseUrl: false,
     showModelId: false,
-    modelIdPlaceholder: 'bankofai-chat',
+    modelIdPlaceholder: 'bai-chat',
     category: 'compatible',
-    envVar: 'BANKOFAI_API_KEY',
+    envVar: 'BAI_API_KEY',
     defaultModelId: 'MiniMax-M2.5',
     supportedAuthModes: ['api_key'],
     defaultAuthMode: 'api_key',
@@ -35,7 +35,7 @@ export const PROVIDER_DEFINITIONS: ProviderDefinition[] = [
     providerConfig: {
       baseUrl: 'https://api.b.ai/v1',
       api: 'openai-completions',
-      apiKeyEnv: 'BANKOFAI_API_KEY',
+      apiKeyEnv: 'BAI_API_KEY',
     },
   },
   {

@@ -13,7 +13,7 @@ type ValidationProfile =
 type ValidationResult = { valid: boolean; error?: string; status?: number };
 
 function logValidationStatus(provider: string, status: number): void {
-  console.log(`[bankofai-validate] ${provider} HTTP ${status}`);
+  console.log(`[bai-validate] ${provider} HTTP ${status}`);
 }
 
 function maskSecret(secret: string): string {
@@ -82,7 +82,7 @@ function logValidationRequest(
   headers: Record<string, string>,
 ): void {
   console.log(
-    `[bankofai-validate] ${provider} request ${method} ${sanitizeValidationUrl(url)} headers=${JSON.stringify(sanitizeHeaders(headers))}`,
+    `[bai-validate] ${provider} request ${method} ${sanitizeValidationUrl(url)} headers=${JSON.stringify(sanitizeHeaders(headers))}`,
   );
 }
 
@@ -165,7 +165,7 @@ async function validateOpenAiCompatibleKey(
 
   if (modelsResult.status === 404) {
     console.log(
-      `[bankofai-validate] ${providerType} /models returned 404, falling back to ${apiProtocol} probe`,
+      `[bai-validate] ${providerType} /models returned 404, falling back to ${apiProtocol} probe`,
     );
     if (apiProtocol === 'openai-responses') {
       return await performResponsesProbe(providerType, probeUrl, headers);
@@ -322,7 +322,7 @@ async function validateAnthropicHeaderKey(
     modelsResult.error?.includes('API error: 400')
   ) {
     console.log(
-      `[bankofai-validate] ${providerType} /models returned error, falling back to /messages probe`,
+      `[bai-validate] ${providerType} /models returned error, falling back to /messages probe`,
     );
     const messagesUrl = `${base}/messages`;
     return await performAnthropicMessagesProbe(providerType, messagesUrl, headers);

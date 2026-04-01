@@ -56,7 +56,7 @@ import { useSettingsStore } from '@/stores/settings';
 import { hostApiFetch } from '@/lib/host-api';
 import { subscribeHostEvent } from '@/lib/host-events';
 import { brandHeadingStyle } from '@/lib/brand';
-import { fetchBankOfAiModels, pickPreferredBankOfAiModelId, resolvePreferredBankOfAiModelId, type BankOfAiModelOption } from '@/lib/bankofai-models';
+import { fetchBaiModels, pickPreferredBaiModelId, resolvePreferredBaiModelId, type BaiModelOption } from '@/lib/bai-models';
 import {
   filterVisibleProviderAccounts,
   filterVisibleProviderStatuses,
@@ -96,11 +96,11 @@ function fallbackModelsEqual(a?: string[], b?: string[]): boolean {
   return left.length === right.length && left.every((model, index) => model === right[index]);
 }
 
-function shouldUseBankOfAiModelSelect(
+function shouldUseBaiModelSelect(
   vendorId: ProviderType | string | null | undefined,
-  models: BankOfAiModelOption[],
+  models: BaiModelOption[],
 ): boolean {
-  return vendorId === 'bankofai' && models.length > 0;
+  return vendorId === 'bai' && models.length > 0;
 }
 
 function getAuthModeLabel(
@@ -439,7 +439,7 @@ function ProviderCard({
   const [validating, setValidating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [storedApiKey, setStoredApiKey] = useState<string>('');
-  const [modelOptions, setModelOptions] = useState<BankOfAiModelOption[]>([]);
+  const [modelOptions, setModelOptions] = useState<BaiModelOption[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
 
@@ -448,8 +448,8 @@ function ProviderCard({
   const showModelIdField = shouldShowProviderModelId(typeInfo, devModeUnlocked);
   const showBaseUrlField = shouldShowProviderBaseUrl(typeInfo);
   const canEditModelConfig = Boolean(showBaseUrlField || showModelIdField);
-  const canDiscoverBankOfAiModels = account.vendorId === 'bankofai' && !!baseUrl.trim();
-  const usesBankOfAiModelSelect = shouldUseBankOfAiModelSelect(account.vendorId, modelOptions);
+  const canDiscoverBaiModels = account.vendorId === 'bai' && !!baseUrl.trim();
+  const usesBaiModelSelect = shouldUseBaiModelSelect(account.vendorId, modelOptions);
 
   useEffect(() => {
     if (isEditing) {
@@ -467,7 +467,7 @@ function ProviderCard({
   useEffect(() => {
     let cancelled = false;
 
-    if (!isEditing || account.vendorId !== 'bankofai') {
+    if (!isEditing || account.vendorId !== 'bai') {
       setStoredApiKey('');
       setModelOptions([]);
       setModelsLoading(false);
@@ -498,7 +498,7 @@ function ProviderCard({
   }, [account.id, account.vendorId, isEditing]);
 
   useEffect(() => {
-    if (!isEditing || account.vendorId !== 'bankofai') {
+    if (!isEditing || account.vendorId !== 'bai') {
       return;
     }
     setModelOptions([]);
@@ -508,24 +508,24 @@ function ProviderCard({
 
   const fallbackOptions = allProviders.filter((candidate) => candidate.account.id !== account.id);
 
-  const handleRefreshBankOfAiModels = async () => {
+  const handleRefreshBaiModels = async () => {
     const effectiveApiKey = newKey.trim() || storedApiKey.trim();
     const effectiveBaseUrl = baseUrl.trim();
     if (!effectiveApiKey || !effectiveBaseUrl) {
-      setModelsError(t('aiProviders.dialog.bankofaiModelsMissingConfig'));
+      setModelsError(t('aiProviders.dialog.baiModelsMissingConfig'));
       return;
     }
 
     setModelsLoading(true);
     setModelsError(null);
     try {
-      const models = await fetchBankOfAiModels({
+      const models = await fetchBaiModels({
         apiKey: effectiveApiKey,
         baseUrl: effectiveBaseUrl,
       });
       setModelOptions(models);
       if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
-        setModelId(pickPreferredBankOfAiModelId(models) || '');
+        setModelId(pickPreferredBaiModelId(models) || '');
       }
     } catch (error) {
       setModelOptions([]);
@@ -758,13 +758,13 @@ function ProviderCard({
                 <div className="space-y-1.5 pt-2">
                   <div className="flex items-center justify-between gap-3">
                     <Label className={currentLabelClasses}>{t('aiProviders.dialog.modelId')}</Label>
-                    {account.vendorId === 'bankofai' && (
+                    {account.vendorId === 'bai' && (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => { void handleRefreshBankOfAiModels(); }}
-                        disabled={modelsLoading || !canDiscoverBankOfAiModels}
+                        onClick={() => { void handleRefreshBaiModels(); }}
+                        disabled={modelsLoading || !canDiscoverBaiModels}
                         className="h-7 rounded-full px-3 text-[12px]"
                       >
                         <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
@@ -772,7 +772,7 @@ function ProviderCard({
                       </Button>
                     )}
                   </div>
-                  {usesBankOfAiModelSelect ? (
+                  {usesBaiModelSelect ? (
                     <Select
                       value={modelId}
                       onChange={(e) => setModelId(e.target.value)}
@@ -792,13 +792,13 @@ function ProviderCard({
                       className={currentInputClasses}
                     />
                   )}
-                  {account.vendorId === 'bankofai' && (
+                  {account.vendorId === 'bai' && (
                     <p className="text-[12px] text-muted-foreground">
                       {modelsError
-                        ? t('aiProviders.dialog.bankofaiModelsFailed', { error: modelsError })
+                        ? t('aiProviders.dialog.baiModelsFailed', { error: modelsError })
                         : (modelsLoading
-                          ? t('aiProviders.dialog.bankofaiModelsLoading')
-                          : t('aiProviders.dialog.bankofaiModelsHint'))}
+                          ? t('aiProviders.dialog.baiModelsLoading')
+                          : t('aiProviders.dialog.baiModelsHint'))}
                     </p>
                   )}
                 </div>
@@ -1021,7 +1021,7 @@ function AddProviderDialog({
   const [showKey, setShowKey] = useState(false);
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [modelOptions, setModelOptions] = useState<BankOfAiModelOption[]>([]);
+  const [modelOptions, setModelOptions] = useState<BaiModelOption[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
 
@@ -1051,8 +1051,8 @@ function AddProviderDialog({
   const supportsApiKey = typeInfo?.supportsApiKey ?? false;
   const vendorMap = new Map(vendors.map((vendor) => [vendor.id, vendor]));
   const selectedVendor = selectedType ? vendorMap.get(selectedType) : undefined;
-  const canDiscoverBankOfAiModels = selectedType === 'bankofai' && !!apiKey.trim() && !!baseUrl.trim();
-  const usesBankOfAiModelSelect = shouldUseBankOfAiModelSelect(selectedType, modelOptions);
+  const canDiscoverBaiModels = selectedType === 'bai' && !!apiKey.trim() && !!baseUrl.trim();
+  const usesBaiModelSelect = shouldUseBaiModelSelect(selectedType, modelOptions);
   const preferredOAuthMode = selectedVendor?.supportedAuthModes.includes('oauth_browser')
     ? 'oauth_browser'
     : (selectedVendor?.supportedAuthModes.includes('oauth_device')
@@ -1069,7 +1069,7 @@ function AddProviderDialog({
   }, [selectedVendor, isOAuth, supportsApiKey]);
 
   useEffect(() => {
-    if (selectedType !== 'bankofai') {
+    if (selectedType !== 'bai') {
       setModelOptions([]);
       setModelsError(null);
       setModelsLoading(false);
@@ -1088,7 +1088,7 @@ function AddProviderDialog({
     const timer = window.setTimeout(() => {
       setModelsLoading(true);
       setModelsError(null);
-      void fetchBankOfAiModels({
+      void fetchBaiModels({
         apiKey: trimmedApiKey,
         baseUrl: trimmedBaseUrl,
       })
@@ -1096,7 +1096,7 @@ function AddProviderDialog({
           if (cancelled) return;
           setModelOptions(models);
           if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
-            setModelId(pickPreferredBankOfAiModelId(models) || '');
+            setModelId(pickPreferredBaiModelId(models) || '');
           }
         })
         .catch((error) => {
@@ -1253,24 +1253,24 @@ function AddProviderDialog({
     }
   };
 
-  const handleRefreshBankOfAiModels = async () => {
+  const handleRefreshBaiModels = async () => {
     const trimmedApiKey = apiKey.trim();
     const trimmedBaseUrl = baseUrl.trim();
     if (!trimmedApiKey || !trimmedBaseUrl) {
-      setModelsError(t('aiProviders.dialog.bankofaiModelsMissingConfig'));
+      setModelsError(t('aiProviders.dialog.baiModelsMissingConfig'));
       return;
     }
 
     setModelsLoading(true);
     setModelsError(null);
     try {
-      const models = await fetchBankOfAiModels({
+      const models = await fetchBaiModels({
         apiKey: trimmedApiKey,
         baseUrl: trimmedBaseUrl,
       });
       setModelOptions(models);
       if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
-        setModelId(pickPreferredBankOfAiModelId(models) || '');
+        setModelId(pickPreferredBaiModelId(models) || '');
       }
     } catch (error) {
       setModelOptions([]);
@@ -1338,8 +1338,8 @@ function AddProviderDialog({
         return;
       }
 
-      const resolvedModel = selectedType === 'bankofai'
-        ? await resolvePreferredBankOfAiModelId({
+      const resolvedModel = selectedType === 'bai'
+        ? await resolvePreferredBaiModelId({
             apiKey: apiKey.trim(),
             baseUrl: baseUrl.trim() || typeInfo?.defaultBaseUrl || '',
             fallbackModelId: typeInfo?.defaultModelId,
@@ -1455,7 +1455,7 @@ function AddProviderDialog({
               </div>
 
               <div className="space-y-6 bg-transparent p-0">
-                {selectedType !== 'bankofai' && (
+                {selectedType !== 'bai' && (
                   <div className="space-y-2.5">
                   <Label htmlFor="name" className={labelClasses}>{t('aiProviders.dialog.displayName')}</Label>
                   <Input
@@ -1555,13 +1555,13 @@ function AddProviderDialog({
                   <div className="space-y-2.5">
                     <div className="flex items-center justify-between gap-3">
                       <Label htmlFor="modelId" className={labelClasses}>{t('aiProviders.dialog.modelId')}</Label>
-                      {selectedType === 'bankofai' && (
+                      {selectedType === 'bai' && (
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => { void handleRefreshBankOfAiModels(); }}
-                          disabled={modelsLoading || !canDiscoverBankOfAiModels}
+                          onClick={() => { void handleRefreshBaiModels(); }}
+                          disabled={modelsLoading || !canDiscoverBaiModels}
                           className="h-7 rounded-full px-3 text-[12px]"
                         >
                           <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
@@ -1569,7 +1569,7 @@ function AddProviderDialog({
                         </Button>
                       )}
                     </div>
-                    {usesBankOfAiModelSelect ? (
+                    {usesBaiModelSelect ? (
                       <Select
                         id="modelId"
                         value={modelId}
@@ -1597,13 +1597,13 @@ function AddProviderDialog({
                         className={inputClasses}
                       />
                     )}
-                    {selectedType === 'bankofai' && (
+                    {selectedType === 'bai' && (
                       <p className="text-[12px] text-muted-foreground">
                         {modelsError
-                          ? t('aiProviders.dialog.bankofaiModelsFailed', { error: modelsError })
+                          ? t('aiProviders.dialog.baiModelsFailed', { error: modelsError })
                           : (modelsLoading
-                            ? t('aiProviders.dialog.bankofaiModelsLoading')
-                            : t('aiProviders.dialog.bankofaiModelsHint'))}
+                            ? t('aiProviders.dialog.baiModelsLoading')
+                            : t('aiProviders.dialog.baiModelsHint'))}
                       </p>
                     )}
                   </div>

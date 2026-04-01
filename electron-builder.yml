@@ -46,14 +46,6 @@ asarUnpack:
 # own process — @electron/rebuild must NOT touch them.
 npmRebuild: false
 
-# Auto-update configuration
-# Primary: Alibaba Cloud OSS (fast for Chinese users, used for auto-update)
-# Fallback: GitHub Releases (backup, used when OSS is unavailable)
-publish:
-  - provider: generic
-    url: https://oss.intelli-spectrum.com/latest
-    useMultipleRangeRequest: false
-
 # macOS Configuration
 mac:
   extraResources:
@@ -152,7 +144,7 @@ linux:
       arch:
         - x64
   category: Utility
-  maintainer: BAIclaw Team <public@valuecell.ai>
+  maintainer: BAIclaw Team <support@b.ai>
   vendor: BAIclaw
   synopsis: AI Assistant powered by OpenClaw
   description: BAIclaw is a graphical AI assistant application that integrates with OpenClaw Gateway to provide intelligent automation and assistance across multiple messaging platforms.

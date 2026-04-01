@@ -5,7 +5,7 @@ import { join } from 'path';
 const { testUserData } = vi.hoisted(() => {
   const suffix = Math.random().toString(36).slice(2);
   return {
-    testUserData: `/tmp/bankofai-logger-${suffix}`,
+    testUserData: `/tmp/bai-logger-${suffix}`,
   };
 });
 
@@ -23,7 +23,7 @@ describe('logger branding', () => {
     await rm(testUserData, { recursive: true, force: true });
   });
 
-  it('writes bankofai-branded log filenames and session headers', async () => {
+  it('writes bai-branded log filenames and session headers', async () => {
     const logger = await import('@electron/utils/logger');
 
     logger.initLogger();
@@ -32,11 +32,11 @@ describe('logger branding', () => {
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     const date = new Date().toISOString().split('T')[0];
-    const logPath = join(testUserData, 'logs', `bankofai-${date}.log`);
+    const logPath = join(testUserData, 'logs', `bai-${date}.log`);
     const content = await readFile(logPath, 'utf8');
 
     expect(logger.getLogFilePath()).toBe(logPath);
-    expect(content).toContain('=== bankofai Session Start (v0.0.0-test) ===');
+    expect(content).toContain('=== bai Session Start (v0.0.0-test) ===');
     expect(content).toContain('hello world');
     expect(content).not.toContain('ClawX Session Start');
   });
@@ -50,7 +50,7 @@ describe('logger branding', () => {
       legacyPath,
       [
         '[2026-03-17T00:00:00.000Z] === ClawX Session Start (v0.0.0-test) ===',
-        '[clawx-validate] bankofai HTTP 200',
+        '[clawx-validate] bai HTTP 200',
         '=== ClawX Application Starting ===',
         'Merged ClawX context into bootstrap.md',
       ].join('\n'),
@@ -60,12 +60,12 @@ describe('logger branding', () => {
     const logger = await import('@electron/utils/logger');
     logger.initLogger();
 
-    const migratedPath = join(legacyDir, `bankofai-${legacyDate}.log`);
+    const migratedPath = join(legacyDir, `bai-${legacyDate}.log`);
     const content = await readFile(migratedPath, 'utf8');
 
-    expect(content).toContain('bankofai Session Start');
-    expect(content).toContain('[bankofai-validate] bankofai HTTP 200');
-    expect(content).toContain('=== bankofai Application Starting ===');
-    expect(content).toContain('Merged bankofai context into bootstrap.md');
+    expect(content).toContain('bai Session Start');
+    expect(content).toContain('[bai-validate] bai HTTP 200');
+    expect(content).toContain('=== bai Application Starting ===');
+    expect(content).toContain('Merged bai context into bootstrap.md');
   });
 });

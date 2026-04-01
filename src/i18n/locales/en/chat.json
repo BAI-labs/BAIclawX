@@ -3,9 +3,9 @@
     "gatewayRequired": "The OpenClaw Gateway needs to be running to use chat. It will start automatically, or you can start it from Settings.",
     "providerGate": {
         "missingTitle": "Set up BAI before chatting",
-        "missingDescription": "Chat is available after you add an BAI account and choose a default model provider.",
+        "missingDescription": "Chat is available after you add a BAI account and choose a default model provider.",
         "defaultRequiredTitle": "Switch the default provider to BAI",
-        "defaultRequiredDescription": "BAIclaw chat only runs with BAI right now. Open Models and set an BAI account as the default provider.",
+        "defaultRequiredDescription": "BAIclaw chat only runs with BAI right now. Open Models and set a BAI account as the default provider.",
         "openModels": "Open Models"
     },
     "welcome": {

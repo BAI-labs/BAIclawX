@@ -1,417 +1,74 @@
+# BAIclaw
 
-<p align="center">
-  <img src="src/assets/logo.svg" width="128" height="128" alt="BAIclaw Logo" />
-</p>
+**Your Personal AI Agent, Right on Your Desktop.**
 
-<h1 align="center">BAIclaw</h1>
+BAIclaw is a personal AI agent desktop application built on [OpenClaw](https://openclaw.ai/) and [ClawX](https://github.com/ValueCell-ai/ClawX). It wraps the power of the OpenClaw agent runtime in a graphical interface — no command line, no config files, just a ready-to-use AI assistant.
 
-<p align="center">
-  <strong>The Desktop Interface for OpenClaw AI Agents</strong>
-</p>
 
-<p align="center">
-  <a href="#features">Features</a> •
-  <a href="#why-clawx">Why BAIclaw</a> •
-  <a href="#getting-started">Getting Started</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#development">Development</a> •
-  <a href="#contributing">Contributing</a>
-</p>
+## ✨ Features
 
-<p align="center">
-  <img src="https://img.shields.io/badge/platform-MacOS%20%7C%20Windows%20%7C%20Linux-blue" alt="Platform" />
-  <img src="https://img.shields.io/badge/electron-40+-47848F?logo=electron" alt="Electron" />
-  <img src="https://img.shields.io/badge/react-19-61DAFB?logo=react" alt="React" />
-  <a href="https://discord.com/invite/84Kex3GGAh" target="_blank">
-  <img src="https://img.shields.io/discord/1399603591471435907?logo=discord&labelColor=%20%235462eb&logoColor=%20%23f5f5f5&color=%20%235462eb" alt="chat on Discord" />
-  </a>
-  <img src="https://img.shields.io/github/downloads/ValueCell-ai/BAIclaw/total?color=%23027DEB" alt="Downloads" />
-  <img src="https://img.shields.io/badge/license-MIT-green" alt="License" />
-</p>
+### 🤖 Multi-Agent Collaboration
 
-<p align="center">
-  English | <a href="README.zh-CN.md">简体中文</a> | <a href="README.zh-TW.md">繁體中文</a>
-</p>
+Configure multiple specialized agents, each with independent system prompts and context memory. Switch between them instantly with the `@agent` command — route the right task to the right agent.
 
----
+### 💬 Multi-Channel Communication
 
-## Overview
+Extend your AI beyond the desktop. Connect to the platforms you already use:
 
-**BAIclaw** bridges the gap between powerful AI agents and everyday users. Built on top of [OpenClaw](https://github.com/OpenClaw), it transforms command-line AI orchestration into an accessible, beautiful desktop experience—no terminal required.
+| Platform | Connection Method |
+|----------|-------------------|
+| **Telegram** | Bot Token via @BotFather |
+| **Discord** | Bot application via Developer Portal |
+| **WhatsApp** | QR code scan from your phone |
+| **Feishu** | One-click robot creation |
+| **DingTalk** | Robot via Developer Platform |
+| **WeCom** | Smart Robot in API mode |
+| **QQ Bot** | Quick registration via QQ Bot portal |
 
-Whether you're automating workflows, managing AI-powered channels, or scheduling intelligent tasks, BAIclaw provides the interface you need to harness AI agents effectively.
+Each channel operates independently and can bind to different agents.
 
-BAIclaw comes pre-configured for BANK OF AI-based model access and natively supports Windows as well as multi-language settings. Of course, you can also fine-tune advanced configurations via **Settings → Advanced → Developer Mode**.
+### 🧩 Plug-and-Play Skills
 
----
-## Screenshot
+Install capability extensions directly from the built-in skill panel — no package manager required. BAIclaw ships with document processing (PDF, Excel, Word, PPT) and web search skills out of the box.
 
-<p align="center">
-  <img src="resources/screenshot/en/chat.png" style="width: 100%; height: auto;">
-</p>
+### ⏱️ Automated Workflows
 
-<p align="center">
-  <img src="resources/screenshot/en/cron.png" style="width: 100%; height: auto;">
-</p>
+Create scheduled tasks that run 7×24 without manual intervention. Set custom triggers, use preset templates, and let your agents work while you sleep.
 
-<p align="center">
-  <img src="resources/screenshot/en/skills.png" style="width: 100%; height: auto;">
-</p>
+### 💰 Agent Wallet
 
-<p align="center">
-  <img src="resources/screenshot/en/channels.png" style="width: 100%; height: auto;">
-</p>
+A locally secured Web3 wallet designed for AI agents. Once configured, your agent can autonomously execute on-chain operations — transfers, token swaps, liquidity management, and x402 protocol payments. Keys are encrypted and stored locally, never uploaded to any server.
 
-<p align="center">
-  <img src="resources/screenshot/en/models.png" style="width: 100%; height: auto;">
-</p>
+## 🏗️ Architecture
 
-<p align="center">
-  <img src="resources/screenshot/en/settings.png" style="width: 100%; height: auto;">
-</p>
-
----
-
-## Why BAIclaw
-
-Building AI agents shouldn't require mastering the command line. BAIclaw was designed with a simple philosophy: **powerful technology deserves an interface that respects your time.**
-
-| Challenge | BAIclaw Solution |
-|-----------|----------------|
-| Complex CLI setup | One-click installation with guided setup wizard |
-| Configuration files | Visual settings with real-time validation |
-| Process management | Automatic gateway lifecycle management |
-| BANK OF AI model access | Unified BANK OF AI account configuration panel |
-| Skill/plugin installation | Built-in skill marketplace and management |
-
-### OpenClaw Inside
-
-BAIclaw is built directly upon the official **OpenClaw** core. Instead of requiring a separate installation, we embed the runtime within the application to provide a seamless "battery-included" experience.
-
-We are committed to maintaining strict alignment with the upstream OpenClaw project, ensuring that you always have access to the latest capabilities, stability improvements, and ecosystem compatibility provided by the official releases.
-
----
-
-## Features
-
-### 🎯 Zero Configuration Barrier
-Complete the entire setup—from installation to your first AI interaction—through an intuitive graphical interface. No terminal commands, no YAML files, no environment variable hunting.
-
-### 💬 Intelligent Chat Interface
-Communicate with AI agents through a modern chat experience. Support for multiple conversation contexts, message history, rich content rendering with Markdown, and direct `@agent` routing in the main composer for multi-agent setups.
-When you target another agent with `@agent`, BAIclaw switches into that agent's own conversation context directly instead of relaying through the default agent. Agent workspaces stay separate by default, and stronger isolation depends on OpenClaw sandbox settings.
-
-### 📡 Multi-Channel Management
-Configure and monitor multiple AI channels simultaneously. Each channel operates independently, allowing you to run specialized agents for different tasks.
-
-### ⏰ Cron-Based Automation
-Schedule AI tasks to run automatically. Define triggers, set intervals, and let your AI agents work around the clock without manual intervention.
-
-### 🧩 Extensible Skill System
-Extend your AI agents with pre-built skills. Browse, install, and manage skills through the integrated skill panel—no package managers required.
-BAIclaw also pre-bundles full document-processing skills (`pdf`, `xlsx`, `docx`, `pptx`), deploys them automatically to the managed skills directory (default `~/.openclaw/skills`) on startup, and enables them by default on first install. Additional bundled skills (`find-skills`, `self-improving-agent`, `tavily-search`, `brave-web-search`, `bocha-skill`) are also enabled by default; if required API keys are missing, OpenClaw will surface configuration errors in runtime.  
-The Skills page can display skills discovered from multiple OpenClaw sources (managed dir, workspace, and extra skill dirs), and now shows each skill's actual location so you can open the real folder directly.
-
-Environment variables for bundled search skills:
-- `BRAVE_SEARCH_API_KEY` for `brave-web-search`
-- `TAVILY_API_KEY` for `tavily-search` (OAuth may also be supported by upstream skill runtime)
-- `BOCHA_API_KEY` for `bocha-skill`
-- `find-skills` and `self-improving-agent` do not require API keys
-
-### 🔐 Secure BANK OF AI Integration
-Configure one or more BANK OF AI accounts with credentials stored securely in your system's native keychain. Account creation only requires an API key; chat can then load the available BANK OF AI models and switch between them directly from the composer with the model picker.
-
-### 🌙 Adaptive Theming
-Light mode, dark mode, or system-synchronized themes. BAIclaw adapts to your preferences automatically.
-
-### 🚀 Startup Launch Control
-In **Settings → General**, you can enable **Launch at system startup** so BAIclaw starts automatically after login.
-
-### Web3 / AgentWallet
-In **Settings**, the **Web3** section manages a **TRON AgentWallet**: a four-step **Create AgentWallet** wizard imports a TRON private key (validated against your BANK OF AI API key when the platform exposes a linked address), sets a local **master password** for `@bankofai/agent-wallet` encrypted storage, then shows a success screen. You can copy the address and delete the wallet. Wallet files default to **`~/.openclaw/agent-wallet-baiclaw`** (override with **`AGENT_WALLET_DIR`**, same as the CLI); new wallets use id **`baiclaw_wallet`** and store the encrypted private key in **`secret_baiclaw_wallet.json`**. Older releases used the Electron app **userData** `agent-wallet` folder—copy its contents into `~/.openclaw/agent-wallet-baiclaw` if you need to keep that vault. CLI-created vaults without the app’s `kv-password` file: the app also accepts **`runtime_secrets.json`** and **`AGENT_WALLET_BAICLAW_PASSWORD`** (same as the CLI) when they unlock the vault, or use **Settings → Web3** once to enter the master password (`POST` `/api/agent-wallets/unlock`, then stored via the OS keychain). Default storage uses Electron’s **`app.getPath('home')`** + **`.openclaw/agent-wallet-baiclaw`** (folder name has two “l”; not `.agent-walllet`). If the app is launched with **`AGENT_WALLET_DIR`**, the CLI must use the same path (`agent-wallet list -d "<path>"`). **Settings → Web3** shows the resolved directory from **`GET` `/api/agent-wallets`** (`storagePath`). Deleting the last configured wallet removes the **entire vault directory** (same as `storagePath`, e.g. `~/.openclaw/agent-wallet-baiclaw`), including `kv-password` and `master.json`. After a successful wallet creation, the wizard calls **`POST` `/api/agent-wallets/runtime-baiclaw-password`**, which sets **`AGENT_WALLET_BAICLAW_PASSWORD`** on the Electron **main** process and restarts the Gateway so forked children inherit it (this is not a permanent OS or shell environment variable). On each app launch, the main process also **re-applies** that variable from the saved vault password (`kv-password` / plain / `runtime_secrets.json` / launch env) when `wallets_config.json` lists at least one wallet, so Gateway auto-start sees it without reopening the wizard. Host API: `GET` `/api/agent-wallets` (`storagePath`, `vaultUnlockRequired`, `savedPasswordMismatch`, `vaultTopologyIncomplete`, …), `POST` `/api/agent-wallets/unlock`, `POST` `/api/agent-wallets/runtime-baiclaw-password`, `POST` `/api/agent-wallets/validate-private-key`, `POST` `/api/agent-wallets`, `DELETE` `/api/agent-wallets/:id`.
-
----
-
-## Getting Started
-
-### System Requirements
-
-- **Operating System**: macOS 11+, Windows 10+, or Linux (Ubuntu 20.04+)
-- **Memory**: 4GB RAM minimum (8GB recommended)
-- **Storage**: 1GB available disk space
-
-### Installation
-
-#### Pre-built Releases (Recommended)
-
-Download the latest release for your platform from the [Releases](https://github.com/ValueCell-ai/BAIclaw/releases) page.
-
-#### Build from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/ValueCell-ai/BAIclaw.git
-cd BAIclaw
-
-# Initialize the project
-pnpm run init
-
-# Start in development mode
-pnpm dev
 ```
-### First Launch
-
-When you launch BAIclaw for the first time, the **Setup Wizard** will guide you through:
-
-1. **Language & Region** – Configure your preferred locale
-2. **BANK OF AI Provider** – Add one or more BANK OF AI accounts with an API key and set the default chat provider
-3. **Skill Bundles** – Select pre-configured skills for common use cases
-4. **Verification** – Test your configuration before entering the main interface
-
-> Note for Moonshot (Kimi): BAIclaw keeps Kimi web search enabled by default.  
-> When Moonshot is configured, BAIclaw also syncs Kimi web search to the China endpoint (`https://api.moonshot.cn/v1`) in OpenClaw config.
-
-### Proxy Settings
-
-BAIclaw includes built-in proxy settings for environments where Electron, the OpenClaw Gateway, or channels such as Telegram need to reach the internet through a local proxy client.
-
-Open **Settings → Gateway → Proxy** and configure:
-
-- **Proxy Server**: the default proxy for all requests
-- **Bypass Rules**: hosts that should connect directly, separated by semicolons, commas, or new lines
-- In **Developer Mode**, you can optionally override:
-  - **HTTP Proxy**
-  - **HTTPS Proxy**
-  - **ALL_PROXY / SOCKS**
-
-Recommended local examples:
-
-```text
-Proxy Server: http://127.0.0.1:7890
+┌─────────────────────────────────────┐
+│           BAIclaw (GUI)             │  ← Graphical Interface
+├─────────────────────────────────────┤
+│            OpenClaw                 │  ← Agent Runtime & Extensions
+├─────────────────────────────────────┤
+│           BAI LLM API               │  ← Intelligence Source
+└─────────────────────────────────────┘
 ```
-Notes:
 
-- A bare `host:port` value is treated as HTTP.
-- If advanced proxy fields are left empty, BAIclaw falls back to `Proxy Server`.
-- Saving proxy settings reapplies Electron networking immediately and restarts the Gateway automatically.
-- BAIclaw also syncs the proxy to OpenClaw's Telegram channel config when Telegram is enabled.
-- In **Settings → Advanced → Developer**, you can run **OpenClaw Doctor** to execute `openclaw doctor --json` and inspect the diagnostic output without leaving the app.
+## 🚀 Quick Start
 
----
+### Requirements
 
-## Architecture
+- macOS 11+ with 4GB+ RAM
 
-BAIclaw employs a **dual-process architecture** with a unified host API layer. The renderer talks to a single client abstraction, while Electron Main owns protocol selection and process lifecycle:
+### Steps
 
-```┌─────────────────────────────────────────────────────────────────┐
-│                        BAIclaw Desktop App                         │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │              Electron Main Process                          │  │
-│  │  • Window & application lifecycle management               │  │
-│  │  • Gateway process supervision                              │  │
-│  │  • System integration (tray, notifications, keychain)       │  │
-│  │  • Auto-update orchestration                                │  │
-│  └────────────────────────────────────────────────────────────┘  │
-│                              │                                    │
-│                              │ IPC (authoritative control plane)  │
-│                              ▼                                    │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │              React Renderer Process                         │  │
-│  │  • Modern component-based UI (React 19)                     │  │
-│  │  • State management with Zustand                            │  │
-│  │  • Unified host-api/api-client calls                        │  │
-│  │  • Rich Markdown rendering                                  │  │
-│  └────────────────────────────────────────────────────────────┘  │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               │ Main-owned transport strategy
-                               │ (WS first, HTTP then IPC fallback)
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                Host API & Main Process Proxies                  │
-│                                                                  │
-│  • hostapi:fetch (Main proxy, avoids CORS in dev/prod)          │
-│  • gateway:httpProxy (Renderer never calls Gateway HTTP direct)  │
-│  • Unified error mapping & retry/backoff                         │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               │ WS / HTTP / IPC fallback
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     OpenClaw Gateway                             │
-│                                                                  │
-│  • AI agent runtime and orchestration                           │
-│  • Message channel management                                    │
-│  • Skill/plugin execution environment                           │
-│  • Provider abstraction layer                                    │
-└─────────────────────────────────────────────────────────────────┘
-```
-### Design Principles
+1. **Install** — Download and install BAIclaw
+2. **Setup Wizard** — Follow the first-launch wizard to complete initial configuration
+3. **Get API Key** — Register at [BAI](https://chat.b.ai/chat) and create an API Key
+4. **Start Chatting** — Open the Chat page and talk to your agent
 
-- **Process Isolation**: The AI runtime operates in a separate process, ensuring UI responsiveness even during heavy computation
-- **Single Entry for Frontend Calls**: Renderer requests go through host-api/api-client; protocol details are hidden behind a stable interface
-- **Main-Process Transport Ownership**: Electron Main controls WS/HTTP usage and fallback to IPC for reliability
-- **Graceful Recovery**: Built-in reconnect, timeout, and backoff logic handles transient failures automatically
-- **Secure Storage**: API keys and sensitive data leverage the operating system's native secure storage mechanisms
-- **CORS-Safe by Design**: Local HTTP access is proxied by Main, preventing renderer-side CORS issues
+> ⚠️ If you have previously installed OpenClaw or ClawX, we recommend uninstalling and removing the config directory (`~/.openclaw`) to avoid conflicts.
 
----
 
-## Use Cases
+## 🔗 Related Projects
 
-### 🤖 Personal AI Assistant
-Configure a general-purpose AI agent that can answer questions, draft emails, summarize documents, and help with everyday tasks—all from a clean desktop interface.
-
-### 📊 Automated Monitoring
-Set up scheduled agents to monitor news feeds, track prices, or watch for specific events. Results are delivered to your preferred notification channel.
-
-### 💻 Developer Productivity
-Integrate AI into your development workflow. Use agents to review code, generate documentation, or automate repetitive coding tasks.
-
-### 🔄 Workflow Automation
-Chain multiple skills together to create sophisticated automation pipelines. Process data, transform content, and trigger actions—all orchestrated visually.
-
----
-
-## Development
-
-### Prerequisites
-
-- **Node.js**: 22+ (LTS recommended)
-- **Package Manager**: pnpm 9+ (recommended) or npm
-
-### Project Structure
-
-```BAIclaw/
-├── electron/                 # Electron Main Process
-│   ├── api/                 # Main-side API router and handlers
-│   │   └── routes/          # RPC/HTTP proxy route modules
-│   ├── services/            # Provider, secrets and runtime services
-│   │   ├── providers/       # Provider/account model sync logic
-│   │   └── secrets/         # OS keychain and secret storage
-│   ├── shared/              # Shared provider schemas/constants
-│   │   └── providers/
-│   ├── main/                # App entry, windows, IPC registration
-│   ├── gateway/             # OpenClaw Gateway process manager
-│   ├── preload/             # Secure IPC bridge
-│   └── utils/               # Utilities (storage, auth, paths)
-├── src/                      # React Renderer Process
-│   ├── lib/                 # Unified frontend API + error model
-│   ├── stores/              # Zustand stores (settings/chat/gateway)
-│   ├── components/          # Reusable UI components
-│   ├── pages/               # Setup/Dashboard/Chat/Channels/Skills/Cron/Settings
-│   ├── i18n/                # Localization resources
-│   └── types/               # TypeScript type definitions
-├── tests/
-│   └── unit/                # Vitest unit/integration-like tests
-├── resources/                # Static assets (icons/images)
-└── scripts/                  # Build and utility scripts
-```
-### Available Commands
-
-```bash
-# Development
-pnpm run init             # Install dependencies + download uv
-pnpm dev                  # Start with hot reload
-
-# Quality
-pnpm lint                 # Run ESLint
-pnpm typecheck            # TypeScript validation
-
-# Testing
-pnpm test                 # Run unit tests
-
-# Build & Package
-pnpm run build:vite       # Build frontend only
-pnpm build                # Full production build (with packaging assets)
-pnpm package              # Package for current platform
-pnpm package:mac          # Package for macOS (downloads/verifies x64 + arm64 uv)
-pnpm package:win          # Package for Windows (downloads/verifies x64 + arm64 uv)
-pnpm package:linux        # Package for Linux (downloads/verifies x64 + arm64 uv)
-```
-### Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Runtime | Electron 40+ |
-| UI Framework | React 19 + TypeScript |
-| Styling | Tailwind CSS + shadcn/ui |
-| State | Zustand |
-| Build | Vite + electron-builder |
-| Testing | Vitest + Playwright |
-| Animation | Framer Motion |
-| Icons | Lucide React |
-
----
-
-## Contributing
-
-We welcome contributions from the community! Whether it's bug fixes, new features, documentation improvements, or translations—every contribution helps make BAIclaw better.
-
-### How to Contribute
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes with clear messages
-4. **Push** to your branch
-5. **Open** a Pull Request
-
-### Guidelines
-
-- Follow the existing code style (ESLint + Prettier)
-- Write tests for new functionality
-- Update documentation as needed
-- Keep commits atomic and descriptive
-
----
-
-## Acknowledgments
-
-BAIclaw is built on the shoulders of excellent open-source projects:
-
-- [OpenClaw](https://github.com/OpenClaw) – The AI agent runtime
-- [Electron](https://www.electronjs.org/) – Cross-platform desktop framework
-- [React](https://react.dev/) – UI component library
-- [shadcn/ui](https://ui.shadcn.com/) – Beautifully designed components
-- [Zustand](https://github.com/pmndrs/zustand) – Lightweight state management
-
----
-
-## Community
-
-Join our community to connect with other users, get support, and share your experiences.
-
-| Enterprise WeChat | Feishu Group | Discord |
-| :---: | :---: | :---: |
-| <img src="src/assets/community/wecom-qr.png" width="150" alt="WeChat QR Code" /> | <img src="src/assets/community/feishu-qr.png" width="150" alt="Feishu QR Code" /> | <img src="src/assets/community/20260212-185822.png" width="150" alt="Discord QR Code" /> |
-
-### BAIclaw Partner Program 🚀
-
-We're launching the BAIclaw Partner Program and looking for partners who can help introduce BAIclaw to more clients, especially those with custom AI agent or automation needs.
-
-Partners help connect us with potential users and projects, while the BAIclaw team provides full technical support, customization, and integration.
-
-If you work with clients interested in AI tools or automation, we'd love to collaborate.
-
-DM us or email [public@valuecell.ai](mailto:public@valuecell.ai) to learn more.
-
----
-
-## Star History
-
-<p align="center">
-  <img src="https://api.star-history.com/svg?repos=ValueCell-ai/BAIclaw&type=Date" alt="Star History Chart" />
-</p>
-
----
-
-## License
-
-BAIclaw is released under the [MIT License](LICENSE). You're free to use, modify, and distribute this software.
-
----
-
-<p align="center">
-  <sub>Built with ❤️ by the ValueCell Team</sub>
-</p>
+- [OpenClaw](https://github.com/openclaw/openclaw) — The agent runtime that powers BAIclaw
+- [ClawX](https://github.com/ValueCell-ai/ClawX) — Desktop application framework
+- [OpenClaw Docs](https://docs.openclaw.ai/) — OpenClaw official documentation

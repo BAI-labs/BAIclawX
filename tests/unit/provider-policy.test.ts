@@ -10,10 +10,10 @@ import { PROVIDER_TYPE_INFO, type ProviderAccount } from '@/lib/providers';
 function buildAccount(overrides: Partial<ProviderAccount>): ProviderAccount {
   return {
     id: 'account-1',
-    vendorId: 'bankofai',
-    label: 'BANK OF AI',
+    vendorId: 'bai',
+    label: 'BAI',
     authMode: 'api_key',
-    baseUrl: 'https://api.bankofai.io/v1',
+    baseUrl: 'https://api.bai.io/v1',
     model: 'gpt-5.2',
     enabled: true,
     isDefault: false,
@@ -24,21 +24,21 @@ function buildAccount(overrides: Partial<ProviderAccount>): ProviderAccount {
 }
 
 describe('provider policy', () => {
-  it('limits visible providers to BANK OF AI', () => {
-    expect(VISIBLE_PROVIDER_TYPES).toEqual(['bankofai']);
-    expect(filterVisibleProviderTypeInfo(PROVIDER_TYPE_INFO).map((provider) => provider.id)).toEqual(['bankofai']);
+  it('limits visible providers to BAI', () => {
+    expect(VISIBLE_PROVIDER_TYPES).toEqual(['bai']);
+    expect(filterVisibleProviderTypeInfo(PROVIDER_TYPE_INFO).map((provider) => provider.id)).toEqual(['bai']);
   });
 
   it('filters hidden provider accounts from product UI', () => {
     expect(filterVisibleProviderAccounts([
-      buildAccount({ id: 'bankofai-1', vendorId: 'bankofai' }),
+      buildAccount({ id: 'bai-1', vendorId: 'bai' }),
       buildAccount({ id: 'openai-1', vendorId: 'openai' }),
-    ]).map((account) => account.id)).toEqual(['bankofai-1']);
+    ]).map((account) => account.id)).toEqual(['bai-1']);
   });
 
-  it('blocks chat when default provider is not BANK OF AI', () => {
+  it('blocks chat when default provider is not BAI', () => {
     const accounts = [
-      buildAccount({ id: 'bankofai-1', vendorId: 'bankofai' }),
+      buildAccount({ id: 'bai-1', vendorId: 'bai' }),
       buildAccount({ id: 'openai-1', vendorId: 'openai' }),
     ];
 
@@ -46,7 +46,7 @@ describe('provider policy', () => {
       blocked: true,
       reason: 'default_not_allowed',
     });
-    expect(getChatProviderGate(accounts, 'bankofai-1')).toEqual({
+    expect(getChatProviderGate(accounts, 'bai-1')).toEqual({
       blocked: false,
       reason: null,
     });

@@ -19,7 +19,7 @@ import { useChatStore } from '@/stores/chat';
 import { useProviderStore } from '@/stores/providers';
 import type { AgentSummary } from '@/types/agent';
 import { useTranslation } from 'react-i18next';
-import { fetchBankOfAiModels, pickPreferredBankOfAiModelId, type BankOfAiModelOption } from '@/lib/bankofai-models';
+import { fetchBaiModels, pickPreferredBaiModelId, type BaiModelOption } from '@/lib/bai-models';
 import { getProviderTypeInfo } from '@/lib/providers';
 
 // ── Types ────────────────────────────────────────────────────────
@@ -94,10 +94,10 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
   const [targetAgentId, setTargetAgentId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
-  const [modelOptions, setModelOptions] = useState<BankOfAiModelOption[]>([]);
+  const [modelOptions, setModelOptions] = useState<BaiModelOption[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
-  const [bankOfAiApiKey, setBankOfAiApiKey] = useState<string | null>(null);
+  const [bankOfAiApiKey, setBaiApiKey] = useState<string | null>(null);
   const [switchingModelId, setSwitchingModelId] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -123,23 +123,23 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     [agents, targetAgentId],
   );
   const showAgentPicker = mentionableAgents.length > 0;
-  const bankOfAiProviderInfo = useMemo(() => getProviderTypeInfo('bankofai'), []);
-  const activeBankOfAiAccount = useMemo(() => {
+  const bankOfAiProviderInfo = useMemo(() => getProviderTypeInfo('bai'), []);
+  const activeBaiAccount = useMemo(() => {
     const defaultAccount = providerAccounts.find((account) => account.id === defaultAccountId) ?? null;
-    if (defaultAccount?.vendorId === 'bankofai') {
+    if (defaultAccount?.vendorId === 'bai') {
       return defaultAccount;
     }
 
-    return providerAccounts.find((account) => account.vendorId === 'bankofai' && account.isDefault) ?? null;
+    return providerAccounts.find((account) => account.vendorId === 'bai' && account.isDefault) ?? null;
   }, [providerAccounts, defaultAccountId]);
-  const activeBankOfAiBaseUrl = activeBankOfAiAccount?.baseUrl?.trim()
+  const activeBaiBaseUrl = activeBaiAccount?.baseUrl?.trim()
     || bankOfAiProviderInfo?.defaultBaseUrl
     || 'https://api.b.ai/v1';
-  const selectedModelId = activeBankOfAiAccount?.model?.trim()
+  const selectedModelId = activeBaiAccount?.model?.trim()
     || bankOfAiProviderInfo?.defaultModelId
     || 'gpt-5.2';
   const selectedModelLabel = modelOptions.find((model) => model.id === selectedModelId)?.displayName || selectedModelId;
-  const canPickModel = Boolean(activeBankOfAiAccount) && !disabled;
+  const canPickModel = Boolean(activeBaiAccount) && !disabled;
 
   // Auto-resize textarea
   useEffect(() => {
@@ -186,8 +186,8 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
   }, [pickerOpen, modelPickerOpen]);
 
   useEffect(() => {
-    if (!activeBankOfAiAccount) {
-      setBankOfAiApiKey(null);
+    if (!activeBaiAccount) {
+      setBaiApiKey(null);
       setModelOptions([]);
       setModelsError(null);
       setModelPickerOpen(false);
@@ -195,19 +195,19 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     }
 
     let cancelled = false;
-    void getAccountApiKey(activeBankOfAiAccount.id).then((apiKey) => {
+    void getAccountApiKey(activeBaiAccount.id).then((apiKey) => {
       if (!cancelled) {
-        setBankOfAiApiKey(apiKey);
+        setBaiApiKey(apiKey);
       }
     });
 
     return () => {
       cancelled = true;
     };
-  }, [activeBankOfAiAccount, getAccountApiKey]);
+  }, [activeBaiAccount, getAccountApiKey]);
 
-  const loadBankOfAiModels = useCallback(async () => {
-    if (!activeBankOfAiAccount || !bankOfAiApiKey?.trim() || !activeBankOfAiBaseUrl.trim()) {
+  const loadBaiModels = useCallback(async () => {
+    if (!activeBaiAccount || !bankOfAiApiKey?.trim() || !activeBaiBaseUrl.trim()) {
       setModelOptions([]);
       setModelsError(t('composer.modelPickerMissingConfig'));
       return;
@@ -217,15 +217,15 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     setModelsError(null);
 
     try {
-      const models = await fetchBankOfAiModels({
+      const models = await fetchBaiModels({
         apiKey: bankOfAiApiKey,
-        baseUrl: activeBankOfAiBaseUrl,
+        baseUrl: activeBaiBaseUrl,
       });
 
       setModelOptions(models);
-      const preferredModelId = pickPreferredBankOfAiModelId(models);
+      const preferredModelId = pickPreferredBaiModelId(models);
       if (preferredModelId && !models.some((model) => model.id === selectedModelId)) {
-        await updateAccount(activeBankOfAiAccount.id, {
+        await updateAccount(activeBaiAccount.id, {
           model: preferredModelId,
         });
       }
@@ -237,38 +237,38 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
     } finally {
       setModelsLoading(false);
     }
-  }, [activeBankOfAiAccount, bankOfAiApiKey, activeBankOfAiBaseUrl, selectedModelId, t, updateAccount]);
+  }, [activeBaiAccount, bankOfAiApiKey, activeBaiBaseUrl, selectedModelId, t, updateAccount]);
 
   useEffect(() => {
-    if (!activeBankOfAiAccount || !bankOfAiApiKey?.trim() || !activeBankOfAiBaseUrl.trim()) {
+    if (!activeBaiAccount || !bankOfAiApiKey?.trim() || !activeBaiBaseUrl.trim()) {
       return;
     }
 
-    void loadBankOfAiModels();
-  }, [activeBankOfAiAccount, bankOfAiApiKey, activeBankOfAiBaseUrl, loadBankOfAiModels]);
+    void loadBaiModels();
+  }, [activeBaiAccount, bankOfAiApiKey, activeBaiBaseUrl, loadBaiModels]);
 
   useEffect(() => {
-    if (modelPickerOpen && activeBankOfAiAccount && !modelsLoading && modelOptions.length === 0 && !modelsError) {
-      void loadBankOfAiModels();
+    if (modelPickerOpen && activeBaiAccount && !modelsLoading && modelOptions.length === 0 && !modelsError) {
+      void loadBaiModels();
     }
-  }, [activeBankOfAiAccount, loadBankOfAiModels, modelOptions.length, modelPickerOpen, modelsError, modelsLoading]);
+  }, [activeBaiAccount, loadBaiModels, modelOptions.length, modelPickerOpen, modelsError, modelsLoading]);
 
   const handleModelSelect = useCallback(async (modelId: string) => {
-    if (!activeBankOfAiAccount || modelId === selectedModelId) {
+    if (!activeBaiAccount || modelId === selectedModelId) {
       setModelPickerOpen(false);
       return;
     }
 
     setSwitchingModelId(modelId);
     try {
-      await updateAccount(activeBankOfAiAccount.id, {
+      await updateAccount(activeBaiAccount.id, {
         model: modelId,
       });
       setModelPickerOpen(false);
     } finally {
       setSwitchingModelId(null);
     }
-  }, [activeBankOfAiAccount, selectedModelId, updateAccount]);
+  }, [activeBaiAccount, selectedModelId, updateAccount]);
 
   // ── File staging via native dialog ─────────────────────────────
 
@@ -633,7 +633,7 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
                       variant="ghost"
                       size="sm"
                       className="h-8 rounded-full px-2 text-muted-foreground"
-                      onClick={() => void loadBankOfAiModels()}
+                      onClick={() => void loadBaiModels()}
                       disabled={modelsLoading || switchingModelId !== null}
                       title={t('composer.refreshModels')}
                     >

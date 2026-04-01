@@ -106,7 +106,7 @@ import {
   shouldInvertInDark,
   shouldShowProviderModelId,
 } from '@/lib/providers';
-import { fetchBankOfAiModels, pickPreferredBankOfAiModelId, resolvePreferredBankOfAiModelId, type BankOfAiModelOption } from '@/lib/bankofai-models';
+import { fetchBaiModels, pickPreferredBaiModelId, resolvePreferredBaiModelId, type BaiModelOption } from '@/lib/bai-models';
 import { filterVisibleProviderTypeInfo } from '@/lib/provider-policy';
 import {
   buildProviderAccountId,
@@ -727,7 +727,7 @@ function ProviderContent({
   const [baseUrl, setBaseUrl] = useState('');
   const [modelId, setModelId] = useState('');
   const [apiProtocol, setApiProtocol] = useState<ProviderAccount['apiProtocol']>('openai-completions');
-  const [modelOptions, setModelOptions] = useState<BankOfAiModelOption[]>([]);
+  const [modelOptions, setModelOptions] = useState<BaiModelOption[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [modelsError, setModelsError] = useState<string | null>(null);
   const [providerMenuOpen, setProviderMenuOpen] = useState(false);
@@ -995,7 +995,7 @@ function ProviderContent({
   }, [providerMenuOpen]);
 
   useEffect(() => {
-    if (selectedProvider !== 'bankofai') {
+    if (selectedProvider !== 'bai') {
       setModelOptions([]);
       setModelsError(null);
       setModelsLoading(false);
@@ -1006,24 +1006,24 @@ function ProviderContent({
     setModelsLoading(false);
   }, [selectedProvider]);
 
-  const handleRefreshBankOfAiModels = async () => {
+  const handleRefreshBaiModels = async () => {
     const trimmedApiKey = apiKey.trim();
     const trimmedBaseUrl = baseUrl.trim();
     if (!trimmedApiKey || !trimmedBaseUrl) {
-      setModelsError(t('provider.bankofaiModelsMissingConfig'));
+      setModelsError(t('provider.baiModelsMissingConfig'));
       return;
     }
 
     setModelsLoading(true);
     setModelsError(null);
     try {
-      const models = await fetchBankOfAiModels({
+      const models = await fetchBaiModels({
         apiKey: trimmedApiKey,
         baseUrl: trimmedBaseUrl,
       });
       setModelOptions(models);
       if (!modelId.trim() || !models.some((model) => model.id === modelId.trim())) {
-        setModelId(pickPreferredBankOfAiModelId(models) || '');
+        setModelId(pickPreferredBaiModelId(models) || '');
       }
     } catch (error) {
       setModelOptions([]);
@@ -1050,8 +1050,8 @@ function ProviderContent({
   const isOAuth = selectedProviderData?.isOAuth ?? false;
   const supportsApiKey = selectedProviderData?.supportsApiKey ?? false;
   const useOAuthFlow = isOAuth && (!supportsApiKey || authMode === 'oauth');
-  const canDiscoverBankOfAiModels = selectedProvider === 'bankofai' && !!apiKey.trim() && !!baseUrl.trim();
-  const usesBankOfAiModelSelect = selectedProvider === 'bankofai' && modelOptions.length > 0;
+  const canDiscoverBaiModels = selectedProvider === 'bai' && !!apiKey.trim() && !!baseUrl.trim();
+  const usesBaiModelSelect = selectedProvider === 'bai' && modelOptions.length > 0;
 
   const handleValidateAndSave = async () => {
     if (!selectedProvider) return;
@@ -1101,8 +1101,8 @@ function ProviderContent({
         setKeyValid(true);
       }
 
-      const effectiveModelId = selectedProvider === 'bankofai'
-        ? await resolvePreferredBankOfAiModelId({
+      const effectiveModelId = selectedProvider === 'bai'
+        ? await resolvePreferredBaiModelId({
             apiKey: apiKey.trim(),
             baseUrl: baseUrl.trim() || selectedProviderData?.defaultBaseUrl || '',
             fallbackModelId: selectedProviderData?.defaultModelId,
@@ -1340,13 +1340,13 @@ function ProviderContent({
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="modelId">{t('provider.modelId')}</Label>
-                {selectedProvider === 'bankofai' && (
+                {selectedProvider === 'bai' && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => { void handleRefreshBankOfAiModels(); }}
-                    disabled={modelsLoading || !canDiscoverBankOfAiModels}
+                    onClick={() => { void handleRefreshBaiModels(); }}
+                    disabled={modelsLoading || !canDiscoverBaiModels}
                     className="h-7 rounded-full px-3 text-[12px]"
                   >
                     <RefreshCw className={cn('mr-1.5 h-3.5 w-3.5', modelsLoading && 'animate-spin')} />
@@ -1354,7 +1354,7 @@ function ProviderContent({
                   </Button>
                 )}
               </div>
-              {usesBankOfAiModelSelect ? (
+              {usesBaiModelSelect ? (
                 <Select
                   id="modelId"
                   value={modelId}
@@ -1385,10 +1385,10 @@ function ProviderContent({
                 />
               )}
               <p className="text-xs text-muted-foreground">
-                {selectedProvider === 'bankofai'
+                {selectedProvider === 'bai'
                   ? (modelsError
-                    ? t('provider.bankofaiModelsFailed', { error: modelsError })
-                    : (modelsLoading ? t('provider.bankofaiModelsLoading') : t('provider.bankofaiModelsHint')))
+                    ? t('provider.baiModelsFailed', { error: modelsError })
+                    : (modelsLoading ? t('provider.baiModelsLoading') : t('provider.baiModelsHint')))
                   : t('provider.modelIdDesc')}
               </p>
             </div>

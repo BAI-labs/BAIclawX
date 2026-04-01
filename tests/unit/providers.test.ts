@@ -15,14 +15,14 @@ import {
 } from '@electron/utils/provider-registry';
 
 describe('provider metadata', () => {
-  it('includes bankofai in the frontend provider registry and keeps it first', () => {
-    expect(PROVIDER_TYPES[0]).toBe('bankofai');
+  it('includes bai in the frontend provider registry and keeps it first', () => {
+    expect(PROVIDER_TYPES[0]).toBe('bai');
 
     expect(PROVIDER_TYPE_INFO).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          id: 'bankofai',
-          name: 'BANK OF AI',
+          id: 'bai',
+          name: 'BAI',
           requiresApiKey: true,
           showBaseUrl: true,
           showModelId: true,
@@ -34,13 +34,13 @@ describe('provider metadata', () => {
     );
   });
 
-  it('includes bankofai in the backend provider registry', () => {
-    expect(BUILTIN_PROVIDER_TYPES).toContain('bankofai');
-    expect(getProviderEnvVar('bankofai')).toBe('BANKOFAI_API_KEY');
-    expect(getProviderConfig('bankofai')).toEqual({
-      baseUrl: 'https://api.bankofai.io/v1',
+  it('includes bai in the backend provider registry', () => {
+    expect(BUILTIN_PROVIDER_TYPES).toContain('bai');
+    expect(getProviderEnvVar('bai')).toBe('BAI_API_KEY');
+    expect(getProviderConfig('bai')).toEqual({
+      baseUrl: 'https://api.bai.io/v1',
       api: 'openai-completions',
-      apiKeyEnv: 'BANKOFAI_API_KEY',
+      apiKeyEnv: 'BAI_API_KEY',
     });
   });
 
@@ -84,7 +84,7 @@ describe('provider metadata', () => {
 
   it('keeps builtin provider sources in sync', () => {
     expect(BUILTIN_PROVIDER_TYPES).toEqual(
-      expect.arrayContaining(['bankofai', 'anthropic', 'openai', 'google', 'openrouter', 'ark', 'moonshot', 'siliconflow', 'minimax-portal', 'minimax-portal-cn', 'qwen-portal', 'ollama'])
+      expect.arrayContaining(['bai', 'anthropic', 'openai', 'google', 'openrouter', 'ark', 'moonshot', 'siliconflow', 'minimax-portal', 'minimax-portal-cn', 'qwen-portal', 'ollama'])
     );
   });
 
@@ -103,7 +103,7 @@ describe('provider metadata', () => {
   });
 
   it('exposes provider documentation links', () => {
-    const bankofai = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'bankofai');
+    const bai = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'bai');
     const anthropic = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'anthropic');
     const openrouter = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'openrouter');
     const moonshot = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'moonshot');
@@ -111,13 +111,13 @@ describe('provider metadata', () => {
     const ark = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'ark');
     const custom = PROVIDER_TYPE_INFO.find((provider) => provider.id === 'custom');
 
-    expect(bankofai).toMatchObject({
+    expect(bai).toMatchObject({
       docsUrl: 'https://b.ai',
     });
     expect(anthropic).toMatchObject({
       docsUrl: 'https://platform.claude.com/docs/en/api/overview',
     });
-    expect(getProviderDocsUrl(bankofai, 'en')).toBe('https://b.ai');
+    expect(getProviderDocsUrl(bai, 'en')).toBe('https://b.ai');
     expect(getProviderDocsUrl(anthropic, 'en')).toBe('https://platform.claude.com/docs/en/api/overview');
     expect(getProviderDocsUrl(openrouter, 'en')).toBe('https://openrouter.ai/models');
     expect(getProviderDocsUrl(moonshot, 'en')).toBe('https://platform.moonshot.cn/');
