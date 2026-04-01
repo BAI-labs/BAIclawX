@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
+const RECHARGE_SKILL_KEY = "recharge-skill";
+
 function loadJson(filePath) {
   try {
     if (!fs.existsSync(filePath)) {
@@ -33,14 +35,31 @@ function readConfig() {
   return { path: "", data: {} };
 }
 
+function readOpenClawSkillEnv() {
+  const filePath = path.join(os.homedir(), ".openclaw", "openclaw.json");
+  const data = loadJson(filePath);
+  const env = data && data.skills && data.skills.entries
+    ? data.skills.entries[RECHARGE_SKILL_KEY] && data.skills.entries[RECHARGE_SKILL_KEY].env
+    : null;
+
+  if (env && typeof env === "object") {
+    return { path: filePath, data: env };
+  }
+
+  return { path: "", data: {} };
+}
+
 function getConfig(overrides = {}) {
   const loaded = readConfig();
+  const skillEnv = readOpenClawSkillEnv();
   const data = loaded.data || {};
+  const skillData = skillEnv.data || {};
+  const configPath = loaded.path || skillEnv.path || "";
   return {
-    configPath: loaded.path,
-    apiKey: overrides.apiKey || process.env.BANKOFAI_API_KEY || data.api_key || "",
-    baseUrl: (overrides.baseUrl || process.env.BANKOFAI_BASE_URL || data.base_url || "https://chat.ainft.com").replace(/\/+$/, ""),
-    timeoutMs: Number(overrides.timeoutMs || process.env.BANKOFAI_TIMEOUT_MS || data.timeout_ms || 15000),
+    configPath,
+    apiKey: overrides.apiKey || process.env.BANKOFAI_API_KEY || data.api_key || skillData.BANKOFAI_API_KEY || "",
+    baseUrl: (overrides.baseUrl || process.env.BANKOFAI_BASE_URL || data.base_url || skillData.BANKOFAI_BASE_URL || "https://chat.ainft.com").replace(/\/+$/, ""),
+    timeoutMs: Number(overrides.timeoutMs || process.env.BANKOFAI_TIMEOUT_MS || data.timeout_ms || skillData.BANKOFAI_TIMEOUT_MS || 15000),
   };
 }
 

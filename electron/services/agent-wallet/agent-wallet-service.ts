@@ -15,6 +15,7 @@ import {
 import { verifyBankOfAiApiKeyByWalletAddress } from './bankofai-tron-verify';
 import { getApiKey } from '../../utils/secure-storage';
 import { logger } from '../../utils/logger';
+import { getAgentWalletBaiclawPassword } from '../secrets/app-secret-store';
 
 const KV_PWD_FILE = 'kv-password.bin';
 const KV_PWD_PLAIN_FILE = 'kv-password.plain.txt';
@@ -410,12 +411,34 @@ export type AgentWalletListResult = {
   wallets: AgentWalletListItem[];
   /** True when wallets_config exists but this app has no stored master password (CLI vault). */
   vaultUnlockRequired: boolean;
+  /** True when baiclaw has a saved master password, but it no longer unlocks the current vault. */
+  savedPasswordMismatch: boolean;
   /**
    * `wallets` in wallets_config.json is empty while master exists — CLI `list` shows none;
    * usually missing `secret_<id>.json` (import never completed). Re-run the wizard with the same master password.
    */
   vaultTopologyIncomplete: boolean;
 };
+
+async function hasSavedPasswordMismatch(): Promise<boolean> {
+  const savedPassword = await getAgentWalletBaiclawPassword();
+  if (!savedPassword) {
+    return false;
+  }
+
+  try {
+    await fs.access(masterJsonPath());
+  } catch {
+    return false;
+  }
+
+  try {
+    new SecureKVStore(getWalletRoot(), savedPassword).verifyPassword();
+    return false;
+  } catch {
+    return true;
+  }
+}
 
 async function resolveWalletAddress(
   provider: ConfigWalletProvider,
@@ -438,13 +461,15 @@ async function resolveWalletAddress(
 }
 
 export async function listAgentWallets(): Promise<AgentWalletListResult> {
+  const root = getWalletRoot();
+  let hasWalletsConfig = false;
   try {
     await fs.access(walletsConfigPath());
+    hasWalletsConfig = true;
   } catch {
-    return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
+    hasWalletsConfig = false;
   }
 
-  const root = getWalletRoot();
   let hasPwdFile = false;
   try {
     await fs.access(path.join(root, KV_PWD_FILE));
@@ -453,20 +478,21 @@ export async function listAgentWallets(): Promise<AgentWalletListResult> {
     hasPwdFile = false;
   }
 
-  const hasTopology = await hasAgentWalletTopologyOnDisk();
-  // console.log('111111111', root, hasPwdFile, hasTopology)
-  if (!(hasTopology && hasPwdFile)) {
-    try {
-      await fs.rm(root, { recursive: true, force: true });
-      clearAgentWalletBaiclawRuntimePassword();
-    } catch (err) {
-      console.error('[agent-wallet] Failed to remove wallet directory:', err);
-      throw err;
-    }
-    return { wallets: [], vaultUnlockRequired: false, vaultTopologyIncomplete: false };
+  let hasMasterFile = false;
+  try {
+    await fs.access(masterJsonPath());
+    hasMasterFile = true;
+  } catch {
+    hasMasterFile = false;
   }
 
-  const topologyIncomplete = await getVaultTopologyIncomplete();
+  if (!hasWalletsConfig && !hasMasterFile && !hasPwdFile) {
+    return { wallets: [], vaultUnlockRequired: false, savedPasswordMismatch: false, vaultTopologyIncomplete: false };
+  }
+
+  const hasTopology = await hasAgentWalletTopologyOnDisk();
+  const topologyIncomplete = !hasTopology || !hasWalletsConfig || !hasMasterFile || (await getVaultTopologyIncomplete());
+  const savedPasswordMismatch = await hasSavedPasswordMismatch();
 
   let password: string;
   try {
@@ -475,7 +501,8 @@ export async function listAgentWallets(): Promise<AgentWalletListResult> {
     if (e instanceof Error && e.message === VAULT_PASSWORD_REQUIRED) {
       return {
         wallets: [],
-        vaultUnlockRequired: true,
+        vaultUnlockRequired: hasTopology,
+        savedPasswordMismatch,
         vaultTopologyIncomplete: topologyIncomplete,
       };
     }
@@ -490,7 +517,6 @@ export async function listAgentWallets(): Promise<AgentWalletListResult> {
 
   for (const [id, , isActive] of rows) {
     const resolved = await resolveWalletAddress(provider, id);
-    console.log(id, resolved)
     if (!resolved) continue;
     if (id !== WALLET_ID) continue;
     out.push({
@@ -505,6 +531,7 @@ export async function listAgentWallets(): Promise<AgentWalletListResult> {
   return {
     wallets: out,
     vaultUnlockRequired: false,
+    savedPasswordMismatch,
     vaultTopologyIncomplete: topologyIncomplete && out.length === 0,
   };
 }

@@ -40,6 +40,7 @@ export function Web3Settings() {
 
   const [wallets, setWallets] = useState<AgentWalletRow[]>([]);
   const [vaultUnlockRequired, setVaultUnlockRequired] = useState(false);
+  const [savedPasswordMismatch, setSavedPasswordMismatch] = useState(false);
   const [vaultTopologyIncomplete, setVaultTopologyIncomplete] = useState(false);
   const [walletsLoading, setWalletsLoading] = useState(true);
   const [providersReady, setProvidersReady] = useState(false);
@@ -84,12 +85,14 @@ export function Web3Settings() {
         success: boolean;
         wallets?: AgentWalletRow[];
         vaultUnlockRequired?: boolean;
+        savedPasswordMismatch?: boolean;
         vaultTopologyIncomplete?: boolean;
         storagePath?: string;
       }>('/api/agent-wallets');
       if (gen !== walletListFetchGen.current) return;
       setWallets(data.wallets ?? []);
       setVaultUnlockRequired(Boolean(data.vaultUnlockRequired));
+      setSavedPasswordMismatch(Boolean(data.savedPasswordMismatch));
       setVaultTopologyIncomplete(Boolean(data.vaultTopologyIncomplete));
       setWalletStoragePath(typeof data.storagePath === 'string' ? data.storagePath : null);
     } catch (error) {
@@ -97,6 +100,7 @@ export function Web3Settings() {
       toast.error(`${t('web3.loadFailed')}: ${toUserMessage(error)}`);
       setWallets([]);
       setVaultUnlockRequired(false);
+      setSavedPasswordMismatch(false);
       setVaultTopologyIncomplete(false);
       setWalletStoragePath(null);
     } finally {
@@ -205,6 +209,10 @@ export function Web3Settings() {
             <p className="mt-1 text-[13px] text-muted-foreground leading-snug">
               {t('web3.vaultUnlockSubtitle')}
             </p>
+          ) : savedPasswordMismatch ? (
+            <p className="mt-1 text-[13px] text-muted-foreground leading-snug">
+              {t('web3.savedPasswordMismatchSubtitle')}
+            </p>
           ) : !displayWallet ? (
             <p className="mt-1 text-[13px] text-muted-foreground">{t('web3.notCreatedSubtitle')}</p>
           ) : (
@@ -226,12 +234,12 @@ export function Web3Settings() {
         </div>
 
         <div className="shrink-0 flex flex-col items-stretch sm:items-end gap-2 sm:pl-2">
-          {vaultUnlockRequired && !loading ? (
+          {(vaultUnlockRequired || savedPasswordMismatch) && !loading ? (
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[220px]">
               <Input
                 type="password"
                 autoComplete="current-password"
-                placeholder={t('web3.vaultUnlockPasswordPlaceholder')}
+                placeholder={t(savedPasswordMismatch ? 'web3.savedPasswordMismatchPasswordPlaceholder' : 'web3.vaultUnlockPasswordPlaceholder')}
                 value={unlockPassword}
                 onChange={(e) => setUnlockPassword(e.target.value)}
                 onKeyDown={(e) => {
@@ -255,7 +263,7 @@ export function Web3Settings() {
                 ) : (
                   <Shield className="h-4 w-4 text-white" strokeWidth={2} />
                 )}
-                {t('web3.vaultUnlockSubmit')}
+                {t(savedPasswordMismatch ? 'web3.savedPasswordMismatchSubmit' : 'web3.vaultUnlockSubmit')}
               </Button>
             </div>
           ) : null}
@@ -299,6 +307,12 @@ export function Web3Settings() {
       {vaultTopologyIncomplete && !walletsLoading && !displayWallet ? (
         <p className="mt-2 text-left text-[13px] text-amber-800 dark:text-amber-400 leading-snug rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3">
           {t('web3.vaultTopologyIncompleteBanner')}
+        </p>
+      ) : null}
+
+      {savedPasswordMismatch && !walletsLoading ? (
+        <p className="mt-2 text-left text-[13px] text-amber-800 dark:text-amber-400 leading-snug rounded-xl border border-amber-500/35 bg-amber-500/10 px-4 py-3">
+          {t('web3.savedPasswordMismatchBanner')}
         </p>
       ) : null}
 

@@ -39,11 +39,12 @@ export async function handleAgentWalletRoutes(
 
   if (url.pathname === '/api/agent-wallets' && req.method === 'GET') {
     try {
-      const { wallets, vaultUnlockRequired, vaultTopologyIncomplete } = await listAgentWallets();
+      const { wallets, vaultUnlockRequired, savedPasswordMismatch, vaultTopologyIncomplete } = await listAgentWallets();
       sendJson(res, 200, {
         success: true,
         wallets,
         vaultUnlockRequired,
+        savedPasswordMismatch,
         vaultTopologyIncomplete,
         storagePath: getAgentWalletStoragePath(),
       });
@@ -138,6 +139,13 @@ export async function handleAgentWalletRoutes(
         masterPassword,
         bankOfAiAccountId,
       });
+      await setAgentWalletBaiclawPassword(masterPassword);
+      setAgentWalletBaiclawRuntimePassword(masterPassword);
+      try {
+        await syncGatewayConfigAndRestart(ctx);
+      } catch (err) {
+        logger.warn('Gateway restart after wallet creation failed:', err);
+      }
       sendJson(res, 200, {
         success: true,
         wallet,

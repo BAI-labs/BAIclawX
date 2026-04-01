@@ -58,6 +58,7 @@ Resolution order:
 3. `bankofai-config.json`
 4. `~/.bankofai/config.json`
 5. `~/.mcporter/bankofai-config.json`
+6. `~/.openclaw/openclaw.json` → `skills.entries["recharge-skill"].env`
 
 See `bankofai-config.example.json` for an example.
 
@@ -75,6 +76,8 @@ Recommended production value:
 
 - Always run the scripts from this skill directory, not from the current workspace.
 - Prefer absolute paths so the agent does not accidentally execute a same-named stub under `~/.openclaw/workspace/scripts/`.
+- `node ~/.openclaw/skills/recharge-skill/scripts/recharge.js --amount 1 --token USDT --format json`
+  - Calls the remote MCP recharge endpoint with x402 payment using the local Agent Wallet
 - `node ~/.openclaw/skills/recharge-skill/scripts/check_balance.js --format json`
   - Query the user's point balance with `api_key`
 - `node ~/.openclaw/skills/recharge-skill/scripts/check_orders.js --format json`

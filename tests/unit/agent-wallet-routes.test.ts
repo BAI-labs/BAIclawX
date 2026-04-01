@@ -154,4 +154,78 @@ describe('handleAgentWalletRoutes', () => {
     expect(restart).toHaveBeenCalledTimes(1);
     expect(sendJsonMock).toHaveBeenCalledWith(expect.anything(), 200, { success: true });
   });
+
+  it('returns savedPasswordMismatch in the wallet list payload', async () => {
+    listAgentWalletsMock.mockResolvedValueOnce({
+      wallets: [],
+      vaultUnlockRequired: false,
+      savedPasswordMismatch: true,
+      vaultTopologyIncomplete: false,
+    });
+    getAgentWalletStoragePathMock.mockReturnValueOnce('/tmp/agent-wallet-baiclaw');
+
+    const { handleAgentWalletRoutes } = await import('@electron/api/routes/agent-wallet');
+    const handled = await handleAgentWalletRoutes(
+      { method: 'GET' } as IncomingMessage,
+      {} as ServerResponse,
+      new URL('http://127.0.0.1:3210/api/agent-wallets'),
+      {} as never,
+    );
+
+    expect(handled).toBe(true);
+    expect(sendJsonMock).toHaveBeenCalledWith(expect.anything(), 200, {
+      success: true,
+      wallets: [],
+      vaultUnlockRequired: false,
+      savedPasswordMismatch: true,
+      vaultTopologyIncomplete: false,
+      storagePath: '/tmp/agent-wallet-baiclaw',
+    });
+  });
+
+  it('persists the new master password after wallet creation and restarts the gateway', async () => {
+    parseJsonBodyMock.mockResolvedValueOnce({
+      privateKey: 'abcd',
+      masterPassword: 'New-password-123!',
+      bankOfAiAccountId: 'bankofai-1',
+    });
+    createAgentWalletFromTronImportMock.mockResolvedValueOnce({
+      id: 'baiclaw_wallet',
+      address: 'T123',
+      network: 'tron',
+      isActive: true,
+    });
+    getAgentWalletStoragePathMock.mockReturnValueOnce('/tmp/agent-wallet-baiclaw');
+
+    const restart = vi.fn().mockResolvedValue(undefined);
+    const ctx = {
+      gatewayManager: {
+        restart,
+      },
+    } as never;
+
+    const { handleAgentWalletRoutes } = await import('@electron/api/routes/agent-wallet');
+    const handled = await handleAgentWalletRoutes(
+      { method: 'POST' } as IncomingMessage,
+      {} as ServerResponse,
+      new URL('http://127.0.0.1:3210/api/agent-wallets'),
+      ctx,
+    );
+
+    expect(handled).toBe(true);
+    expect(setAgentWalletBaiclawPasswordMock).toHaveBeenCalledWith('New-password-123!');
+    expect(setAgentWalletBaiclawRuntimePasswordMock).toHaveBeenCalledWith('New-password-123!');
+    expect(syncGatewayConfigBeforeLaunchMock).toHaveBeenCalledWith({});
+    expect(restart).toHaveBeenCalledTimes(1);
+    expect(sendJsonMock).toHaveBeenCalledWith(expect.anything(), 200, {
+      success: true,
+      wallet: {
+        id: 'baiclaw_wallet',
+        address: 'T123',
+        network: 'tron',
+        isActive: true,
+      },
+      storagePath: '/tmp/agent-wallet-baiclaw',
+    });
+  });
 });
