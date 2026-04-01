@@ -75,7 +75,7 @@
     {
       "slug": "recharge-skill",
       "localPath": "resources/skills/local/recharge-skill",
-      "version": "local-dev-abs-paths",
+      "version": "local-dev-abs-paths-v2",
       "autoEnable": true
     },
     {
