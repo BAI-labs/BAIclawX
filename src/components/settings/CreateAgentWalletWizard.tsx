@@ -68,9 +68,9 @@ export function CreateAgentWalletWizard({
   const [passwordMismatchError, setPasswordMismatchError] = useState(false);
 
   const handleBack = useCallback(() => {
-    if (step === 2 || step === 1) {
-      setPrivateKey('');
-    }
+    // if (step === 2 || step === 1) {
+    //   setPrivateKey('');
+    // }
     setStep((s) => (s - 1) as Step);
   }, [step]);
 
@@ -95,12 +95,14 @@ export function CreateAgentWalletWizard({
   if (!open) return null;
 
   const handleNextFromStep0 = async () => {
-    resetTransientErrors();
+    // resetTransientErrors();
+    setPrivateKey('');
+    setMasterPassword('');
     setStep(1);
   }
 
   const handleNextFromStep1 = async () => {
-    resetTransientErrors();
+    // resetTransientErrors();
     setValidatingKey(true);
     try {
       const apiKey = (await getAccountApiKey(bankOfAiAccountId))?.trim() ?? '';
@@ -126,6 +128,9 @@ export function CreateAgentWalletWizard({
         else setKeyErrorFormat(true);
         return;
       }
+      
+      setMasterPassword('');
+      setConfirmPassword('');
       setStep(2);
     } catch (error) {
       toast.error(toUserMessage(error));
