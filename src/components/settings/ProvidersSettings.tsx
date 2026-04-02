@@ -52,6 +52,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { invokeIpc } from '@/lib/api-client';
+import { onExternalLinkClick } from '@/lib/external-links';
 import { useSettingsStore } from '@/stores/settings';
 import { hostApiFetch } from '@/lib/host-api';
 import { subscribeHostEvent } from '@/lib/host-events';
@@ -333,8 +334,8 @@ export function ProvidersSettings() {
           {` `}
           <a
             href={'https://chat.b.ai/usage'}
-            target="_blank"
             rel="noopener noreferrer"
+            onClick={onExternalLinkClick('https://chat.b.ai/usage')}
             className="text-[13px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
           >
             https://chat.b.ai/usage
@@ -731,8 +732,8 @@ function ProviderCard({
             <div className="flex justify-end -mt-2 mb-2">
               <a
                 href={providerDocsUrl}
-                target="_blank"
                 rel="noopener noreferrer"
+                onClick={onExternalLinkClick(providerDocsUrl)}
                 className="text-[12px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
               >
                 {t('aiProviders.dialog.customDoc2')}
@@ -904,8 +905,8 @@ function ProviderCard({
               <div className="flex justify-start">
                 <a
                   href={typeInfo.apiKeyUrl}
-                  target="_blank"
                   rel="noopener noreferrer"
+                  onClick={onExternalLinkClick(typeInfo.apiKeyUrl)}
                   className="text-[13px] text-blue-500 hover:text-blue-600 hover:underline flex items-center gap-1"
                   tabIndex={-1}
                 >
@@ -1442,8 +1443,8 @@ function AddProviderDialog({
                       <span className="mx-2 text-foreground/20">|</span>
                       <a
                         href={providerDocsUrl}
-                        target="_blank"
                         rel="noopener noreferrer"
+                        onClick={onExternalLinkClick(providerDocsUrl)}
                         className="text-[13px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
                       >
                         {t('aiProviders.dialog.customDoc2')}
@@ -1500,8 +1501,8 @@ function AddProviderDialog({
                       {typeInfo?.apiKeyUrl && (
                         <a
                           href={typeInfo.apiKeyUrl}
-                          target="_blank"
                           rel="noopener noreferrer"
+                          onClick={onExternalLinkClick(typeInfo.apiKeyUrl)}
                           className="text-[13px] text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1"
                           tabIndex={-1}
                         >
