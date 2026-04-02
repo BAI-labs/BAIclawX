@@ -22,8 +22,11 @@ function loadManifest() {
     throw new Error('Invalid preinstalled-skills manifest format');
   }
   for (const item of parsed.skills) {
-    if (!item.slug || !item.repo || !item.repoPath) {
+    if (!item.slug) {
       throw new Error(`Invalid manifest entry: ${JSON.stringify(item)}`);
+    }
+    if (!item.localPath && (!item.repo || !item.repoPath)) {
+      throw new Error(`Manifest entry must provide localPath or repo/repoPath: ${JSON.stringify(item)}`);
     }
   }
   return parsed.skills;
@@ -32,12 +35,39 @@ function loadManifest() {
 function groupByRepoRef(entries) {
   const grouped = new Map();
   for (const entry of entries) {
+    if (entry.localPath) continue;
     const ref = entry.ref || 'main';
     const key = `${entry.repo}#${ref}`;
     if (!grouped.has(key)) grouped.set(key, { repo: entry.repo, ref, entries: [] });
     grouped.get(key).entries.push(entry);
   }
   return [...grouped.values()];
+}
+
+function bundleSkillFromDirectory(entry, sourceDir, commit) {
+  const targetDir = join(OUTPUT_ROOT, entry.slug);
+
+  if (!existsSync(sourceDir)) {
+    throw new Error(`Missing skill source directory: ${sourceDir}`);
+  }
+
+  rmSync(targetDir, { recursive: true, force: true });
+  cpSync(sourceDir, targetDir, { recursive: true, dereference: true });
+
+  const skillManifest = join(targetDir, 'SKILL.md');
+  if (!existsSync(skillManifest)) {
+    throw new Error(`Skill ${entry.slug} is missing SKILL.md after copy`);
+  }
+
+  const requestedVersion = (entry.version || '').trim();
+  return {
+    slug: entry.slug,
+    version: requestedVersion || commit,
+    repo: entry.repo,
+    repoPath: entry.repoPath,
+    ref: entry.ref,
+    commit,
+  };
 }
 
 function createRepoDirName(repo, ref) {
@@ -94,6 +124,15 @@ const lock = {
   skills: [],
 };
 
+for (const entry of manifestSkills.filter((item) => item.localPath)) {
+  const sourceDir = join(ROOT, entry.localPath);
+  const commit = `local:${entry.localPath}`;
+
+  echo`Using local skill source for ${entry.slug}: ${entry.localPath}`;
+  lock.skills.push(bundleSkillFromDirectory(entry, sourceDir, commit));
+  echo`   OK ${entry.slug}`;
+}
+
 const groups = groupByRepoRef(manifestSkills);
 for (const group of groups) {
   const cacheRepoDir = join(CACHE_ROOT, createRepoDirName(group.repo, group.ref));
@@ -107,32 +146,9 @@ for (const group of groups) {
 
   for (const entry of group.entries) {
     const sourceDir = join(repoDir, entry.repoPath);
-    const targetDir = join(OUTPUT_ROOT, entry.slug);
-
-    if (!existsSync(sourceDir)) {
-      throw new Error(`Missing source path in repo checkout: ${entry.repoPath}`);
-    }
-
-    rmSync(targetDir, { recursive: true, force: true });
-    cpSync(sourceDir, targetDir, { recursive: true, dereference: true });
-
-    const skillManifest = join(targetDir, 'SKILL.md');
-    if (!existsSync(skillManifest)) {
-      throw new Error(`Skill ${entry.slug} is missing SKILL.md after copy`);
-    }
-
     const requestedVersion = (entry.version || '').trim();
-    const resolvedVersion = !requestedVersion || requestedVersion === 'main'
-      ? commit
-      : requestedVersion;
-    lock.skills.push({
-      slug: entry.slug,
-      version: resolvedVersion,
-      repo: entry.repo,
-      repoPath: entry.repoPath,
-      ref: group.ref,
-      commit,
-    });
+    const resolvedVersion = !requestedVersion || requestedVersion === 'main' ? commit : requestedVersion;
+    lock.skills.push(bundleSkillFromDirectory(entry, sourceDir, resolvedVersion));
 
     echo`   OK ${entry.slug}`;
   }

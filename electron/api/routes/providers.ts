@@ -278,13 +278,18 @@ export async function handleProviderRoutes(
           accountId: body.accountId,
           label: body.label,
         });
+        sendJson(res, 200, { success: true });
       } else {
-        await deviceOAuthManager.startFlow(body.provider, body.region, {
+        const started = await deviceOAuthManager.startFlow(body.provider, body.region, {
           accountId: body.accountId,
           label: body.label,
         });
+        if (!started) {
+          sendJson(res, 503, { success: false, error: 'Device OAuth is temporarily disabled in this build' });
+          return true;
+        }
+        sendJson(res, 200, { success: true });
       }
-      sendJson(res, 200, { success: true });
     } catch (error) {
       sendJson(res, 500, { success: false, error: String(error) });
     }

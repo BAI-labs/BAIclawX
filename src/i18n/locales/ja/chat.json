@@ -42,6 +42,7 @@
         "stop": "停止",
         "gatewayConnected": "接続済み",
         "gatewayStatus": "ゲートウェイ {{state}} | ポート: {{port}} {{pid}}",
+        "currentModel": "現在のモデル：",
         "retryFailedAttachments": "失敗した添付を再試行"
     },
     "historyBuckets": {

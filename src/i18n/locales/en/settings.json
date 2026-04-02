@@ -12,6 +12,98 @@
     "launchAtStartup": "Launch at system startup",
     "launchAtStartupDesc": "Automatically launch BAIclaw when you log in"
   },
+  "web3": {
+    "title": "Web3",
+    "sectionTitle": "Web3 Configuration",
+    "agentWalletTitle": "Agent Wallet",
+    "notCreatedSubtitle": "Agent Wallet not created",
+    "vaultUnlockSubtitle": "A wallet exists in ~/.openclaw/agent-wallet-baiclaw (e.g. from the CLI) but this app has not stored its master password yet. Enter the same master password to unlock; it will be saved with the OS keychain like a wallet created in the app.",
+    "savedPasswordMismatchSubtitle": "This app's saved wallet master password is out of date. Re-enter the current master password to restore self-recharge and CLI wallet features.",
+    "vaultUnlockPasswordPlaceholder": "Master password",
+    "vaultUnlockSubmit": "Unlock wallet",
+    "vaultUnlockSuccess": "Wallet unlocked",
+    "vaultUnlockFailed": "Could not unlock wallet",
+    "vaultUnlockPasswordRequired": "Enter the master password",
+    "savedPasswordMismatchPasswordPlaceholder": "Re-enter current master password",
+    "savedPasswordMismatchSubmit": "Resync master password",
+    "storagePathHint": "Wallet directory: {{path}} — use the same path in the CLI (e.g. agent-wallet list -d \"{{path}}\") or set AGENT_WALLET_DIR. Folder name is .openclaw/agent-wallet-baiclaw (two \"l\").",
+    "vaultTopologyIncompleteBanner": "Vault is initialized only partially. `wallets_config.json` has no wallet entries — CLI shows \"No wallets configured\". If `secret_baiclaw_wallet.json` is also missing, the key import did not finish. Use **Create wallet** again with the **same master password** to complete registration.",
+    "savedPasswordMismatchBanner": "The saved Agent Wallet master password no longer unlocks the vault on disk. This usually happens after you recreate or re-import a wallet. Re-enter the current master password so BAIclaw can update its saved copy.",
+    "createWallet": "Create Wallet",
+    "deleteWallet": "Delete Wallet",
+    "bankOfAiKeyWarning": "Add your BAI API key before creating a wallet.",
+    "subtitle": "Agent wallets for on-chain signing (EVM, local encrypted keys)",
+    "create": "Create Agent Wallet",
+    "empty": "No Agent Wallet yet",
+    "emptyDesc": "Create a wallet to get an EVM address stored securely on this device.",
+    "dialogTitle": "Create Agent Wallet",
+    "dialogDesc": "A new key is generated locally and encrypted. Copy the address after creation; the private key never leaves this machine.",
+    "labelOptional": "Label (optional)",
+    "labelPlaceholder": "e.g. Trading agent",
+    "walletId": "Wallet ID",
+    "address": "Address",
+    "active": "Active",
+    "copyAddress": "Copy address",
+    "copied": "Address copied",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete Agent Wallet?",
+    "deleteConfirmMessage": "Wallets, keys, and configurations will be deleted and cannot be recovered. Are you sure you want to delete them?",
+    "loadFailed": "Failed to load wallets",
+    "createFailed": "Failed to create wallet",
+    "createSuccess": "Agent Wallet created",
+    "deleteFailed": "Failed to delete wallet",
+    "deleteSuccess": "Agent Wallet removed",
+    "creating": "Creating…",
+    "wizard": {
+      "title": "Create Agent Wallet",
+      "cancel": "Cancel",
+      "back": "Back",
+      "next": "Next",
+      "finish": "Finish",
+      "bindingSkippedToast": "Could not verify binding with BAI online, format checks passed.",
+      "step0": {
+        "subtitle": "Agent Wallet is a locally secure Web3 wallet built for AI agents.",
+        "body": "BAIclaw supports importing the private key associated with your current BAI API Key to create an Agent Wallet\n\nBy configuring Agent Wallet, BAIclaw can enable self-recharge, transfers, token swaps, liquidity pool management, and access to x402 protocol paid resources and other Web3 skills.",
+        "learnMore": "Learn more about Agent Wallet",
+        "learnMoreUrl": "https://docs.b.ai/BAIclaw/Agent-Wallet/"
+      },
+      "step1": {
+        "label": "Bind BAI login wallet private key",
+        "desc": "(Only TRON supported)",
+        "howTo": "How to get private key",
+        "howToUrl": "https://docs.b.ai/BAIclaw/operation-guide/Get-Wallet-Secret/",
+        "placeholder": "64-character hex private key",
+        "errorFormat": "Invalid private key format.",
+        "errorMismatch": "The private key does not correspond to the address of the BAI API Key account, or it is not a TRON address private key.",
+        "errorTronOnly": "Only TRON addresses are supported for now.",
+        "errorNoApiKey": "Could not read your BAI API key for this account."
+      },
+      "step2": {
+        "passwordLabel": "Master password",
+        "confirmLabel": "Confirm master password",
+        "policyHint": "At least 8 characters, including uppercase and lowercase letters, numbers, and a special character.",
+        "mismatchHint": "The two passwords do not match.",
+        "warningBullet1": "Use at least 8 characters with uppercase, lowercase, numbers, and a special character.",
+        "warningBullet2": "Keep your master password safe. BAIclaw does not back it up; it cannot be recovered if lost."
+      },
+      "step3": {
+        "successTitle": "Wallet created successfully!",
+        "intro": "Congratulations! You've unlocked many of BAIclaw's Web3 skills. You can try asking:",
+        "example1": "How much TRX can I get for 100 USDT on SunSwap?",
+        "example2": "What is my BAI account balance?",
+        "example3": "Show my recent BAI orders.",
+        "example4": "Top up BAI with 1 USDT.",
+        "learnSkills": "Learn more about BAI Web3 skills",
+        "skillsUrl": "https://docs.bankofai.io/McpServer-Skills/SKILLS/Intro/"
+      },
+      "errors": {
+        "masterPasswordIncorrect": "Incorrect master password.",
+        "walletExists": "A wallet already exists. Remove it before creating a new one.",
+        "persistFailed": "The wallet was not fully written to disk (check space and permissions), please try again.",
+        "runtimePasswordFailed": "Wallet created, but setting AGENT_WALLET_BAICLAW_PASSWORD / Gateway restart failed"
+      }
+    }
+  },
   "aiProviders": {
     "title": "AI Providers",
     "description": "Configure your AI model providers and API keys",
@@ -84,6 +176,12 @@
       "setDefault": "Set as default",
       "editKey": "Edit API key",
       "delete": "Delete provider"
+    },
+    "agentWalletBound": {
+      "title": "Agent Wallet is linked",
+      "message": "This API key is already linked to an Agent Wallet. To change it, delete the Agent Wallet in Settings → Web3 first.",
+      "message2": "This API key is already linked to an Agent Wallet. To delete it, delete the Agent Wallet in Settings → Web3 first.",
+      "gotIt": "Got it"
     },
     "protocols": {
       "openai": "OpenAI Compatible",
@@ -273,7 +371,7 @@
   "about": {
     "title": "About",
     "appName": "BAIclaw",
-    "tagline": "Graphical AI Assistant",
+    "tagline": "Your Ready-to-Use AI Assistant",
     "basedOn": "Based on OpenClaw",
     "version": "Version {{version}}",
     "docs": "Website",

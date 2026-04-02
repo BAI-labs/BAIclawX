@@ -1,6 +1,6 @@
 {
     "name": "baiclaw",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "pnpm": {
         "onlyBuiltDependencies": [
             "@discordjs/opus",
@@ -24,7 +24,10 @@
     "scripts": {
         "init": "pnpm install && pnpm run uv:download",
         "dev": "vite",
-        "build": "vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs && electron-builder",
+        "bundle:openclaw": "zx scripts/bundle-openclaw.mjs",
+        "verify:openclaw-bundle": "zx scripts/verify-openclaw-bundle.mjs",
+        "prepare:desktop-bundle": "pnpm run bundle:openclaw && pnpm run verify:openclaw-bundle && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs",
+        "build": "vite build && pnpm run prepare:desktop-bundle && electron-builder",
         "build:vite": "vite build",
         "bundle:openclaw-plugins": "zx scripts/bundle-openclaw-plugins.mjs",
         "bundle:preinstalled-skills": "zx scripts/bundle-preinstalled-skills.mjs",
@@ -42,17 +45,18 @@
         "uv:verify:linux": "zx scripts/verify-bundled-uv.mjs --platform=linux",
         "uv:verify:all": "zx scripts/verify-bundled-uv.mjs --all",
         "icons": "zx scripts/generate-icons.mjs",
-        "package": "vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs && electron-builder",
-        "package:mac": "pnpm run uv:download:mac && pnpm run uv:verify:mac && vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs && electron-builder --mac",
-        "package:win": "pnpm run uv:download:win && pnpm run uv:verify:win && vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs && electron-builder --win",
-        "package:linux": "pnpm run uv:download:linux && pnpm run uv:verify:linux && vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs && electron-builder --linux",
-        "release": "pnpm run uv:download:all && pnpm run uv:verify:all && vite build && zx scripts/bundle-openclaw.mjs && zx scripts/bundle-openclaw-plugins.mjs && zx scripts/bundle-preinstalled-skills.mjs && electron-builder --publish always",
+        "package": "vite build && pnpm run prepare:desktop-bundle && electron-builder",
+        "package:mac": "pnpm run uv:download:mac && pnpm run uv:verify:mac && vite build && pnpm run prepare:desktop-bundle && electron-builder --mac",
+        "package:win": "pnpm run uv:download:win && pnpm run uv:verify:win && vite build && pnpm run prepare:desktop-bundle && electron-builder --win",
+        "package:linux": "pnpm run uv:download:linux && pnpm run uv:verify:linux && vite build && pnpm run prepare:desktop-bundle && electron-builder --linux",
+        "release": "pnpm run uv:download:all && pnpm run uv:verify:all && vite build && pnpm run prepare:desktop-bundle && electron-builder --publish always",
         "version:patch": "pnpm version patch",
         "version:minor": "pnpm version minor",
         "version:major": "pnpm version major",
         "postversion": "git push && git push --tags"
     },
     "dependencies": {
+        "@bankofai/agent-wallet": "^2.3.0",
         "clawhub": "^0.5.0",
         "electron-store": "^11.0.2",
         "electron-updater": "^6.8.3",
@@ -63,7 +67,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@larksuite/openclaw-lark": "2026.3.12",
+        "@larksuite/openclaw-lark": "2026.3.24",
         "@radix-ui/react-dialog": "^1.1.15",
         "@radix-ui/react-dropdown-menu": "^2.1.16",
         "@radix-ui/react-label": "^2.1.8",
@@ -101,7 +105,7 @@
         "i18next": "^25.8.11",
         "jsdom": "^28.1.0",
         "lucide-react": "^0.563.0",
-        "openclaw": "2026.3.13",
+        "openclaw": "2026.3.24",
         "png2icons": "^2.0.1",
         "postcss": "^8.5.6",
         "react": "^19.2.4",

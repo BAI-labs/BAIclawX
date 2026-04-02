@@ -120,6 +120,38 @@ function listPackages(nodeModulesDir) {
   return result;
 }
 
+function readJson(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function resolveWorkspacePackage(packageName) {
+  const candidates = [
+    path.join(NODE_MODULES, packageName),
+    path.join(NODE_MODULES, '.pnpm', 'node_modules', packageName),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      return fs.realpathSync(candidate);
+    } catch {
+      // Keep trying fallbacks.
+    }
+  }
+
+  return null;
+}
+
+function enqueuePackage(realPath, packageName, queue, collected) {
+  if (collected.has(realPath)) return false;
+  collected.set(realPath, packageName);
+
+  const depVirtualNM = getVirtualStoreNodeModules(realPath);
+  if (depVirtualNM) {
+    queue.push({ nodeModulesDir: depVirtualNM, skipPkg: packageName });
+  }
+  return true;
+}
+
 // Start BFS from openclaw's virtual store node_modules
 const openclawVirtualNM = getVirtualStoreNodeModules(openclawReal);
 if (!openclawVirtualNM) {
@@ -136,6 +168,29 @@ const SKIP_PACKAGES = new Set([
 ]);
 const SKIP_SCOPES = ['@cloudflare/', '@types/'];
 let skippedDevCount = 0;
+
+// Seed extra runtime packages that openclaw expects to exist but may not
+// appear in dependencies/optionalDependencies. pnpm.onlyBuiltDependencies is
+// currently used upstream for packages like @whiskeysockets/baileys.
+const openclawPkg = readJson(path.join(openclawReal, 'package.json'));
+const extraRuntimePackages = openclawPkg.pnpm?.onlyBuiltDependencies || [];
+let seededExtraCount = 0;
+
+for (const packageName of extraRuntimePackages) {
+  if (SKIP_PACKAGES.has(packageName) || SKIP_SCOPES.some(s => packageName.startsWith(s))) {
+    continue;
+  }
+
+  const realPath = resolveWorkspacePackage(packageName);
+  if (!realPath) {
+    echo`   ⚠️  Could not resolve extra runtime package ${packageName}`;
+    continue;
+  }
+
+  if (enqueuePackage(realPath, packageName, queue, collected)) {
+    seededExtraCount++;
+  }
+}
 
 while (queue.length > 0) {
   const { nodeModulesDir, skipPkg } = queue.shift();
@@ -172,6 +227,9 @@ while (queue.length > 0) {
 
 echo`   Found ${collected.size} total packages (direct + transitive)`;
 echo`   Skipped ${skippedDevCount} dev-only package references`;
+if (seededExtraCount > 0) {
+  echo`   Seeded ${seededExtraCount} extra runtime package(s) from pnpm.onlyBuiltDependencies`;
+}
 
 // 5. Copy all collected packages into OUTPUT/node_modules/ (flat structure)
 //

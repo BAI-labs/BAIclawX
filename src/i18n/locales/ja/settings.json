@@ -12,6 +12,98 @@
     "launchAtStartup": "システム起動時に自動起動",
     "launchAtStartupDesc": "ログイン時に BAIclaw を自動的に起動します"
   },
+  "web3": {
+    "title": "Web3",
+    "sectionTitle": "Web3 設定",
+    "agentWalletTitle": "Agent wallet",
+    "notCreatedSubtitle": "Agent Wallet は未作成です",
+    "vaultUnlockSubtitle": "~/.openclaw/agent-wallet-baiclaw に既にウォレットがあります（CLI で作成した場合など）が、このアプリにはまだマスターパスワードが保存されていません。CLI と同じマスターパスワードを入力してロック解除してください。解除後はアプリ内で作成した場合と同様に OS キーチェーンに保存されます。",
+    "savedPasswordMismatchSubtitle": "このアプリに保存されているウォレットのマスターパスワードが古くなっています。現在の正しいマスターパスワードを再入力して、自己チャージと CLI ウォレット機能を復元してください。",
+    "vaultUnlockPasswordPlaceholder": "マスターパスワード",
+    "vaultUnlockSubmit": "ウォレットをロック解除",
+    "vaultUnlockSuccess": "ロック解除しました",
+    "vaultUnlockFailed": "ロック解除に失敗しました",
+    "vaultUnlockPasswordRequired": "マスターパスワードを入力してください",
+    "savedPasswordMismatchPasswordPlaceholder": "現在のマスターパスワードを再入力",
+    "savedPasswordMismatchSubmit": "マスターパスワードを再同期",
+    "storagePathHint": "ウォレットディレクトリ: {{path}} — CLI でも同じパスを指定してください（例: agent-wallet list -d \"{{path}}\"）または AGENT_WALLET_DIR を設定。フォルダ名は .openclaw/agent-wallet-baiclaw（l が 2 つ）です。",
+    "vaultTopologyIncompleteBanner": "vault は部分的にしか初期化されていません。`wallets_config.json` にウォレット項目がない場合、CLI は “No wallets configured” を表示します。さらに `secret_baiclaw_wallet.json` もなければ、秘密鍵のインポートが完了していません。**ウォレットを作成**を再度実行し、**同じマスターパスワード**で登録を完了してください。",
+    "savedPasswordMismatchBanner": "保存されている Agent Wallet のマスターパスワードでは、ディスク上のウォレット vault を開けなくなっています。これは wallet を再作成または再インポートした後によく起こります。現在の正しいマスターパスワードを再入力して、BAIclaw に保存済みのコピーを更新してください。",
+    "createWallet": "ウォレットを作成",
+    "deleteWallet": "ウォレットを削除",
+    "bankOfAiKeyWarning": "BAI の API キーが未設定です。追加してから作成してください。",
+    "subtitle": "エージェント用オンチェーン署名ウォレット（EVM、ローカル暗号化）",
+    "create": "AgentWallet を作成",
+    "empty": "AgentWallet がありません",
+    "emptyDesc": "ウォレットを作成すると、この端末に安全に保存された EVM アドレスが得られます。",
+    "dialogTitle": "AgentWallet を作成",
+    "dialogDesc": "新しい鍵をローカルで生成し暗号化して保存します。秘密鍵はこの端末の外に出ません。作成後にアドレスをコピーできます。",
+    "labelOptional": "表示名（任意）",
+    "labelPlaceholder": "例: トレード用エージェント",
+    "walletId": "ウォレット ID",
+    "address": "アドレス",
+    "active": "アクティブ",
+    "copyAddress": "アドレスをコピー",
+    "copied": "コピーしました",
+    "delete": "削除",
+    "deleteConfirmTitle": "AgentWallet を削除しますか？",
+    "deleteConfirmMessage": "ウォレット、鍵、および設定は削除され、復元することはできません。本当に削除してもよろしいですか？",
+    "loadFailed": "ウォレット一覧の読み込みに失敗しました",
+    "createFailed": "ウォレットの作成に失敗しました",
+    "createSuccess": "AgentWallet を作成しました",
+    "deleteFailed": "ウォレットの削除に失敗しました",
+    "deleteSuccess": "AgentWallet を削除しました",
+    "creating": "作成中…",
+    "wizard": {
+      "title": "AgentWallet を作成",
+      "cancel": "キャンセル",
+      "back": "戻る",
+      "next": "次へ",
+      "finish": "完了",
+      "bindingSkippedToast": "BAI とのオンライン検証はできませんでした。形式チェックのみ通過しています。",
+      "step0": {
+        "subtitle": "Agent Wallet は AI エージェント向けのローカル安全な Web3 ウォレットです",
+        "body": "BAIclaw は、現在使用している BAI API-Key に関連付けられたウォレットの秘密鍵をインポートして Agent Wallet を作成することをサポートしています\nAgent Wallet を設定することで、BAIclaw は自己充電、送金、トークン交換、流動性プール管理、x402 プロトコルの有料リソースへのアクセスなど、様々な web3 スキルを実現できます。",
+        "learnMore": "Agent Wallet の詳細",
+        "learnMoreUrl": "https://docs.b.ai/BAIclaw/Agent-Wallet/"
+      },
+      "step1": {
+        "label": "BAI ログインウォレットの秘密鍵を紐付け",
+        "desc": "(TRONアドレスのみインポートに対応しています)",
+        "howTo": "秘密鍵の取得方法",
+        "howToUrl": "https://docs.bankofai.io",
+        "placeholder": "64 文字の 16 進秘密鍵",
+        "errorFormat": "秘密鍵の形式が正しくありません",
+        "errorMismatch": "秘密鍵に対応するアドレスが BAI の API キーに紐付けられているアカウントのアドレスと一致しません（現在は Tron アドレスのインポートのみサポートしています）",
+        "errorTronOnly": "現在は TRON アドレスのみ対応です",
+        "errorNoApiKey": "このアカウントの BAI API キーを読み取れません"
+      },
+      "step2": {
+        "passwordLabel": "マスターパスワードを設定",
+        "confirmLabel": "マスターパスワードを確認",
+        "policyHint": "8 文字以上、大文字・小文字・数字・記号を含めてください",
+        "mismatchHint": "2 つのパスワードが一致しません",
+        "warningBullet1": "8 文字以上で大文字・小文字・数字・記号を含めてください",
+        "warningBullet2": "マスターパスワードは BAIclaw がバックアップしません。紛失すると復元できません"
+      },
+      "step3": {
+        "successTitle": "ウォレットを作成しました",
+        "intro": "BAIclaw の Web3 スキルが使えます。例：",
+        "example1": "今 100 USDT で SunSwap でいくら TRX に換えられる？",
+        "example2": "BAI アカウントの残高は？",
+        "example3": "最近の BAI の注文を見せて",
+        "example4": "BAI に 1 USDT チャージして",
+        "learnSkills": "BAI Web3 スキルの詳細",
+        "skillsUrl": "https://docs.bankofai.io/McpServer-Skills/SKILLS/Intro/"
+      },
+      "errors": {
+        "masterPasswordIncorrect": "マスターパスワードが正しくありません",
+        "walletExists": "既にウォレットがあります。削除してから作成してください",
+        "persistFailed": "ウォレットをディスクに完全に書き込めませんでした（容量・権限を確認のうえ再試行してください）。",
+        "runtimePasswordFailed": "ウォレットは作成済みですが、AGENT_WALLET_BAICLAW_PASSWORD の設定または Gateway の再起動に失敗しました"
+      }
+    }
+  },
   "aiProviders": {
     "title": "AI プロバイダー",
     "description": "AI モデルプロバイダーと API キーを設定",
@@ -84,6 +176,12 @@
       "setDefault": "デフォルトに設定",
       "editKey": "API キーを編集",
       "delete": "プロバイダーを削除"
+    },
+    "agentWalletBound": {
+      "title": "AgentWallet が紐付け済みです",
+      "message": "この API キーには既に AgentWallet が紐付いています。変更するには、設定の Web3 で AgentWallet を削除してください。",
+      "message2": "この API キーには既に AgentWallet が紐付いています。削除するには、設定の Web3 で AgentWallet を削除してください。",
+      "gotIt": "了解しました"
     },
     "protocols": {
       "openai": "OpenAI 互換",

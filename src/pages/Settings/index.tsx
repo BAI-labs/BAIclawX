@@ -41,6 +41,7 @@ import { hostApiFetch } from '@/lib/host-api';
 import { cn } from '@/lib/utils';
 import { brand, getBrandExternalUrl } from '@/lib/brand';
 import heroImage from '@/assets/hero.png';
+import { Web3Settings } from '@/components/settings/Web3Settings';
 type ControlUiInfo = {
   url: string;
   token: string;
@@ -207,7 +208,7 @@ export function Settings() {
 
     versionTapCountRef.current += 1;
 
-    if (versionTapCountRef.current >= 5) {
+    if (versionTapCountRef.current >= 10) {
       versionTapCountRef.current = 0;
       versionTapTimerRef.current = null;
       setShowHeroEasterEgg(true);
@@ -556,6 +557,10 @@ export function Settings() {
               </div>
             </div>
           </div>
+
+          <Separator className="bg-black/5 dark:bg-white/5" />
+
+          <Web3Settings />
 
           <Separator className="bg-black/5 dark:bg-white/5" />
 
@@ -1031,13 +1036,12 @@ export function Settings() {
                 <strong className="text-foreground font-semibold">{brand.displayName}</strong> - {t('about.tagline')}
               </p>
               <p>{t('about.basedOn')}</p>
-              <button
-                type="button"
-                className="inline-flex w-fit rounded-md px-1 py-0.5 -mx-1 -my-0.5 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+              <p
+                className="select-none"
                 onClick={handleVersionTap}
               >
                 {t('about.version', { version: currentVersion })}
-              </button>
+              </p>
               <div className="flex gap-4 pt-3">
                 <Button
                   variant="link"

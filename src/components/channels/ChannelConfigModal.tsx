@@ -22,6 +22,7 @@ import { useChannelsStore } from '@/stores/channels';
 
 import { hostApiFetch } from '@/lib/host-api';
 import { subscribeHostEvent } from '@/lib/host-events';
+import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
 import {
   CHANNEL_ICONS,
@@ -350,15 +351,7 @@ export function ChannelConfigModal({
   const openDocs = () => {
     if (!meta?.docsUrl) return;
     const url = t(meta.docsUrl);
-    try {
-      if (window.electron?.openExternal) {
-        window.electron.openExternal(url);
-      } else {
-        window.open(url, '_blank');
-      }
-    } catch {
-      window.open(url, '_blank');
-    }
+    void openExternalUrl(url);
   };
 
   const isFormValid = () => {

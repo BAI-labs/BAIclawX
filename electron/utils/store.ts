@@ -35,6 +35,7 @@ export interface AppSettings {
   gatewayAutoStart: boolean;
   gatewayPort: number;
   gatewayToken: string;
+  agentWalletSelectedWalletId: string;
   proxyEnabled: boolean;
   proxyServer: string;
   proxyHttpServer: string;
@@ -75,6 +76,7 @@ const defaults: AppSettings = {
   gatewayAutoStart: true,
   gatewayPort: 19789,
   gatewayToken: generateToken(),
+  agentWalletSelectedWalletId: 'baiclaw_wallet',
   proxyEnabled: false,
   proxyServer: '',
   proxyHttpServer: '',

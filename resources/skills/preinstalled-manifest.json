@@ -71,6 +71,60 @@
       "ref": "main",
       "version": "main",
       "autoEnable": true
+    },
+    {
+      "slug": "recharge-skill",
+      "localPath": "resources/skills/local/recharge-skill",
+      "version": "local-dev-abs-paths-v2",
+      "autoEnable": true
+    },
+    {
+      "slug": "sunperp-skill",
+      "repo": "BofAI/skills",
+      "repoPath": "sunperp-skill",
+      "ref": "main",
+      "version": "main",
+      "autoEnable": true
+    },
+    {
+      "slug": "sunswap",
+      "repo": "BofAI/skills",
+      "repoPath": "sunswap",
+      "ref": "main",
+      "version": "main",
+      "autoEnable": true
+    },
+    {
+      "slug": "trc20-toolkit-skill",
+      "repo": "BofAI/skills",
+      "repoPath": "trc20-toolkit-skill",
+      "ref": "main",
+      "version": "main",
+      "autoEnable": true
+    },
+    {
+      "slug": "tronscan-skill",
+      "repo": "BofAI/skills",
+      "repoPath": "tronscan-skill",
+      "ref": "main",
+      "version": "main",
+      "autoEnable": true
+    },
+    {
+      "slug": "x402-payment",
+      "repo": "BofAI/skills",
+      "repoPath": "x402-payment",
+      "ref": "main",
+      "version": "main",
+      "autoEnable": true
+    },
+    {
+      "slug": "multisig-permissions",
+      "repo": "BofAI/skills",
+      "repoPath": "multisig-permissions",
+      "ref": "main",
+      "version": "main",
+      "autoEnable": true
     }
   ]
 }

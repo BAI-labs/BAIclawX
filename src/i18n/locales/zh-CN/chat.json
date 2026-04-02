@@ -42,6 +42,7 @@
         "stop": "停止",
         "gatewayConnected": "已连接",
         "gatewayStatus": "gateway {{state}} | port: {{port}} {{pid}}",
+        "currentModel": "当前模型：",
         "retryFailedAttachments": "重试失败的附件"
     },
     "historyBuckets": {

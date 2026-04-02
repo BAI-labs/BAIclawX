@@ -88,6 +88,13 @@ A locally secured Web3 wallet designed for AI agents. Once configured, your agen
 
 > ⚠️ If you have previously installed OpenClaw or ClawX, we recommend uninstalling and removing the config directory (`~/.openclaw`) to avoid conflicts.
 
+## 🛠️ Packaging
+
+Desktop packaging now validates the bundled OpenClaw runtime before `electron-builder` runs. The validation checks that runtime-loaded modules such as `@whiskeysockets/baileys`, `pino`, `protobufjs`, and `qrcode-terminal` can be resolved from `build/openclaw`.
+
+- Run `pnpm run verify:openclaw-bundle` to validate an existing OpenClaw bundle.
+- `pnpm run build`, `pnpm run package`, `pnpm run package:mac`, `pnpm run package:win`, `pnpm run package:linux`, and `pnpm run release` all include this validation automatically.
+
 
 ## 🔗 Related Projects
 

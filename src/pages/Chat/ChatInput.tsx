@@ -743,6 +743,7 @@ export function ChatInput({ onSend, onStop, disabled = false, sending = false, i
                 pid: gatewayStatus.pid ? `| pid: ${gatewayStatus.pid}` : '',
               })}
             </span>
+            <span>| {t('composer.currentModel')}{selectedModelLabel}</span>
           </div>
           {hasFailedAttachments && (
             <Button

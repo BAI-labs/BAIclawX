@@ -5,7 +5,7 @@
  *
  * All file I/O uses async fs/promises to avoid blocking the main thread.
  */
-import { readFile, writeFile, access, cp, mkdir } from 'fs/promises';
+import { readFile, writeFile, access, cp, mkdir, rm } from 'fs/promises';
 import { existsSync } from 'fs';
 import { constants } from 'fs';
 import { join } from 'path';
@@ -32,6 +32,7 @@ interface OpenClawConfig {
 
 interface PreinstalledSkillSpec {
     slug: string;
+    localPath?: string;
     version?: string;
     autoEnable?: boolean;
 }
@@ -314,6 +315,7 @@ async function tryReadMarker(markerPath: string): Promise<PreinstalledMarker | n
  * - If local skill exists without our marker, treat as user-managed and never overwrite.
  * - If marker exists with same version, skip.
  * - If marker exists with a different version, skip by default to avoid overwriting edits.
+ * - Exception: app-bundled local skills (`localPath`) are owned by the app and may be refreshed.
  */
 export async function ensurePreinstalledSkillsInstalled(): Promise<void> {
     const skills = await readPreinstalledManifest();
@@ -356,8 +358,16 @@ export async function ensurePreinstalledSkillsInstalled(): Promise<void> {
             if (marker.version === desiredVersion) {
                 continue;
             }
-            logger.info(`Skipping preinstalled skill update for ${spec.slug} (local marker version=${marker.version}, desired=${desiredVersion})`);
-            continue;
+            if (!spec.localPath) {
+                logger.info(`Skipping preinstalled skill update for ${spec.slug} (local marker version=${marker.version}, desired=${desiredVersion})`);
+                continue;
+            }
+            try {
+                await rm(targetDir, { recursive: true, force: true });
+            } catch (error) {
+                logger.warn(`Failed to clear preinstalled local skill ${spec.slug} before refresh:`, error);
+                continue;
+            }
         }
 
         try {

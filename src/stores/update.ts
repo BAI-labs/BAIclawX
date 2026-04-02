@@ -20,7 +20,7 @@ export interface ProgressInfo {
   bytesPerSecond: number;
 }
 
-export type UpdateStatus = 
+export type UpdateStatus =
   | 'idle'
   | 'checking'
   | 'available'
@@ -52,7 +52,7 @@ interface UpdateState {
 
 export const useUpdateStore = create<UpdateState>((set, get) => ({
   status: 'idle',
-  currentVersion: '0.9.0',
+  currentVersion: '0.9.1',
   updateInfo: null,
   progress: null,
   error: null,
@@ -131,7 +131,7 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
 
   checkForUpdates: async () => {
     set({ status: 'checking', error: null });
-    
+
     try {
       const result = await Promise.race([
         invokeIpc('update:check'),
@@ -146,7 +146,7 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
           error?: string;
         };
       };
-      
+
       if (result.status) {
         set({
           status: result.status.status,
@@ -171,13 +171,13 @@ export const useUpdateStore = create<UpdateState>((set, get) => ({
 
   downloadUpdate: async () => {
     set({ status: 'downloading', error: null });
-    
+
     try {
       const result = await invokeIpc<{
         success: boolean;
         error?: string;
       }>('update:download');
-      
+
       if (!result.success) {
         set({ status: 'error', error: result.error || 'Failed to download update' });
       }

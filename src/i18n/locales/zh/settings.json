@@ -12,6 +12,98 @@
     "launchAtStartup": "开机自动启动",
     "launchAtStartupDesc": "登录系统后自动启动 BAIclaw"
   },
+  "web3": {
+    "title": "Web3",
+    "sectionTitle": "Web3配置",
+    "agentWalletTitle": "Agent wallet",
+    "notCreatedSubtitle": "未创建 Agent Wallet",
+    "vaultUnlockSubtitle": "在 ~/.openclaw/agent-wallet-baiclaw 中已有钱包（例如通过 CLI 创建），但本应用尚未保存其主密码。请输入与 CLI 相同的主密码以解锁；解锁后会像应用内创建的钱包一样写入系统密钥链。",
+    "savedPasswordMismatchSubtitle": "本应用保存的钱包主密码已经过期。请重新输入当前正确的主密码，以恢复自助充值和命令行钱包功能。",
+    "vaultUnlockPasswordPlaceholder": "主密码",
+    "vaultUnlockSubmit": "解锁钱包",
+    "vaultUnlockSuccess": "钱包已解锁",
+    "vaultUnlockFailed": "解锁失败",
+    "vaultUnlockPasswordRequired": "请输入主密码",
+    "savedPasswordMismatchPasswordPlaceholder": "重新输入当前主密码",
+    "savedPasswordMismatchSubmit": "重新同步主密码",
+    "storagePathHint": "钱包目录：{{path}}。命令行需指向同一目录（例如 agent-wallet list -d \"{{path}}\"）或设置环境变量 AGENT_WALLET_DIR。文件夹名为 .openclaw/agent-wallet-baiclaw。",
+    "vaultTopologyIncompleteBanner": "保管库只完成了部分初始化。`wallets_config.json` 没有钱包项时，CLI 会显示 “No wallets configured”。如果也缺少 `secret_baiclaw_wallet.json`，说明私钥导入尚未完成。请再次点击 **创建钱包**，使用**相同主密码**完成注册。",
+    "savedPasswordMismatchBanner": "检测到当前保存的 Agent Wallet 主密码无法解开磁盘上的钱包保管库。这通常发生在你重建或重新导入 wallet 之后。请重新输入当前正确的主密码，让 BAIclaw 更新保存的密码。",
+    "createWallet": "创建钱包",
+    "deleteWallet": "删除钱包",
+    "bankOfAiKeyWarning": "还未添加 BAI 的API key，请添加后再进行创建",
+    "subtitle": "Agent 链上签名钱包（EVM，本地加密存储）",
+    "create": "创建 AgentWallet",
+    "empty": "暂无 AgentWallet",
+    "emptyDesc": "创建钱包以生成本地安全保存的 EVM 地址。",
+    "dialogTitle": "创建 AgentWallet",
+    "dialogDesc": "将在本机生成并加密保存新密钥。私钥不会离开此设备；创建后可复制地址。",
+    "labelOptional": "显示名称（可选）",
+    "labelPlaceholder": "例如：交易 Agent",
+    "walletId": "钱包 ID",
+    "address": "地址",
+    "active": "当前活跃",
+    "copyAddress": "复制地址",
+    "copied": "已复制地址",
+    "delete": "删除",
+    "deleteConfirmTitle": "删除 AgentWallet？",
+    "deleteConfirmMessage": "钱包、密钥和配置将被删除,无法恢复。确认要删除吗?",
+    "loadFailed": "加载钱包列表失败",
+    "createFailed": "创建钱包失败",
+    "createSuccess": "AgentWallet 已创建",
+    "deleteFailed": "删除钱包失败",
+    "deleteSuccess": "已删除 AgentWallet",
+    "creating": "创建中…",
+    "wizard": {
+      "title": "创建 AgentWallet",
+      "cancel": "取消",
+      "back": "上一步",
+      "next": "下一步",
+      "finish": "完成",
+      "bindingSkippedToast": "暂时无法在线校验与 BAI 的绑定，已通过本地格式校验。",
+      "step0": {
+        "subtitle": "Agent Wallet 是专为 AI 代理打造的本地安全的 Web3 钱包",
+        "body": "BAIclaw 支持您导入当前使用的 BAI API-Key关联的钱包私钥来创建 Agent Wallet\n通过配置 Agent Wallet,BAIclaw 可实现自我充值、转账、换币、管理流动性池,以及访问x402协议付费资源等web3技能。",
+        "learnMore": "了解更多关于 Agent Wallet 的知识",
+        "learnMoreUrl": "https://docs.b.ai/zh-Hans/BAIclaw/Agent-Wallet/"
+      },
+      "step1": {
+        "label": "绑定 BAI 登录钱包私钥",
+        "desc": "(仅支持TRON地址导入)",
+        "howTo": "了解如何获取私钥",
+        "howToUrl": "https://docs.bankofai.io",
+        "placeholder": "64 位十六进制私钥",
+        "errorFormat": "私钥格式不正确",
+        "errorMismatch": "私钥对应的地址与 BAI 的 API Key 绑定账户地址不一致 (当前只支持Tron地址导入)",
+        "errorTronOnly": "目前只支持 TRON 地址",
+        "errorNoApiKey": "无法读取该账户的 BAI API Key"
+      },
+      "step2": {
+        "passwordLabel": "设置主密码",
+        "confirmLabel": "确认主密码",
+        "policyHint": "至少 8 位，包含大小写字母、数字和特殊字符",
+        "mismatchHint": "两次输入的密码不一致",
+        "warningBullet1": "至少 8 位，包含大小写字母、数字和特殊字符",
+        "warningBullet2": "请妥善保管好主密码，BAIclaw 不会备份您的密码，丢失无法找回"
+      },
+      "step3": {
+        "successTitle": "钱包创建成功！",
+        "intro": "恭喜你已解锁 BAIclaw 的众多 web3 技能，你可以尝试提问：",
+        "example1": "帮我算算现在 100 USDT 在 SunSwap 上能换多少 TRX？",
+        "example2": "我的 BAI 账户还有多少余额？",
+        "example3": "显示我最近的 BAI 订单记录。",
+        "example4": "给 BAI 充值 1 USDT。",
+        "learnSkills": "了解更多 BAI web3 技能",
+        "skillsUrl": "https://docs.bankofai.io/zh-Hans/McpServer-Skills/SKILLS/Intro/"
+      },
+      "errors": {
+        "masterPasswordIncorrect": "主密码不正确",
+        "walletExists": "已存在钱包，请先删除后再创建",
+        "persistFailed": "钱包未能完整写入磁盘（请检查空间与权限），请重试。",
+        "runtimePasswordFailed": "钱包已创建，但未能写入主进程环境变量 AGENT_WALLET_BAICLAW_PASSWORD 或重启 Gateway"
+      }
+    }
+  },
   "aiProviders": {
     "title": "AI 模型提供商",
     "description": "配置 AI 模型提供商和 API 密钥",
@@ -79,6 +171,12 @@
       "setDefault": "设为默认",
       "editKey": "编辑 API 密钥",
       "delete": "删除提供商"
+    },
+    "agentWalletBound": {
+      "title": "已绑定 AgentWallet",
+      "message": "当前 API-Key 已绑定 AgentWallet，如要修改请先在设置中删除 AgentWallet",
+      "message2": "当前 API-Key 已绑定 AgentWallet，如要删除请先在设置中删除 AgentWallet",
+      "gotIt": "知道了"
     },
     "protocols": {
       "openai": "OpenAI 兼容",
