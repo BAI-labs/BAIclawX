@@ -4,6 +4,28 @@
 
 BAIclaw is a personal AI agent desktop application built on [OpenClaw](https://openclaw.ai/) and [ClawX](https://github.com/ValueCell-ai/ClawX). It wraps the power of the OpenClaw agent runtime in a graphical interface — no command line, no config files, just a ready-to-use AI assistant.
 
+## Installation
+
+#### Download a Pre-built Release
+
+If you just want to use BAIclaw, download the latest package for your platform from the [Releases](https://github.com/BAI-labs/BAIclawX/releases) page.
+
+#### Run from Source
+
+If you are developing locally or want to build the app yourself, use the steps below:
+
+```bash
+# Clone the repository
+git clone https://github.com/BAI-labs/BAIclawX
+cd BAIclawX
+
+# Install dependencies and download uv
+pnpm run init
+
+# Start the app in development mode
+pnpm dev
+```
+
 
 ## ✨ Features
 
