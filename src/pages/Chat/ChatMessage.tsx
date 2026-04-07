@@ -9,7 +9,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
-import { openExternalUrl } from '@/lib/external-links';
 import { cn } from '@/lib/utils';
 import { invokeIpc } from '@/lib/api-client';
 import type { RawMessage, AttachedFileMeta } from '@/stores/chat';
@@ -369,17 +368,7 @@ function MessageBubble({
               },
               a({ href, children }) {
                 return (
-                  <a
-                    href={href}
-                    rel="noopener noreferrer"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      if (href) {
-                        void openExternalUrl(href);
-                      }
-                    }}
-                    className="text-primary hover:underline break-words break-all"
-                  >
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-words break-all">
                     {children}
                   </a>
                 );

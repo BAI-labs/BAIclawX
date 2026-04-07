@@ -34,7 +34,6 @@ import type { TFunction } from 'i18next';
 import { SUPPORTED_LANGUAGES } from '@/i18n';
 import { toast } from 'sonner';
 import { invokeIpc } from '@/lib/api-client';
-import { onExternalLinkClick } from '@/lib/external-links';
 import { hostApiFetch } from '@/lib/host-api';
 import { subscribeHostEvent } from '@/lib/host-events';
 import { brand } from '@/lib/brand';
@@ -1221,8 +1220,8 @@ function ProviderContent({
           {selectedProvider && providerDocsUrl && (
             <a
               href={providerDocsUrl}
+              target="_blank"
               rel="noopener noreferrer"
-              onClick={onExternalLinkClick(providerDocsUrl)}
               className="text-[13px] text-blue-500 hover:text-blue-600 font-medium inline-flex items-center gap-1"
             >
               {t('settings:aiProviders.dialog.customDoc2')}
