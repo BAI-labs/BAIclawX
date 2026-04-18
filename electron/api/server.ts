@@ -15,6 +15,7 @@ import { handleFileRoutes } from './routes/files';
 import { handleSessionRoutes } from './routes/sessions';
 import { handleCronRoutes } from './routes/cron';
 import { handleAgentWalletRoutes } from './routes/agent-wallet';
+import { handleWeb3Routes } from './routes/web3';
 import { sendJson } from './route-utils';
 
 type RouteHandler = (
@@ -28,6 +29,7 @@ const routeHandlers: RouteHandler[] = [
   handleAppRoutes,
   handleGatewayRoutes,
   handleSettingsRoutes,
+  handleWeb3Routes,
   handleProviderRoutes,
   handleAgentRoutes,
   handleChannelRoutes,

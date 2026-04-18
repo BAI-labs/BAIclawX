@@ -142,7 +142,7 @@ export function ProvidersSettings() {
   const [editingProvider, setEditingProvider] = useState<string | null>(null);
   const [agentWalletBoundModalOpen, setAgentWalletBoundModalOpen] = useState(false);
   const [agentWalletBoundModalType, setAgentWalletBoundModalType] = useState(0);
-  const [walletCheckLoading, setWalletCheckLoading] = useState(true);
+  const [, setWalletCheckLoading] = useState(true);
   const [hasWalletBound, setHasWalletBound] = useState(false);
   const visibleAccounts = useMemo(() => filterVisibleProviderAccounts(accounts), [accounts]);
   const visibleStatuses = useMemo(() => filterVisibleProviderStatuses(statuses), [statuses]);

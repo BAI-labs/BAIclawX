@@ -7,6 +7,7 @@ import { hostApiFetch } from '@/lib/host-api';
 import { AppError, normalizeAppError } from '@/lib/error-model';
 import { useGatewayStore } from './gateway';
 import type { Skill, MarketplaceSkill } from '../types/skill';
+import { getManagedWeb3Pack, isManagedWeb3PackId, MANAGED_WEB3_PACKS } from '@/lib/web3-metadata';
 
 type GatewaySkillStatus = {
   skillKey: string;
@@ -34,6 +35,10 @@ type ClawHubListResult = {
   version?: string;
   source?: string;
   baseDir?: string;
+};
+
+type Web3EntitlementResult = {
+  canUseManagedWeb3Skills: boolean;
 };
 
 function mapErrorCodeToSkillErrorKey(
@@ -100,6 +105,7 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
 
       // 3. Fetch configurations directly from Electron (since Gateway doesn't return them)
       const configResult = await hostApiFetch<Record<string, { apiKey?: string; env?: Record<string, string> }>>('/api/skills/configs');
+      const entitlement = await hostApiFetch<Web3EntitlementResult>('/api/entitlements/web3');
 
       let combinedSkills: Skill[] = [];
       const currentSkills = get().skills;
@@ -113,8 +119,8 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
           return {
             id: s.skillKey,
             slug: s.slug || s.skillKey,
-            name: s.name || s.skillKey,
-            description: s.description || '',
+            name: getManagedWeb3Pack(s.skillKey)?.title || s.name || s.skillKey,
+            description: getManagedWeb3Pack(s.skillKey)?.description || s.description || '',
             enabled: !s.disabled,
             icon: s.emoji || '📦',
             version: s.version || '1.0.0',
@@ -125,9 +131,12 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
             },
             isCore: s.bundled && s.always,
             isBundled: s.bundled,
-            source: s.source,
+            source: isManagedWeb3PackId(s.skillKey) ? 'clawx-managed-web3' : s.source,
             baseDir: s.baseDir,
             filePath: s.filePath,
+            isManagedWeb3: isManagedWeb3PackId(s.skillKey),
+            locked: isManagedWeb3PackId(s.skillKey) ? !entitlement.canUseManagedWeb3Skills : false,
+            docsUrl: getManagedWeb3Pack(s.skillKey)?.docsUrl,
           };
         });
       } else if (currentSkills.length > 0) {
@@ -152,8 +161,8 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
           combinedSkills.push({
             id: cs.slug,
             slug: cs.slug,
-            name: cs.slug,
-            description: 'Recently installed, initializing...',
+            name: getManagedWeb3Pack(cs.slug)?.title || cs.slug,
+            description: getManagedWeb3Pack(cs.slug)?.description || 'Recently installed, initializing...',
             enabled: false,
             icon: '⌛',
             version: cs.version || 'unknown',
@@ -161,9 +170,33 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
             config: directConfig,
             isCore: false,
             isBundled: false,
-            source: cs.source || 'openclaw-managed',
+            source: isManagedWeb3PackId(cs.slug) ? 'clawx-managed-web3' : (cs.source || 'openclaw-managed'),
             baseDir: cs.baseDir,
+            isManagedWeb3: isManagedWeb3PackId(cs.slug),
+            locked: isManagedWeb3PackId(cs.slug) ? !entitlement.canUseManagedWeb3Skills : false,
+            docsUrl: getManagedWeb3Pack(cs.slug)?.docsUrl,
           });
+        });
+      }
+
+      const existingIds = new Set(combinedSkills.map((skill) => skill.id));
+      for (const pack of MANAGED_WEB3_PACKS) {
+        if (existingIds.has(pack.id)) continue;
+        combinedSkills.push({
+          id: pack.id,
+          slug: pack.id,
+          name: pack.title,
+          description: pack.description,
+          enabled: false,
+          icon: pack.requiredExchange ? '💱' : '🧠',
+          version: 'managed-web3-v1',
+          config: configResult[pack.id] || {},
+          isCore: false,
+          isBundled: true,
+          source: 'clawx-managed-web3',
+          isManagedWeb3: true,
+          locked: !entitlement.canUseManagedWeb3Skills,
+          docsUrl: pack.docsUrl,
         });
       }
 
@@ -251,7 +284,11 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
   },
 
   enableSkill: async (skillId) => {
-    const { updateSkill } = get();
+    const { updateSkill, skills } = get();
+    const skill = skills.find((s) => s.id === skillId);
+    if (skill?.isManagedWeb3 && skill.locked) {
+      throw new Error('Managed Web3 skills are locked for the current tier');
+    }
 
     try {
       await useGatewayStore.getState().rpc('skills.update', { skillKey: skillId, enabled: true });
@@ -268,6 +305,9 @@ export const useSkillsStore = create<SkillsState>((set, get) => ({
     const skill = skills.find((s) => s.id === skillId);
     if (skill?.isCore) {
       throw new Error('Cannot disable core skill');
+    }
+    if (skill?.isManagedWeb3 && skill.locked) {
+      throw new Error('Managed Web3 skills are locked for the current tier');
     }
 
     try {

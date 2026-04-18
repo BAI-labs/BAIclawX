@@ -30,6 +30,7 @@ import { browserOAuthManager } from '../utils/browser-oauth';
 import { whatsAppLoginManager } from '../utils/whatsapp-login';
 import { syncAllProviderAuthToRuntime } from '../services/providers/provider-runtime-sync';
 import { bootstrapAgentWalletBaiclawRuntimePassword } from '../services/agent-wallet/agent-wallet-service';
+import { syncManagedWeb3SkillState } from '../services/web3/managed-web3';
 
 // Disable GPU hardware acceleration globally for maximum stability across
 // all GPU configurations (no GPU, integrated, discrete).
@@ -244,9 +245,13 @@ async function initialize(): Promise<void> {
   // Pre-deploy bundled third-party skills from resources/preinstalled-skills.
   // This installs full skill directories (not only SKILL.md) in an idempotent,
   // non-destructive way and never blocks startup.
-  void ensurePreinstalledSkillsInstalled().catch((error) => {
-    logger.warn('Failed to install preinstalled skills:', error);
-  });
+  void ensurePreinstalledSkillsInstalled()
+    .then(async () => {
+      await syncManagedWeb3SkillState();
+    })
+    .catch((error) => {
+      logger.warn('Failed to install/sync managed Web3 skills:', error);
+    });
 
   // Bridge gateway and host-side events before any auto-start logic runs, so
   // renderer subscribers observe the full startup lifecycle.

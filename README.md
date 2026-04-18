@@ -53,6 +53,8 @@ Each channel operates independently and can bind to different agents.
 
 Install capability extensions directly from the built-in skill panel — no package manager required. BAIclaw ships with document processing (PDF, Excel, Word, PPT) and web search skills out of the box.
 
+BAIclaw also bundles managed Web3 packs for `sun-skill`, `surf`, `binance-web3-pack`, and `htx-web3-pack`. These packs are surfaced in Chat and Settings, gated by the current Web3 entitlement tier, and synced automatically on startup.
+
 ### ⏱️ Automated Workflows
 
 Create scheduled tasks that run 7×24 without manual intervention. Set custom triggers, use preset templates, and let your agents work while you sleep.
@@ -60,6 +62,10 @@ Create scheduled tasks that run 7×24 without manual intervention. Set custom tr
 ### 💰 Agent Wallet
 
 A locally secured Web3 wallet designed for AI agents. Once configured, your agent can autonomously execute on-chain operations — transfers, token swaps, liquidity management, and x402 protocol payments. Keys are encrypted and stored locally, never uploaded to any server.
+
+### 🔐 Managed Exchange Keys
+
+For the managed Binance and HTX Web3 packs, exchange access keys and secret keys are configured in `Settings > Web3`. They are stored locally in a dedicated exchange secret store, never written into `~/.openclaw/openclaw.json`, and are injected into the Gateway runtime only when the active Web3 entitlement allows those managed packs.
 
 ## 🏗️ Architecture
 

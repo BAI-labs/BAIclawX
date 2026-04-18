@@ -57,6 +57,7 @@ export interface AppSettings {
   selectedBundles: string[];
   enabledSkills: string[];
   disabledSkills: string[];
+  mockWeb3Tier: 'free' | 'pro' | 'max' | 'unknown';
 }
 
 /**
@@ -98,6 +99,7 @@ const defaults: AppSettings = {
   selectedBundles: ['productivity', 'developer'],
   enabledSkills: [],
   disabledSkills: [],
+  mockWeb3Tier: 'free',
 };
 
 /**

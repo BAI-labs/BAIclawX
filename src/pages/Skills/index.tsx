@@ -57,6 +57,7 @@ function resolveSkillSourceLabel(skill: Skill, t: TFunction<'skills'>): string {
   }
   if (source === 'openclaw-bundled') return t('source.badge.bundled', { defaultValue: 'Bundled' });
   if (source === 'openclaw-managed') return t('source.badge.managed', { defaultValue: 'Managed' });
+  if (source === 'clawx-managed-web3') return t('source.badge.managedWeb3', { defaultValue: 'Managed Web3' });
   if (source === 'openclaw-workspace') return t('source.badge.workspace', { defaultValue: 'Workspace' });
   if (source === 'openclaw-extra') return t('source.badge.extra', { defaultValue: 'Extra dirs' });
   if (source === 'agents-skills-personal') return t('source.badge.agentsPersonal', { defaultValue: 'Personal .agents' });
@@ -182,6 +183,7 @@ function SkillDetailDialog({ skill, isOpen, onClose, onToggle, onUninstall, onOp
   };
 
   if (!skill) return null;
+  const canEditSkillConfig = !skill.isCore && !skill.isManagedWeb3;
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -215,6 +217,13 @@ function SkillDetailDialog({ skill, isOpen, onClose, onToggle, onUninstall, onOp
             {skill.description && (
               <p className="text-[14px] text-foreground/70 font-medium leading-[1.6] text-center px-4">
                 {skill.description}
+              </p>
+            )}
+            {skill.isManagedWeb3 && (
+              <p className="mt-3 text-[12px] text-foreground/55 text-center px-4">
+                {skill.locked
+                  ? t('detail.managedLocked', { defaultValue: 'This managed Web3 pack is locked for the current subscription tier.' })
+                  : t('detail.managedDescription', { defaultValue: 'This managed Web3 pack is configured through BAIclaw Web3 settings.' })}
               </p>
             )}
           </div>
@@ -257,7 +266,7 @@ function SkillDetailDialog({ skill, isOpen, onClose, onToggle, onUninstall, onOp
             </div>
 
             {/* API Key Section */}
-            {!skill.isCore && (
+            {canEditSkillConfig && (
               <div className="space-y-2">
                 <h3 className="text-[13px] font-bold flex items-center gap-2 text-foreground/80">
                   <Key className="h-3.5 w-3.5 text-blue-500" />
@@ -277,7 +286,7 @@ function SkillDetailDialog({ skill, isOpen, onClose, onToggle, onUninstall, onOp
             )}
 
             {/* Environment Variables Section */}
-            {!skill.isCore && (
+            {canEditSkillConfig && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-2">
@@ -337,23 +346,30 @@ function SkillDetailDialog({ skill, isOpen, onClose, onToggle, onUninstall, onOp
             )}
 
             {/* External Links */}
-            {skill.slug && !skill.isBundled && !skill.isCore && (
+            {((skill.slug && !skill.isBundled && !skill.isCore) || skill.docsUrl) && (
               <div className="flex gap-2 justify-center pt-8">
-                <Button variant="outline" size="sm" className="h-[28px] text-[11px] font-medium px-3 gap-1.5 rounded-full border-black/10 dark:border-white/10 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 shadow-none text-foreground/70" onClick={handleOpenClawhub}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-[28px] text-[11px] font-medium px-3 gap-1.5 rounded-full border-black/10 dark:border-white/10 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 shadow-none text-foreground/70"
+                  onClick={skill.docsUrl ? () => invokeIpc('shell:openExternal', skill.docsUrl!) : handleOpenClawhub}
+                >
                   <Globe className="h-[12px] w-[12px]" />
-                  ClawHub
+                  {t('detail.viewDocs', { defaultValue: 'View docs' })}
                 </Button>
-                <Button variant="outline" size="sm" className="h-[28px] text-[11px] font-medium px-3 gap-1.5 rounded-full border-black/10 dark:border-white/10 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 shadow-none text-foreground/70" onClick={handleOpenEditor}>
-                  <FileCode className="h-[12px] w-[12px]" />
-                  {t('detail.openManual')}
-                </Button>
+                {!skill.isManagedWeb3 && (
+                  <Button variant="outline" size="sm" className="h-[28px] text-[11px] font-medium px-3 gap-1.5 rounded-full border-black/10 dark:border-white/10 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 shadow-none text-foreground/70" onClick={handleOpenEditor}>
+                    <FileCode className="h-[12px] w-[12px]" />
+                    {t('detail.openManual')}
+                  </Button>
+                )}
               </div>
             )}
           </div>
 
           {/* Centered Footer Buttons */}
           <div className="pt-8 pb-4 flex items-center justify-center gap-4 w-full px-2 max-w-[340px] mx-auto">
-            {!skill.isCore && (
+            {canEditSkillConfig && (
               <Button
                 onClick={handleSaveConfig}
                 className={cn(
@@ -378,6 +394,7 @@ function SkillDetailDialog({ skill, isOpen, onClose, onToggle, onUninstall, onOp
                     onToggle(!skill.enabled);
                   }
                 }}
+                disabled={Boolean(skill.locked)}
               >
                 {!skill.isBundled && onUninstall
                   ? t('detail.uninstall')
@@ -473,13 +490,14 @@ export function Skills() {
 
   const bulkToggleVisible = useCallback(async (enable: boolean) => {
     const candidates = filteredSkills.filter((skill) => !skill.isCore && skill.enabled !== enable);
-    if (candidates.length === 0) {
+    const allowedCandidates = candidates.filter((skill) => !skill.locked);
+    if (allowedCandidates.length === 0) {
       toast.info(enable ? t('toast.noBatchEnableTargets') : t('toast.noBatchDisableTargets'));
       return;
     }
 
     let succeeded = 0;
-    for (const skill of candidates) {
+    for (const skill of allowedCandidates) {
       try {
         if (enable) {
           await enableSkill(skill.id);
@@ -492,12 +510,12 @@ export function Skills() {
       }
     }
 
-    trackUiEvent('skills.batch_toggle', { enable, total: candidates.length, succeeded });
-    if (succeeded === candidates.length) {
+    trackUiEvent('skills.batch_toggle', { enable, total: allowedCandidates.length, succeeded });
+    if (succeeded === allowedCandidates.length) {
       toast.success(enable ? t('toast.batchEnabled', { count: succeeded }) : t('toast.batchDisabled', { count: succeeded }));
       return;
     }
-    toast.warning(t('toast.batchPartial', { success: succeeded, total: candidates.length }));
+    toast.warning(t('toast.batchPartial', { success: succeeded, total: allowedCandidates.length }));
   }, [disableSkill, enableSkill, filteredSkills, t]);
 
   const handleToggle = useCallback(async (skillId: string, enable: boolean) => {
@@ -768,6 +786,10 @@ export function Skills() {
                         <h3 className="text-[15px] font-semibold text-foreground truncate">{skill.name}</h3>
                         {skill.isCore ? (
                           <Lock className="h-3 w-3 text-muted-foreground" />
+                        ) : skill.isManagedWeb3 ? (
+                          <Badge variant="secondary" className="px-1.5 py-0 h-5 text-[10px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border-0 shadow-none">
+                            {skill.locked ? t('detail.locked', { defaultValue: 'Locked' }) : t('detail.managedBadge', { defaultValue: 'Managed Web3' })}
+                          </Badge>
                         ) : skill.isBundled ? (
                           <Puzzle className="h-3 w-3 text-blue-500/70" />
                         ) : null}
@@ -799,7 +821,7 @@ export function Skills() {
                     <Switch
                       checked={skill.enabled}
                       onCheckedChange={(checked) => handleToggle(skill.id, checked)}
-                      disabled={skill.isCore}
+                      disabled={skill.isCore || Boolean(skill.locked)}
                     />
                   </div>
                 </div>

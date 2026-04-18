@@ -11,6 +11,7 @@ import { useChatStore, type RawMessage } from '@/stores/chat';
 import { useGatewayStore } from '@/stores/gateway';
 import { useAgentsStore } from '@/stores/agents';
 import { useProviderStore } from '@/stores/providers';
+import { useWeb3Store } from '@/stores/web3';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
@@ -31,6 +32,9 @@ export function Chat() {
   const providerAccounts = useProviderStore((s) => s.accounts);
   const defaultAccountId = useProviderStore((s) => s.defaultAccountId);
   const refreshProviderSnapshot = useProviderStore((s) => s.refreshProviderSnapshot);
+  const managedWeb3Packs = useWeb3Store((s) => s.managedPacks);
+  const refreshWeb3 = useWeb3Store((s) => s.refresh);
+  const web3Entitlement = useWeb3Store((s) => s.entitlement);
 
   const messages = useChatStore((s) => s.messages);
   const currentSessionKey = useChatStore((s) => s.currentSessionKey);
@@ -81,6 +85,10 @@ export function Chat() {
       cancelled = true;
     };
   }, [refreshProviderSnapshot]);
+
+  useEffect(() => {
+    void refreshWeb3();
+  }, [refreshWeb3]);
 
   // Update timestamp when sending starts
   useEffect(() => {
@@ -135,9 +143,12 @@ export function Chat() {
               onOpenModels={() => navigate('/models')}
             />
           ) : isEmpty ? (
-            <WelcomeScreen />
+            <WelcomeScreen managedWeb3Packs={managedWeb3Packs} web3Locked={!web3Entitlement?.canUseManagedWeb3Skills} />
           ) : (
             <>
+              {managedWeb3Packs.length > 0 && (
+                <ManagedWeb3Card packs={managedWeb3Packs} />
+              )}
               {messages.map((msg, idx) => (
                 <ChatMessage
                   key={msg.id || `msg-${idx}`}
@@ -222,7 +233,21 @@ export function Chat() {
 
 // ── Welcome Screen ──────────────────────────────────────────────
 
-function WelcomeScreen() {
+function WelcomeScreen({
+  managedWeb3Packs,
+  web3Locked,
+}: {
+  managedWeb3Packs: Array<{
+    id: string;
+    title: string;
+    description: string;
+    docsUrl: string;
+    locked: boolean;
+    enabled: boolean;
+    configured: boolean;
+  }>;
+  web3Locked: boolean;
+}) {
   const { t } = useTranslation('chat');
   const quickActions = [
     { key: 'askQuestions', label: t('welcome.askQuestions') },
@@ -244,6 +269,87 @@ function WelcomeScreen() {
           >
             {label}
           </button>
+        ))}
+      </div>
+
+      {managedWeb3Packs.length > 0 && (
+        <div className="mt-12 w-full max-w-xl">
+          <ManagedWeb3Card packs={managedWeb3Packs} lockedOverride={web3Locked} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ManagedWeb3Card({
+  packs,
+  lockedOverride,
+}: {
+  packs: Array<{
+    id: string;
+    title: string;
+    description: string;
+    docsUrl: string;
+    locked: boolean;
+    enabled: boolean;
+    configured: boolean;
+  }>;
+  lockedOverride?: boolean;
+}) {
+  const { t } = useTranslation('chat');
+  const locked = lockedOverride ?? packs.every((pack) => pack.locked);
+
+  return (
+    <div className="rounded-[28px] border border-black/10 dark:border-white/10 bg-background/95 px-6 py-5 shadow-sm">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <h3 className="text-[28px] font-serif tracking-tight text-foreground">
+            {t('web3.title', { defaultValue: 'Web3 Skills' })}
+          </h3>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            {locked
+              ? t('web3.lockedDescription', { defaultValue: 'Upgrade to Pro or Max to unlock the managed Web3 skill packs.' })
+              : t('web3.unlockedDescription', { defaultValue: 'Managed Web3 packs are ready in this conversation.' })}
+          </p>
+        </div>
+      </div>
+      <div className="space-y-4">
+        {packs.map((pack) => (
+          <div key={pack.id} className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-[16px] font-semibold text-foreground">{pack.title}</p>
+                <span className={cn(
+                  'inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium',
+                  pack.locked
+                    ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                    : pack.enabled
+                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-black/5 text-muted-foreground',
+                )}>
+                  {pack.locked
+                    ? t('web3.locked', { defaultValue: 'Locked' })
+                    : pack.enabled
+                      ? t('web3.enabled', { defaultValue: 'Enabled' })
+                      : t('web3.available', { defaultValue: 'Available' })}
+                </span>
+                {!pack.configured && !pack.locked && (
+                  <span className="inline-flex rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    {t('web3.needsConfig', { defaultValue: 'Needs config' })}
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">{pack.description}</p>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              className="shrink-0 rounded-full"
+              onClick={() => void window.electron?.openExternal?.(pack.docsUrl)}
+            >
+              {t('web3.viewDocs', { defaultValue: 'View docs' })}
+            </Button>
+          </div>
         ))}
       </div>
     </div>

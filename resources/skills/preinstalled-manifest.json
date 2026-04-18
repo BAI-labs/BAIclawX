@@ -125,6 +125,30 @@
       "ref": "main",
       "version": "main",
       "autoEnable": true
+    },
+    {
+      "slug": "sun-skill",
+      "localPath": "resources/skills/local/sun-skill",
+      "version": "managed-web3-v1",
+      "autoEnable": true
+    },
+    {
+      "slug": "surf",
+      "localPath": "resources/skills/local/surf",
+      "version": "managed-web3-v1",
+      "autoEnable": true
+    },
+    {
+      "slug": "binance-web3-pack",
+      "localPath": "resources/skills/local/binance-web3-pack",
+      "version": "managed-web3-v1",
+      "autoEnable": true
+    },
+    {
+      "slug": "htx-web3-pack",
+      "localPath": "resources/skills/local/htx-web3-pack",
+      "version": "managed-web3-v1",
+      "autoEnable": true
     }
   ]
 }

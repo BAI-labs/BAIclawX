@@ -18,6 +18,8 @@ import { loadAgentWalletRuntimeEnv } from '../utils/agent-wallet';
 import { listProviderAccounts } from '../services/providers/provider-store';
 import type { ProviderAccount } from '../shared/providers/types';
 import { getSkillConfig, updateSkillConfig } from '../utils/skill-config';
+import { buildExchangeRuntimeEnv } from '../services/secrets/exchange-secret-store';
+import { getWeb3Entitlement } from '../services/web3/entitlements';
 
 export interface GatewayLaunchContext {
   appSettings: Awaited<ReturnType<typeof getAllSettings>>;
@@ -388,6 +390,14 @@ async function loadProviderEnv(): Promise<{ providerEnv: Record<string, string>;
   return { providerEnv, loadedProviderKeyCount };
 }
 
+async function loadManagedWeb3Env(): Promise<Record<string, string>> {
+  const entitlement = await getWeb3Entitlement();
+  if (!entitlement.canUseManagedWeb3Skills) {
+    return {};
+  }
+  return await buildExchangeRuntimeEnv();
+}
+
 async function resolveChannelStartupPolicy(): Promise<{
   skipChannels: boolean;
   channelStartupSummary: string;
@@ -441,6 +451,7 @@ export async function prepareGatewayLaunchContext(port: number): Promise<Gateway
   const binPathExists = existsSync(binPath);
 
   const { providerEnv, loadedProviderKeyCount } = await loadProviderEnv();
+  const managedWeb3Env = await loadManagedWeb3Env();
   const agentWalletEnv = await loadAgentWalletRuntimeEnv();
   const { skipChannels, channelStartupSummary } = await resolveChannelStartupPolicy();
   const uvEnv = await getUvMirrorEnv();
@@ -458,6 +469,7 @@ export async function prepareGatewayLaunchContext(port: number): Promise<Gateway
   const forkEnv: Record<string, string | undefined> = {
     ...baseEnvPatched,
     ...providerEnv,
+    ...managedWeb3Env,
     ...agentWalletEnv,
     ...uvEnv,
     ...proxyEnv,

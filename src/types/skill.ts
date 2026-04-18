@@ -23,6 +23,9 @@ export interface Skill {
   source?: string;
   baseDir?: string;
   filePath?: string;
+  isManagedWeb3?: boolean;
+  locked?: boolean;
+  docsUrl?: string;
 }
 
 /**
