@@ -3,6 +3,9 @@ name: Package macOS
 on:
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   package-mac:
     runs-on: macos-14
@@ -14,8 +17,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.31.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
