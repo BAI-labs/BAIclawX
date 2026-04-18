@@ -1,0 +1,39 @@
+name: Package macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package-mac:
+    runs-on: macos-14
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.31.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build macOS package
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: pnpm run package:mac:ci
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: baiclaw-mac
+          path: release/*
+          if-no-files-found: error
