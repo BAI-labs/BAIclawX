@@ -47,6 +47,7 @@
         "icons": "zx scripts/generate-icons.mjs",
         "package": "vite build && pnpm run prepare:desktop-bundle && electron-builder",
         "package:mac": "pnpm run uv:download:mac && pnpm run uv:verify:mac && vite build && pnpm run prepare:desktop-bundle && electron-builder --mac",
+        "package:mac:ci": "pnpm run uv:download:mac && pnpm run uv:verify:mac && vite build && pnpm run prepare:desktop-bundle && electron-builder --mac -c.mac.notarize=false",
         "package:win": "pnpm run uv:download:win && pnpm run uv:verify:win && vite build && pnpm run prepare:desktop-bundle && electron-builder --win",
         "package:linux": "pnpm run uv:download:linux && pnpm run uv:verify:linux && vite build && pnpm run prepare:desktop-bundle && electron-builder --linux",
         "release": "pnpm run uv:download:all && pnpm run uv:verify:all && vite build && pnpm run prepare:desktop-bundle && electron-builder --publish always",
